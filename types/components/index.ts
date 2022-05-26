@@ -7,7 +7,7 @@ type RenderItemData<T> = {
   index: number
 }
 
-export type RenderItem<T extends any = any> = (data: RenderItemData<T>) => React.ReactNode
+export type RenderItem<T = any> = (data: RenderItemData<T>) => React.ReactNode
 
 export type InputLabelProps = {
   id: string
@@ -30,7 +30,7 @@ export type LabelledInputProps = WithLabelledProps<IInputProps>
 
 export type ControlledInputProps = WithControllerProps<IInputProps>
 
-export interface ISelectItem<T extends any = any> {
+export interface ISelectItem<T = any> {
   value: T
   display: string
 }
@@ -46,8 +46,21 @@ export type LabelledSelectProps = WithLabelledProps<ISelectProps>
 
 export type ControlledSelectProps = WithControllerProps<ISelectProps>
 
-export interface ITableProps<T extends any = any> {
+export interface ITableProps<T = any> {
   items: T[]
   // renderItems renders a single row given some data
   renderItems?: RenderItem<T>
+}
+
+export interface IBaseErrorProps {
+  error: string
+}
+
+export interface IErrorBoundaryProps {
+  component?: React.FC<IBaseErrorProps>
+}
+
+export interface IErrorBoundaryStates {
+  hasError: boolean
+  error: string
 }

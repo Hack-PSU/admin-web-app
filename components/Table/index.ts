@@ -11,4 +11,4 @@
  * To better abstract the use of Table, Table should only accept an array of objects representing the data
  *
  */
-export { default as Table } from './Table'
+export { default as Table } from "./Table";

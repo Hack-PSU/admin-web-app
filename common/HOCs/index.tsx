@@ -1,19 +1,18 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {NextPage} from "next";
-import { useFirebase } from 'components/context'
-import { AuthPermission } from 'types/context'
-import {Error} from "components/base";
-
+import { useFirebase } from 'components/context';
+import { AuthPermission } from 'types/context';
+import UnauthorizedError from "components/base/Error/UnauthorizedError";
 
 export function withAuthPage(Component: NextPage, permission: AuthPermission) {
   const Page: NextPage = () => {
-    const { validatePermissions } = useFirebase()
+    const { validatePermissions } = useFirebase();
 
     if (validatePermissions(permission)) {
-      return <Component />
+      return <Component />;
     } else {
-      return <Error />
+      return <UnauthorizedError error={"Unauthorized access"} />;
     }
-  }
-  return Page
+  };
+  return Page;
 }

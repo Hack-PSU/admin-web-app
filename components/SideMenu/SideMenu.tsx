@@ -1,9 +1,9 @@
-import {FC} from "react";
+import { FC } from "react";
 
 const SideMenu: FC = () => {
   return (
     <></>
-  )
-}
+  );
+};
 
-export default SideMenu
+export default SideMenu;

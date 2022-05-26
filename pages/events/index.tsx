@@ -1,9 +1,9 @@
-import {NextPage} from "next";
+import { NextPage } from "next";
 
 const Events: NextPage = () => {
   return (
     <></>
-  )
-}
+  );
+};
 
-export default Events
+export default Events;

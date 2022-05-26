@@ -1,18 +1,18 @@
-import React, {FC, forwardRef} from "react";
-import {ControlledInputProps, IInputProps, LabelledInputProps} from "types/components";
-import {alpha, InputBase, styled} from "@mui/material";
+import React, { FC, forwardRef } from "react";
+import { ControlledInputProps, IInputProps, LabelledInputProps } from "types/components";
+import { alpha, InputBase, styled } from "@mui/material";
 import InputLabel from "components/base/Input/InputLabel";
-import {useController} from "react-hook-form";
+import { useController } from "react-hook-form";
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   padding: theme.spacing(1, 2),
   border: "2px solid black",
   color: theme.palette.common.black,
-  fontSize: '0.8rem',
+  fontSize: "0.8rem",
   "&::placeholder": {
-    color: alpha(theme.palette.common.black, 0.8)
-  }
-}))
+    color: alpha(theme.palette.common.black, 0.8),
+  },
+}));
 
 const Input = forwardRef<any, IInputProps>(({ placeholder, ...props }, ref) => {
   return (
@@ -22,10 +22,14 @@ const Input = forwardRef<any, IInputProps>(({ placeholder, ...props }, ref) => {
       placeholder={placeholder}
       {...props}
     />
-  )
-})
+  );
+});
+Input.displayName = "Input";
 
-export const LabelledInput: FC<LabelledInputProps> = ({ id, label, showError, error, placeholder, ...props }) => {
+export const LabelledInput: FC<LabelledInputProps> =
+  ({ id, label, showError,
+     error, placeholder, ...props
+  }) => {
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
@@ -34,11 +38,14 @@ export const LabelledInput: FC<LabelledInputProps> = ({ id, label, showError, er
         {...props}
       />
     </>
-  )
-}
+  );
+};
 
-export const ControlledInput: FC<ControlledInputProps> = ({ as: Component, name, rules, defaultValue, placeholder, ...props }) => {
-  const { field: { onChange, onBlur, value } } = useController({ name, rules, defaultValue: defaultValue ?? "" })
+export const ControlledInput: FC<ControlledInputProps> =
+  ({ as: Component, name, rules,
+     defaultValue, placeholder, ...props
+  }) => {
+  const { field: { onChange, onBlur, value } } = useController({ name, rules, defaultValue: defaultValue ?? "" });
 
   if (Component) {
     return (
@@ -49,7 +56,7 @@ export const ControlledInput: FC<ControlledInputProps> = ({ as: Component, name,
         value={value}
         {...props}
       />
-    )
+    );
   }
 
   return (
@@ -60,7 +67,7 @@ export const ControlledInput: FC<ControlledInputProps> = ({ as: Component, name,
       value={value}
       {...props}
     />
-  )
-}
+  );
+};
 
-export default Input
+export default Input;
