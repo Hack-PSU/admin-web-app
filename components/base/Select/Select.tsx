@@ -73,7 +73,7 @@ export const LabelledSelect: FC<LabelledSelectProps> =
 
 export const ControlledSelect: FC<ControlledSelectProps> =
   ({
-     placeholder, name, rules, defaultValue,
+     as: Component, placeholder, name, rules, defaultValue,
      items, renderItem, ...props
    }) => {
     const { field: { onChange, onBlur, value, ref } } = useController({
@@ -81,6 +81,22 @@ export const ControlledSelect: FC<ControlledSelectProps> =
       rules,
       defaultValue: defaultValue ?? placeholder,
     });
+
+    if (Component) {
+      return (
+        <Component
+          placeholder={placeholder}
+          items={items}
+          renderItem={renderItem}
+          onChange={onChange}
+          onBlur={onBlur}
+          ref={ref}
+          value={value}
+          defaultValue={defaultValue}
+          {...props}
+        />
+      );
+    }
 
     return (
       <Select

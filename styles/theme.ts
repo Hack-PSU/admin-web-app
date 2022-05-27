@@ -7,6 +7,15 @@ export const theme = responsiveFontSizes(
         black: "#1a1a1a",
         white: "#ffffff"
       }
+    },
+    typography: {
+      htmlFontSize: 16,
+      h1: {
+        fontSize: '2.8rem',
+      },
+      h2: {
+        fontSize: '2.4rem'
+      }
     }
   })
-)
+);

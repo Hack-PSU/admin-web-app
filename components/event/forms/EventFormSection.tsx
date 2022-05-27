@@ -14,16 +14,18 @@ const EventFormSection: FC<WithChildren<IEventFormSectionProps>> = ({ label, chi
     <>
       <Grid item>
         <Typography
-          variant="h4"
+          variant="h6"
           sx={{
             borderBottom: `3px solid ${theme.palette.common.black}`,
             fontWeight: 500,
+            width: "fit-content",
+            lineHeight: "2rem",
           }}
         >
           { label }
         </Typography>
       </Grid>
-      <Grid item>
+      <Grid item sx={{ mt: 1 }}>
         { children }
       </Grid>
     </>
