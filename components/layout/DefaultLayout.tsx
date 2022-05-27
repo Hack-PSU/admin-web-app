@@ -25,7 +25,7 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
           height: "100vh",
           padding: theme.spacing(3, 5) }}
       >
-        {children}
+        { children }
       </Grid>
     </Grid>
   );

@@ -9,7 +9,6 @@ interface IDetailFormProps {
   onSelectWorkshop(isWorkshop: boolean): void
 }
 
-
 const locationItems = [
   { value: "Location1", display: "Location 1" },
   { value: "Location2", display: "Location 2" },
