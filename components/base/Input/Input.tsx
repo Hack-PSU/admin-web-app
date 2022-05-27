@@ -1,5 +1,9 @@
 import React, { FC, forwardRef } from "react";
-import { ControlledInputProps, IInputProps, LabelledInputProps } from "types/components";
+import {
+  ControlledInputProps,
+  IInputProps,
+  LabelledInputProps,
+} from "types/components";
 import { alpha, InputBase, styled } from "@mui/material";
 import InputLabel from "components/base/Input/InputLabel";
 import { useController } from "react-hook-form";
@@ -26,26 +30,33 @@ const Input = forwardRef<any, IInputProps>(({ placeholder, ...props }, ref) => {
 });
 Input.displayName = "Input";
 
-export const LabelledInput: FC<LabelledInputProps> =
-  ({ id, label, showError,
-     error, placeholder, ...props
-  }) => {
+export const LabelledInput: FC<LabelledInputProps> = ({
+  id,
+  label,
+  showError,
+  error,
+  placeholder,
+  ...props
+}) => {
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
-      <Input
-        placeholder={placeholder}
-        {...props}
-      />
+      <Input placeholder={placeholder} {...props} />
     </>
   );
 };
 
-export const ControlledInput: FC<ControlledInputProps> =
-  ({ as: Component, name, rules,
-     defaultValue, placeholder, ...props
-  }) => {
-  const { field: { onChange, onBlur, value } } = useController({ name, rules, defaultValue: defaultValue ?? "" });
+export const ControlledInput: FC<ControlledInputProps> = ({
+  as: Component,
+  name,
+  rules,
+  defaultValue,
+  placeholder,
+  ...props
+}) => {
+  const {
+    field: { onChange, onBlur, value },
+  } = useController({ name, rules, defaultValue: defaultValue ?? "" });
 
   if (Component) {
     return (
