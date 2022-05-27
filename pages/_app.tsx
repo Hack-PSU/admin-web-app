@@ -7,9 +7,8 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { FirebaseProvider } from "components/context";
 import { getAuth } from "@firebase/auth";
 import ApiProvider from "components/context/ApiProvider";
-import { getEnvironment } from "../common/config";
+import { getEnvironment } from "common/config";
 import { initializeApp } from "@firebase/app";
-import { ErrorBoundary } from "components/base/Error";
 
 const client = new QueryClient();
 

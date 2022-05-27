@@ -2,12 +2,15 @@
   "name": "admin-web-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "yarn": ">=2.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -45,5 +48,6 @@
   "lint-staged": {
     "*.{js,tsx,ts}": "eslint --cache --fix",
     "*.{js,css,md,tsx,ts}": "prettier --write"
-  }
+  },
+  "packageManager": "yarn@3.2.1"
 }
