@@ -19,7 +19,7 @@ export type InputLabelProps = {
 export type WithLabelledProps<TProps> = Omit<TProps, "id" | "error"> & InputLabelProps
 
 export type WithControllerProps<TProps> = UseControllerProps & TProps & {
-  as?: React.FC<TProps>
+  as?: React.FC<any>
 }
 
 export interface IInputProps extends Omit<InputProps, "name" | "defaultValue" | "placeholder"> {
@@ -28,7 +28,7 @@ export interface IInputProps extends Omit<InputProps, "name" | "defaultValue" | 
 
 export type LabelledInputProps = WithLabelledProps<IInputProps>
 
-export type ControlledInputProps = WithControllerProps<IInputProps>
+export type ControlledInputProps = WithControllerProps<IInputProps & Partial<InputLabelProps>>
 
 export interface ISelectItem<T = any> {
   value: T
@@ -44,7 +44,7 @@ export interface ISelectProps extends Omit<SelectProps, "placeholder"> {
 
 export type LabelledSelectProps = WithLabelledProps<ISelectProps>
 
-export type ControlledSelectProps = WithControllerProps<ISelectProps>
+export type ControlledSelectProps = WithControllerProps<ISelectProps & Partial<InputLabelProps>>
 
 export interface ITableProps<T = any> {
   items: T[]

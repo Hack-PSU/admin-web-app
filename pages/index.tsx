@@ -8,4 +8,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default withAuthPage(Home, AuthPermission.VOLUNTEER);
+export default Home;

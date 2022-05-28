@@ -7,8 +7,8 @@ export function getEnvironment() {
       projectId: String(process.env.FIREBASE_PROJECT_ID),
       storageBucket: String(process.env.FIREBASE_STORAGE_BUCKET),
       messagingSenderId: String(process.env.FIREBASE_MESSAGING_SENDER_ID),
-      appId: String(process.env.FIREBASE_APP_ID)
+      appId: String(process.env.FIREBASE_APP_ID),
     },
-    baseURL: String(process.env.BASE_URL)
-  }
+    baseURL: String(process.env.BASE_URL),
+  };
 }

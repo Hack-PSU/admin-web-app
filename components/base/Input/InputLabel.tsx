@@ -17,7 +17,7 @@ const InputLabel: FC<InputLabelProps> =
       <Grid container justifyContent="space-between">
         <Grid item sx={{ width: showError ? "50%" : "100%" }}>
           <label htmlFor={id}>
-            <StyledLabel variant="body1">
+            <StyledLabel variant="body1" sx={{ fontWeight: 600 }}>
               {label}
             </StyledLabel>
           </label>
