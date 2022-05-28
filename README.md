@@ -11,7 +11,7 @@ npm install -g yarn
 Install dependencies by running
 
 ```bash
-yarn && yarn prepare
+yarn
 ```
 
 To start the development server:
