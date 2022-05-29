@@ -1,12 +1,16 @@
 import { FC, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { ControlledInput, ControlledSelect, LabelledInput } from "components/base";
+import {
+  ControlledInput,
+  ControlledSelect,
+  LabelledInput,
+} from "components/base";
 import LabelledEventInput from "components/event/forms/LabelledEventInput";
 import { Grid } from "@mui/material";
 import LabelledEventSelect from "components/event/forms/LabelledEventSelect";
 
 interface IDetailFormProps {
-  onSelectWorkshop(isWorkshop: boolean): void
+  onSelectWorkshop(isWorkshop: boolean): void;
 }
 
 const locationItems = [
@@ -18,9 +22,9 @@ const DetailForm: FC<IDetailFormProps> = ({ onSelectWorkshop }) => {
   const { watch } = useForm();
   const eventType = watch("type");
 
-  useEffect(() => {
-    onSelectWorkshop(eventType === "workshop");
-  }, [eventType, onSelectWorkshop]);
+  // useEffect(() => {
+  //   onSelectWorkshop(eventType === "workshop");
+  // }, [eventType, onSelectWorkshop]);
 
   return (
     <Grid container>

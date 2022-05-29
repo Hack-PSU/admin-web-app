@@ -1,16 +1,44 @@
-import { createContext, FC, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { WithChildren } from "types/common";
-import { getIdToken, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from "@firebase/auth";
-import { AuthError, AuthPermission, IFirebaseProviderHooks, IFirebaseProviderProps, JwtToken } from "types/context";
+import {
+  getIdToken,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
+} from "@firebase/auth";
+import {
+  AuthError,
+  AuthPermission,
+  IFirebaseProviderHooks,
+  IFirebaseProviderProps,
+  IJwtToken,
+} from "types/context";
 import jwtDecode from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
+import nookies from "nookies";
 
-const FirebaseContext = createContext<IFirebaseProviderHooks>({} as IFirebaseProviderHooks);
+const FirebaseContext = createContext<IFirebaseProviderHooks>(
+  {} as IFirebaseProviderHooks
+);
 
-const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({ auth, children }) => {
+const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
+  auth,
+  children,
+}) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [token, setToken] = useState<string>("");
-  const [permission, setPermission] = useState<AuthPermission>(AuthPermission.NONE);
+  const [permission, setPermission] = useState<AuthPermission>(
+    AuthPermission.NONE
+  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<AuthError>(AuthError.NONE);
 
@@ -18,44 +46,56 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({ auth, chil
     return await getIdToken(user);
   }, []);
 
-  const validatePermissions = useCallback((privilege: number, userToken?: string) => {
-    const validToken = userToken || token || "";
-    if (validToken) {
-      const decoded = jwtDecode<JwtToken>(validToken);
-      if (decoded.iss && decoded.iss.includes("hackpsu18")) {
-        setPermission(decoded.privilege);
-        if (decoded.privilege && decoded.privilege >= privilege) {
-          return true;
+  const validatePermissions = useCallback(
+    (privilege: number, userToken?: string) => {
+      const validToken = userToken || token || "";
+      if (validToken) {
+        const decoded = jwtDecode<IJwtToken>(validToken);
+        if (decoded.iss && decoded.iss.includes("hackpsu18")) {
+          setPermission(decoded.privilege);
+          if (decoded.privilege && decoded.privilege >= privilege) {
+            return true;
+          }
         }
       }
-    }
-    setError(AuthError.NONE);
-    return false;
-  }, [token]);
+      setError(AuthError.NONE);
+      return false;
+    },
+    [token]
+  );
 
-  const validateToken = useCallback(async (user: User) => {
-    const token = await getUserIdToken(user);
-    setToken(token);
+  const validateToken = useCallback(
+    async (user: User) => {
+      const token = await getUserIdToken(user);
+      setToken(token);
+      nookies.set(undefined, "idtoken", token, { path: "/" });
 
-    return validatePermissions(AuthPermission.TEAM, token);
-  }, [getUserIdToken, validatePermissions]);
+      return validatePermissions(AuthPermission.TEAM, token);
+    },
+    [getUserIdToken, validatePermissions]
+  );
 
-  const resolveAuthState = useCallback(async (user?: User) => {
-    if (user) {
-      if (await validateToken(user)) {
-        setUser(user);
-        setIsAuthenticated(true);
+  const resolveAuthState = useCallback(
+    async (user?: User) => {
+      if (user) {
+        if (await validateToken(user)) {
+          console.log(user);
+          setUser(user);
+          setIsAuthenticated(true);
+        } else {
+          setUser(undefined);
+          setIsAuthenticated(false);
+          setError(AuthError.NO_PERMISSION);
+        }
       } else {
+        nookies.set(undefined, "idtoken", "", { path: "/" });
         setUser(undefined);
         setIsAuthenticated(false);
-        setError(AuthError.NO_PERMISSION);
+        setError(AuthError.NONE);
       }
-    } else {
-      setUser(undefined);
-      setIsAuthenticated(false);
-      setError(AuthError.NONE);
-    }
-  }, [validateToken]);
+    },
+    [validateToken]
+  );
 
   const resolveAuthError = useCallback((error: string) => {
     switch (error) {
@@ -68,17 +108,24 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({ auth, chil
     }
   }, []);
 
-  const loginWithEmailAndPassword = useCallback(async (email: string, password: string) => {
-    setError(AuthError.NONE);
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (userCredential.user) {
-        await resolveAuthState(userCredential.user);
+  const loginWithEmailAndPassword = useCallback(
+    async (email: string, password: string) => {
+      setError(AuthError.NONE);
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        if (userCredential.user) {
+          await resolveAuthState(userCredential.user);
+        }
+      } catch (e) {
+        resolveAuthError((e as FirebaseError).code);
       }
-    } catch (e) {
-      resolveAuthError((e as FirebaseError).code);
-    }
-  }, [auth, resolveAuthError, resolveAuthState]);
+    },
+    [auth, resolveAuthError, resolveAuthState]
+  );
 
   const logout = useCallback(async () => {
     try {
@@ -94,27 +141,30 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({ auth, chil
     });
   }, [auth, resolveAuthState]);
 
-  const value = useMemo(() => ({
-    user,
-    token,
-    permission,
-    isAuthenticated,
-    error,
-    validatePermissions,
-    resolveAuthState,
-    loginWithEmailAndPassword,
-    logout,
-  }), [
-    user,
-    token,
-    permission,
-    isAuthenticated,
-    error,
-    validatePermissions,
-    resolveAuthState,
-    loginWithEmailAndPassword,
-    logout,
-  ]);
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      permission,
+      isAuthenticated,
+      error,
+      validatePermissions,
+      resolveAuthState,
+      loginWithEmailAndPassword,
+      logout,
+    }),
+    [
+      user,
+      token,
+      permission,
+      isAuthenticated,
+      error,
+      validatePermissions,
+      resolveAuthState,
+      loginWithEmailAndPassword,
+      logout,
+    ]
+  );
 
   return (
     <FirebaseContext.Provider value={value}>

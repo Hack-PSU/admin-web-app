@@ -1,11 +1,9 @@
 import type { NextPage } from "next";
-import { withAuthPage } from "common/HOCs";
+import { withAuthPage, withDefaultLayout } from "common/HOCs";
 import { AuthPermission } from "types/context";
 
 const Home: NextPage = () => {
-  return (
-    <></>
-  );
+  return <></>;
 };
 
-export default Home;
+export default withDefaultLayout(Home);
