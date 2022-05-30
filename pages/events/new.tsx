@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import { NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { Grid, Typography } from "@mui/material";
 import { DetailForm, EventFormSection } from "components/event";
 import { FormProvider, useForm } from "react-hook-form";
-import { withDefaultLayout } from "common/HOCs";
-import { useQuery } from "react-query";
+import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { getAllEvents } from "api/index";
+import { IGetAllEventsResponse } from "types/api";
 
-const NewEvent: NextPage = () => {
+interface INewEventProps {
+  events: IGetAllEventsResponse[];
+}
+
+const NewEvent: NextPage<INewEventProps> = ({ events }) => {
   const [isWorkshop, setIsWorkshop] = useState<boolean>(false);
   const methods = useForm();
 
@@ -15,9 +19,9 @@ const NewEvent: NextPage = () => {
     setIsWorkshop((bool) => !bool);
   };
 
-  const { data } = useQuery("events", () => getAllEvents());
+  // console.log(events);
 
-  // console.log(data);
+  // const { data } = useQuery("events", () => getAllEvents(0));
 
   return (
     <Grid
@@ -49,5 +53,19 @@ const NewEvent: NextPage = () => {
     </Grid>
   );
 };
+
+export const getServerSideProps = withServerSideProps(async (token) => {
+  const resp = await getAllEvents(undefined, undefined, token);
+  let events: IGetAllEventsResponse[] = [];
+
+  if (resp && resp.data) {
+    events = resp.data.body.data;
+  }
+  return {
+    props: {
+      events,
+    },
+  };
+});
 
 export default withDefaultLayout(NewEvent);

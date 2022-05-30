@@ -1,19 +1,34 @@
-export type CreateEntity<TInput, TUid extends keyof TInput, TResponse> = (
-  entity: Omit<TInput, TUid>
-) => Promise<TResponse | undefined>;
+import { AxiosResponse } from "axios";
+
+export type ApiResponse<TData> = {
+  api_response: string;
+  status: number;
+  body: {
+    result: string;
+    data: TData;
+  };
+};
+
+export type CreateEntity<TInput, TOmit extends keyof TInput, TResponse> = (
+  entity: Omit<TInput, TOmit>,
+  token?: string
+) => Promise<AxiosResponse<ApiResponse<TResponse>> | undefined>;
 
 export type GetEntity<TResponse, TParams = any> = (
-  params?: TParams
-) => Promise<TResponse | undefined>;
+  params?: TParams,
+  token?: string
+) => Promise<AxiosResponse<ApiResponse<TResponse>> | undefined>;
 
 export type UpdateEntity<TInput, TResponse> = (
   entity: Partial<TInput>,
-  extractId?: (entity: Partial<TInput>) => number | string
-) => Promise<TResponse | undefined>;
+  extractId?: (entity: Partial<TInput>) => number | string,
+  token?: string
+) => Promise<AxiosResponse<ApiResponse<TResponse>> | undefined>;
 
 export type DeleteEntity<TInput, TParams extends keyof TInput, TResponse> = (
-  entity: Pick<TInput, TParams>
-) => Promise<TResponse>;
+  entity: Pick<TInput, TParams>,
+  token?: string
+) => Promise<AxiosResponse<ApiResponse<TResponse>>>;
 
 export enum EventType {
   WORKSHOP = "workshop",
@@ -115,4 +130,37 @@ export interface IHackathonEntity {
   end_time: string;
   base_pin: number;
   active: boolean;
+}
+
+export interface ICheckoutEntity {
+  uid?: number;
+  itemId: string;
+  userId: string;
+  checkoutTime: number;
+  returnTime?: number;
+  hackathon?: string;
+}
+
+export interface IGetAllCheckoutItemsResponse {
+  uid: number;
+  item_id: number;
+  user_id: string;
+  checkout_time: string;
+  return_time: string | null;
+  hackathon?: string;
+  firstname: string;
+  lastname: string;
+  name: string;
+}
+
+export interface ICheckoutRequestResponse {
+  item_id: number;
+  user_id: string;
+  checkout_time: number;
+}
+
+export interface ICheckoutItemEntity {
+  uid?: number;
+  name: string;
+  quantity: number;
 }

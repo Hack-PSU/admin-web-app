@@ -10,6 +10,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (request) => {
+  if (request.headers && request.headers.idtoken) {
+    return request;
+  }
+
   const user = getAuth(getApp()).currentUser;
 
   if (user) {

@@ -6,7 +6,7 @@ export type WithChildren<T = {}> = T & {
   children?: React.ReactNode;
 };
 
-export type NextPageLayout = NextPage & {
+export type NextPageLayout<TProps = any> = NextPage<TProps> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
 };
 

@@ -1,10 +1,15 @@
 import { PaginatedQueryFn } from "types/hooks";
 import {
+  ApiResponse,
   CreateEntity,
   DeleteEntity,
   EventEndpointResponse,
   GetEntity,
+  ICheckoutEntity,
+  ICheckoutItemEntity,
+  ICheckoutRequestResponse,
   IEventEntity,
+  IGetAllCheckoutItemsResponse,
   IGetAllEventsResponse,
   IGetAllHackersResponse,
   IHackathonEntity,
@@ -23,74 +28,155 @@ import { AxiosResponse } from "axios";
  * Get All Hackers
  * @param offset (optional)
  * @param limit (optional)
+ * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Statistics-Get_list_of_all_users
  */
 export const getAllHackers: PaginatedQueryFn<
-  AxiosResponse<IGetAllHackersResponse[]>
-> = async (offset, limit) =>
-  api.get<IGetAllHackersResponse[]>("/admin/data", {
+  AxiosResponse<ApiResponse<IGetAllHackersResponse[]>>
+> = async (offset, limit, token) =>
+  api.get("/admin/data", {
     params: {
       type: "registration",
-      offset: offset ?? 0,
+      ...(offset ? { offset } : {}),
       ...(limit ? { limit } : {}),
     },
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
   });
 
 /**
  * Get All Events
  * @param offset (optional)
  * @param limit (optional)
+ * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Get_events
  */
 export const getAllEvents: PaginatedQueryFn<
-  AxiosResponse<IGetAllEventsResponse[]>
-> = async (offset, limit) =>
-  api.get<IGetAllEventsResponse[]>("/live/events", {
-    // params: {
-    // offset: offset ?? 0,
-    // ...(limit ? { limit } : {}),
-    // },
+  AxiosResponse<ApiResponse<IGetAllEventsResponse[]>>
+> = async (offset, limit, token) =>
+  api.get("/live/events", {
+    params: {
+      ...(offset ? { offset } : {}),
+      ...(limit ? { limit } : {}),
+    },
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
   });
 
 /**
  * Get All Locations
  * @param offset (optional)
  * @param limit (optional)
+ * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Get_Location_List
  */
 export const getAllLocations: PaginatedQueryFn<
-  AxiosResponse<LocationEndpointResponse[]>
-> = async (offset, limit) =>
+  AxiosResponse<ApiResponse<LocationEndpointResponse[]>>
+> = async (offset, limit, token) =>
   api.get("/admin/location", {
     params: {
-      offset: offset ?? 0,
+      ...(offset ? { offset } : {}),
       ...(limit ? { limit } : {}),
     },
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
   });
 
 /**
  * Get All Hackathons
  * @param offset (optional)
  * @param limit (optional)
+ * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-Get_Hackathons
  */
 export const getAllHackathons: PaginatedQueryFn<
-  AxiosResponse<IHackathonEntity[]>
-> = async (offset, limit) =>
+  AxiosResponse<ApiResponse<IHackathonEntity[]>>
+> = async (offset, limit, token) =>
   api.get("/admin/hackathon", {
     params: {
-      offset: offset ?? 0,
+      ...(offset ? { offset } : {}),
       ...(limit ? { limit } : {}),
     },
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
   });
 
 /**
  * Get Hackathon Count
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-get_count_of_hackathon
  */
-export const getHackathonCount: GetEntity<
-  AxiosResponse<{ count: number }>
-> = async () => api.get("/admin/hackathon/count");
+export const getHackathonCount: GetEntity<{ count: number }> = async (
+  params,
+  token
+) =>
+  api.get("/admin/hackathon/count", {
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
+  });
+
+/**
+ * Get All Checked Out Items
+ * @param params no params available here
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Item_Checkout-Get_list_of_checkout_out_items
+ */
+export const getAllCheckoutItems: GetEntity<
+  IGetAllCheckoutItemsResponse
+> = async (params, token) =>
+  api.get("/admin/checkout", {
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
+  });
+
+/**
+ * Get All Available Checkout Items
+ * @param params no params available here - undefined
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Item_Checkout-Get_items_for_checkout
+ */
+export const getAllAvailableItems: GetEntity<ICheckoutItemEntity> = async (
+  params,
+  token
+) =>
+  api.get("/admin/checkout/items", {
+    ...(token
+      ? {
+          headers: {
+            idtoken: token,
+          },
+        }
+      : {}),
+  });
 
 /**
  * Mutations
@@ -104,7 +190,7 @@ export const getHackathonCount: GetEntity<
 export const createLocation: CreateEntity<
   ILocationEntity,
   "uid",
-  AxiosResponse<LocationEndpointResponse>
+  LocationEndpointResponse
 > = async (entity) => api.post("/admin/location", entity);
 
 /**
@@ -114,7 +200,7 @@ export const createLocation: CreateEntity<
  */
 export const updateLocation: UpdateEntity<
   ILocationEntity,
-  AxiosResponse<LocationEndpointResponse>
+  LocationEndpointResponse
 > = async (entity) => api.post("/admin/location/update", entity);
 
 /**
@@ -125,7 +211,7 @@ export const updateLocation: UpdateEntity<
 export const deleteLocation: DeleteEntity<
   ILocationEntity,
   "uid",
-  AxiosResponse<LocationEndpointResponse>
+  LocationEndpointResponse
 > = async (entity) => api.post("/admin/location/delete", entity);
 
 /**
@@ -136,7 +222,7 @@ export const deleteLocation: DeleteEntity<
 export const createEvent: CreateEntity<
   IEventEntity,
   "uid",
-  AxiosResponse<EventEndpointResponse>
+  EventEndpointResponse
 > = async (entity) => api.post("/live/events", entity);
 
 /**
@@ -146,7 +232,7 @@ export const createEvent: CreateEntity<
  */
 export const updateEvent: UpdateEntity<
   IEventEntity,
-  AxiosResponse<EventEndpointResponse>
+  EventEndpointResponse
 > = async (entity) => api.post("/live/events/update", entity);
 
 /**
@@ -157,7 +243,7 @@ export const updateEvent: UpdateEntity<
 export const deleteEvent: DeleteEntity<
   IEventEntity,
   "uid" | "hackathon",
-  AxiosResponse<{}>
+  {}
 > = async (entity) => api.post("/live/events/delete", entity);
 
 /**
@@ -168,7 +254,7 @@ export const deleteEvent: DeleteEntity<
 export const createHackathon: CreateEntity<
   IHackathonEntity,
   "uid" | "base_pin" | "active",
-  AxiosResponse<IHackathonEntity>
+  IHackathonEntity
 > = async (entity) => api.post("/admin/hackathon", entity);
 
 /**
@@ -178,7 +264,7 @@ export const createHackathon: CreateEntity<
  */
 export const updateHackathon: UpdateEntity<
   IHackathonEntity,
-  AxiosResponse<IHackathonEntity>
+  IHackathonEntity
 > = async (entity) => api.post("/admin/hackathon/update", entity);
 
 /**
@@ -189,5 +275,28 @@ export const updateHackathon: UpdateEntity<
 export const updateActiveHackathon: DeleteEntity<
   IHackathonEntity,
   "uid",
-  AxiosResponse<IHackathonEntity>
+  IHackathonEntity
 > = async (entity) => api.post("/admin/hackathon/active", entity);
+
+/**
+ * Create a Checkout Request
+ * @param entity
+ * @link https://api.hackpsu.org/v2/doc/#api-Item_Checkout-Create_new_Item_Checkout
+ */
+export const createCheckoutRequest: CreateEntity<
+  ICheckoutEntity,
+  "uid" | "checkoutTime" | "hackathon" | "returnTime",
+  ICheckoutRequestResponse
+> = async (entity) => api.post("/admin/post", entity);
+
+/**
+ * Return a Checked Out Item
+ * @param entity
+ * @link https://api.hackpsu.org/v2/doc/#api-Item_Checkout-Return_checkout_item
+ */
+export const returnCheckoutItem: DeleteEntity<
+  ICheckoutItemEntity,
+  "uid",
+  {}
+> = async (entity) =>
+  api.post("/admin/checkout/return", { checkoutId: entity.uid });

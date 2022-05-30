@@ -1,13 +1,14 @@
-import { FC, useEffect } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { FC } from "react";
+import { useForm } from "react-hook-form";
 import {
   ControlledInput,
   ControlledSelect,
-  LabelledInput,
+  LabelledSelect,
 } from "components/base";
 import LabelledEventInput from "components/event/forms/LabelledEventInput";
 import { Grid } from "@mui/material";
 import LabelledEventSelect from "components/event/forms/LabelledEventSelect";
+import { EventType } from "types/api";
 
 interface IDetailFormProps {
   onSelectWorkshop(isWorkshop: boolean): void;
@@ -16,6 +17,12 @@ interface IDetailFormProps {
 const locationItems = [
   { value: "Location1", display: "Location 1" },
   { value: "Location2", display: "Location 2" },
+];
+
+const eventTypeItems = [
+  { value: EventType.FOOD, display: "Food" },
+  { value: EventType.ACTIVITY, display: "Event" },
+  { value: EventType.WORKSHOP, display: "Workshop" },
 ];
 
 const DetailForm: FC<IDetailFormProps> = ({ onSelectWorkshop }) => {
@@ -27,7 +34,7 @@ const DetailForm: FC<IDetailFormProps> = ({ onSelectWorkshop }) => {
   // }, [eventType, onSelectWorkshop]);
 
   return (
-    <Grid container>
+    <Grid container rowGap={3}>
       <Grid item xs={4}>
         <ControlledInput
           name="name"
@@ -49,12 +56,21 @@ const DetailForm: FC<IDetailFormProps> = ({ onSelectWorkshop }) => {
       </Grid>
       <Grid item xs={4}>
         <ControlledSelect
-          items={locationItems}
+          items={eventTypeItems}
           name="type"
           placeholder="Select a type"
           id="type"
           label="Type"
           as={LabelledEventSelect}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <ControlledInput
+          name="date"
+          placeholder="Select Date"
+          id="date"
+          label="Date"
+          as={LabelledEventInput}
         />
       </Grid>
     </Grid>

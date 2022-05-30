@@ -22,14 +22,16 @@ const Login: NextPage = () => {
     methods.handleSubmit((data) => {
       return loginWithEmailAndPassword(data.email, data.password);
     })();
-    // .then(() => {
-    //   return router.push("/events/new");
-    // });
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      void router.push("/events/new");
+      const { from } = router.query;
+      if (from) {
+        void router.push(String(from));
+      } else {
+        void router.push("/events/new");
+      }
     }
   }, [router, isAuthenticated]);
 
