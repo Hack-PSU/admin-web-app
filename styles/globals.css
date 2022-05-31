@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&display=swap");
 
 html,
 body {
@@ -15,4 +15,21 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.react-datepicker {
+  border: none;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.react-datepicker__header {
+  background-color: #ffffff;
+  border-bottom: none;
+}
+
+.react-datepicker__day-name {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+  font-weight: 600;
+  font-family: "Poppins", "Arial", sans-serif;
 }

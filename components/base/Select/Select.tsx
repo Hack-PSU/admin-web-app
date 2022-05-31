@@ -77,15 +77,15 @@ const Select = forwardRef<any, ISelectProps>(
           onBlur={onBlur}
           inputProps={{
             style: {
-              WebkitTextFillColor: "black",
+              WebkitTextFillColor: selectColor,
               ...props.selectInputStyle,
             },
           }}
           sx={{
             width: "100%",
             "&& > input.MuiInputBase-input.Mui-disabled": {
-              color: "black !important",
-              WebkitTextFillColor: "black !important",
+              color: selectColor,
+              WebkitTextFillColor: selectColor,
             },
             ...selectStyle,
           }}

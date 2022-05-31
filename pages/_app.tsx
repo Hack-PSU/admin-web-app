@@ -1,5 +1,5 @@
+import "react-datepicker/dist/react-datepicker.css";
 import "../styles/globals.css";
-import { DefaultLayout } from "components/layout";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "styles";
 import { QueryClientProvider, QueryClient } from "react-query";
@@ -7,8 +7,10 @@ import { FirebaseProvider } from "components/context";
 import { getAuth } from "@firebase/auth";
 import ApiProvider from "components/context/ApiProvider";
 import { getEnvironment } from "common/config";
-import { getApp, getApps, initializeApp } from "@firebase/app";
+import { initializeApp } from "@firebase/app";
 import { AppPropsLayout } from "types/common";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 const client = new QueryClient();
 const config = getEnvironment();

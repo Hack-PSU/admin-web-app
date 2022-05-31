@@ -12,6 +12,7 @@ import {
   UseControllerReturn,
   UseFormRegister,
 } from "react-hook-form";
+import { ReactDatePickerProps } from "react-datepicker";
 
 type RenderItemData<T> = {
   item: T;
@@ -88,3 +89,30 @@ export interface IErrorBoundaryStates {
   hasError: boolean;
   error: string;
 }
+
+export interface IDatePickerProps extends ReactDatePickerProps {
+  value: string;
+  onChange(value: Date): void;
+  placeholder?: string;
+  inputProps?: IInputProps;
+}
+
+export type LabelledDatePickerProps = WithLabelledProps<IDatePickerProps>;
+
+export type ControlledDatePickerProps = WithControllerProps<
+  Omit<IDatePickerProps, "value" | "onChange"> & Partial<InputLabelProps>
+>;
+
+export interface ITimePickerProps
+  extends Omit<IInputProps, "value" | "onChange"> {
+  value: Date;
+  onChange?: UseControllerReturn["field"]["onChange"];
+  menuWidth?: string;
+  pickerInputStyle?: React.CSSProperties;
+}
+
+export type LabelledTimePickerProps = WithLabelledProps<ITimePickerProps>;
+
+export type ControlledTimePickerProps = WithControllerProps<
+  Omit<ITimePickerProps, "value" | "onChange"> & Partial<InputLabelProps>
+>;

@@ -44,7 +44,7 @@ export const theme = responsiveFontSizes(
         fontFamily: "Open Sans",
       },
       body1: {
-        fontSize: "0.8rem",
+        fontSize: "0.9rem",
         fontFamily: "Poppins",
       },
     },
