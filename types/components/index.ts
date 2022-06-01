@@ -1,17 +1,6 @@
 import React from "react";
-import {
-  InputProps,
-  SxProps,
-  Theme,
-  SelectProps,
-  TextFieldProps,
-  InputBaseComponentProps,
-} from "@mui/material";
-import {
-  UseControllerProps,
-  UseControllerReturn,
-  UseFormRegister,
-} from "react-hook-form";
+import { InputProps, SxProps, Theme, SelectProps } from "@mui/material";
+import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 
 type RenderItemData<T> = {
@@ -116,3 +105,10 @@ export type LabelledTimePickerProps = WithLabelledProps<ITimePickerProps>;
 export type ControlledTimePickerProps = WithControllerProps<
   Omit<ITimePickerProps, "value" | "onChange"> & Partial<InputLabelProps>
 >;
+
+export interface IDateTimePicker {
+  datePickerProps: Omit<IDateTimePicker, "value" | "onChange">;
+  timePickerProps: Omit<ITimePickerProps, "value" | "onChange">;
+  value: Date;
+  onChange: UseControllerReturn["field"]["onChange"];
+}

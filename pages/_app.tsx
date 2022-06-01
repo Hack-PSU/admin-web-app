@@ -9,8 +9,6 @@ import ApiProvider from "components/context/ApiProvider";
 import { getEnvironment } from "common/config";
 import { initializeApp } from "@firebase/app";
 import { AppPropsLayout } from "types/common";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 const client = new QueryClient();
 const config = getEnvironment();

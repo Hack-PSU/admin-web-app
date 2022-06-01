@@ -6,9 +6,10 @@ import {
 } from "common/HOCs";
 import { AuthPermission } from "types/context";
 import { Grid } from "@mui/material";
-import { ControlledSelect, Select } from "components/base";
+import { ControlledSelect, Input, Select } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
-import { TimePicker } from "components/base/Pickers";
+import { DatePicker, TimePicker } from "components/base/Pickers";
+import { useDateTime } from "common/hooks";
 
 const Home: NextPage = () => {
   const methods = useForm();
@@ -19,10 +20,15 @@ const Home: NextPage = () => {
     })();
   };
 
+  const { dateTime, register } = useDateTime("dateTime", methods);
+
+  console.log(dateTime);
+
   return (
     <Grid container justifyContent="center" alignItems="center">
       <Grid item xs={10}>
-        <TimePicker value={new Date()} placeholder={"Select a time"} />
+        <DatePicker {...register("date")} />
+        <TimePicker placeholder={"Select time"} {...register("time")} />
       </Grid>
       {/*<ControlledSelect*/}
       {/*  name={"cselect"}*/}
@@ -33,7 +39,7 @@ const Home: NextPage = () => {
       {/*  ]}*/}
       {/*  menuWidth="74.5%"*/}
       {/*/>*/}
-      {/*<button onClick={onClickButton}>Click</button>*/}
+      <button onClick={onClickButton}>Click</button>
       {/*<Select placeholder={"Select here"} items={[{ value: "1", display: "1" }, { value: "2", display: "2" }]} />*/}
     </Grid>
   );
