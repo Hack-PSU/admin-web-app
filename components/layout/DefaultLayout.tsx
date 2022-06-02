@@ -20,12 +20,14 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
       <Grid
         item
         sx={{
+          width: "80%",
           flexGrow: 1,
           overflow: "auto",
           height: "100vh",
-          padding: theme.spacing(3, 5) }}
+          padding: theme.spacing(3, 5),
+        }}
       >
-        { children }
+        {children}
       </Grid>
     </Grid>
   );

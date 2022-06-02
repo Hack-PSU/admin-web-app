@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import BaseDatePicker, {
   ReactDatePickerCustomHeaderProps,
 } from "react-datepicker";
@@ -12,6 +12,7 @@ import {
   LabelledDatePickerProps,
 } from "types/components";
 import { useController, useForm } from "react-hook-form";
+import { DateTime } from "luxon";
 
 const DatePickerAdornment: FC = () => (
   <InputAdornment
@@ -26,12 +27,13 @@ const DatePickerAdornment: FC = () => (
 );
 
 const DatePickerInput: FC<Omit<IInputProps, "placeholder">> = ({
+  sx,
   ...props
 }) => {
   return (
     <Input
       placeholder={""}
-      sx={{ width: "100%", borderRadius: "15px" }}
+      sx={{ width: "100%", borderRadius: "15px", ...sx }}
       endAdornment={<DatePickerAdornment />}
       {...props}
     />
@@ -40,12 +42,8 @@ const DatePickerInput: FC<Omit<IInputProps, "placeholder">> = ({
 
 const DatePickerHeader: FC<ReactDatePickerCustomHeaderProps> = ({
   date,
-  changeYear,
-  changeMonth,
   decreaseMonth,
   increaseMonth,
-  prevMonthButtonDisabled,
-  nextMonthButtonDisabled,
 }) => {
   const theme = useTheme();
 
@@ -92,11 +90,26 @@ const DatePicker: FC<IDatePickerProps> = ({
   value,
   inputProps,
   placeholder,
+  minDate,
+  endDate,
+  ...props
 }) => {
+  useEffect(() => {
+    if (props.selectsEnd && minDate && endDate) {
+      // is end side of range
+      const dateTimeMin = DateTime.fromJSDate(minDate).startOf("day");
+      const dateTimeEnd = DateTime.fromJSDate(endDate).startOf("day");
+
+      if (dateTimeEnd < dateTimeMin) {
+        onChange(dateTimeMin.toJSDate());
+      }
+    }
+  }, [props.selectsEnd, minDate, endDate, onChange]);
+
   return (
     <BaseDatePicker
       onChange={onChange}
-      value={value}
+      selected={value}
       placeholderText={placeholder ?? "MM/DD/YYYY"}
       renderCustomHeader={(props) => <DatePickerHeader {...props} />}
       formatWeekDay={(day) => day.substring(0, 3).toUpperCase()}
@@ -105,6 +118,9 @@ const DatePicker: FC<IDatePickerProps> = ({
       renderDayContents={(dayOfMonth, date) => (
         <DatePickerDay dayOfMonth={dayOfMonth} date={date} />
       )}
+      minDate={minDate}
+      endDate={endDate}
+      {...props}
     />
   );
 };

@@ -79,11 +79,11 @@ export interface IErrorBoundaryStates {
   error: string;
 }
 
-export interface IDatePickerProps extends ReactDatePickerProps {
-  value: string;
+export interface IDatePickerProps extends Omit<ReactDatePickerProps, "value"> {
+  value: Date;
   onChange(value: Date): void;
   placeholder?: string;
-  inputProps?: IInputProps;
+  inputProps?: Omit<IInputProps, "placeholder" | "value" | "onChange">;
 }
 
 export type LabelledDatePickerProps = WithLabelledProps<IDatePickerProps>;
@@ -93,7 +93,7 @@ export type ControlledDatePickerProps = WithControllerProps<
 >;
 
 export interface ITimePickerProps
-  extends Omit<IInputProps, "value" | "onChange"> {
+  extends Omit<IInputProps, "value" | "onChange" | "placeholder"> {
   value: Date;
   onChange?: UseControllerReturn["field"]["onChange"];
   menuWidth?: string;

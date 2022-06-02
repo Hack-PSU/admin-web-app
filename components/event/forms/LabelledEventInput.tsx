@@ -11,6 +11,7 @@ const LabelledEventInput: FC<LabelledInputProps> = ({
   label,
   showError,
   error,
+  sx,
   ...props
 }) => {
   return (
@@ -23,6 +24,7 @@ const LabelledEventInput: FC<LabelledInputProps> = ({
         width: "80%",
         mt: 0.6,
         borderRadius: "15px",
+        ...sx,
       }}
       inputProps={{
         style: {

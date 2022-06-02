@@ -20,16 +20,9 @@ const Home: NextPage = () => {
     })();
   };
 
-  const { dateTime, register } = useDateTime("dateTime", methods);
-
-  console.log(dateTime);
-
   return (
     <Grid container justifyContent="center" alignItems="center">
-      <Grid item xs={10}>
-        <DatePicker {...register("date")} />
-        <TimePicker placeholder={"Select time"} {...register("time")} />
-      </Grid>
+      <Grid item xs={10}></Grid>
       {/*<ControlledSelect*/}
       {/*  name={"cselect"}*/}
       {/*  placeholder={"Select Here"}*/}

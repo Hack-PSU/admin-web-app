@@ -1,27 +1,21 @@
-import React, { useState } from "react";
-import { GetServerSidePropsContext, NextPage } from "next";
-import { Grid, Typography } from "@mui/material";
-import { DetailForm, EventFormSection } from "components/event";
+import React from "react";
+import { NextPage } from "next";
+import { Button, darken, Grid, Typography, useTheme } from "@mui/material";
+import { DetailForm, EventFormSection, WorkshopForm } from "components/event";
 import { FormProvider, useForm } from "react-hook-form";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { getAllEvents } from "api/index";
-import { IGetAllEventsResponse } from "types/api";
+import { EventType, IGetAllEventsResponse } from "types/api";
 
 interface INewEventProps {
   events: IGetAllEventsResponse[];
 }
 
 const NewEvent: NextPage<INewEventProps> = ({ events }) => {
-  const [isWorkshop, setIsWorkshop] = useState<boolean>(false);
   const methods = useForm();
+  const eventType = methods.watch("type");
 
-  const toggleWorkshop = () => {
-    setIsWorkshop((bool) => !bool);
-  };
-
-  // console.log(events);
-
-  // const { data } = useQuery("events", () => getAllEvents(0));
+  const theme = useTheme();
 
   return (
     <Grid
@@ -39,17 +33,37 @@ const NewEvent: NextPage<INewEventProps> = ({ events }) => {
         >
           New Event
         </Typography>
-        <FormProvider {...methods}>
-          <EventFormSection label={"Details"}>
-            <DetailForm onSelectWorkshop={toggleWorkshop} />
-          </EventFormSection>
-          {/*{ isWorkshop &&*/}
-          {/*  <EventFormSection label={"Workshop"}>*/}
-          {/*    <></>*/}
-          {/*  </EventFormSection>*/}
-          {/*}*/}
-        </FormProvider>
       </Grid>
+      <FormProvider {...methods}>
+        <EventFormSection label={"Details"}>
+          <DetailForm />
+        </EventFormSection>
+        {eventType && eventType.value === EventType.WORKSHOP && (
+          <EventFormSection label={"Workshop"} sx={{ mt: 2 }}>
+            <WorkshopForm />
+          </EventFormSection>
+        )}
+        <Grid item mt={2}>
+          <Button
+            sx={{
+              borderRadius: "15px",
+              backgroundColor: "#f0f0f0",
+              lineHeight: "1.2rem",
+              textTransform: "none",
+              color: "black",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              padding: theme.spacing(1, 5),
+              ":hover": {
+                backgroundColor: darken("#f0f0f0", 0.05),
+              },
+            }}
+            onClick={methods.handleSubmit((data) => console.log(data))}
+          >
+            Submit
+          </Button>
+        </Grid>
+      </FormProvider>
     </Grid>
   );
 };

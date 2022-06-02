@@ -1,21 +1,23 @@
 import { FC } from "react";
 import { WithChildren } from "types/common";
-import { Grid, Typography } from "@mui/material";
+import { Grid, SxProps, Theme, Typography } from "@mui/material";
 import { useTheme } from "@mui/system";
 
 interface IEventFormSectionProps {
   label: string;
+  sx?: SxProps<Theme>;
 }
 
 const EventFormSection: FC<WithChildren<IEventFormSectionProps>> = ({
   label,
   children,
+  sx,
 }) => {
   const theme = useTheme();
 
   return (
     <>
-      <Grid item>
+      <Grid item sx={sx}>
         <Typography
           variant="h4"
           sx={{

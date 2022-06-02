@@ -20,11 +20,11 @@ const TimePickerAdornment: FC = () => (
 );
 
 const TimePicker: FC<ITimePickerProps> = ({
-  placeholder,
   value,
   onChange,
   menuWidth,
   pickerInputStyle,
+  sx,
   ...props
 }) => {
   const [hour, setHour] = useState<string>("01");
@@ -63,7 +63,7 @@ const TimePicker: FC<ITimePickerProps> = ({
   return (
     <>
       <Input
-        placeholder={placeholder}
+        placeholder={""}
         disabled
         endAdornment={<TimePickerAdornment />}
         onClick={onClickInput}
@@ -73,6 +73,9 @@ const TimePicker: FC<ITimePickerProps> = ({
           ".MuiInputBase-input": {
             cursor: "pointer",
           },
+          width: "100%",
+          borderRadius: "15px",
+          ...sx,
         }}
         inputProps={{
           style: {

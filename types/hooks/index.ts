@@ -22,16 +22,12 @@ export type UsePaginatedQuery<TData> = UseQueryResult<
   handleJump(to: number): void;
 };
 
-type RegisterDateTimePicker<T> = {
-  value: T;
+type RegisterDateTimePicker = {
+  value: Date;
   onChange: UseControllerReturn["field"]["onChange"];
 };
 
 export type UseDateTime = {
   dateTime: Date;
-  register<T extends "date" | "time">(
-    type: T
-  ): T extends "date"
-    ? RegisterDateTimePicker<string>
-    : RegisterDateTimePicker<Date>;
+  register<T extends "date" | "time">(type: T): RegisterDateTimePicker;
 };

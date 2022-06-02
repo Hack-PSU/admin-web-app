@@ -7,21 +7,21 @@ import {
 } from "types/components";
 import { EvaIcon } from "components/base";
 import { Input, InputLabel } from "components/base/Input";
-import { InputAdornment, Menu, MenuItem } from "@mui/material";
+import { Box, InputAdornment, Menu, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { useController } from "react-hook-form";
 
 const ChevronDown: FC = () => (
-  <EvaIcon name={"chevron-down-outline"} size="medium" fill="#000" />
+  <EvaIcon name={"chevron-down-outline"} size="large" fill="#000" />
 );
 
 const ChevronUp: FC = () => (
-  <EvaIcon name={"chevron-up-outline"} size="medium" fill="#000" />
+  <EvaIcon name={"chevron-up-outline"} size="large" fill="#000" />
 );
 
 const SelectAdornment: FC<{ open: boolean }> = ({ open }) => (
   <InputAdornment position={"end"}>
-    {open ? <ChevronUp /> : <ChevronDown />}
+    <Box mt={0.5}>{open ? <ChevronUp /> : <ChevronDown />}</Box>
   </InputAdornment>
 );
 
@@ -37,6 +37,7 @@ const Select = forwardRef<any, ISelectProps>(
       value,
       onChange,
       onBlur,
+      selectInputStyle,
       ...props
     },
     ref
@@ -78,7 +79,7 @@ const Select = forwardRef<any, ISelectProps>(
           inputProps={{
             style: {
               WebkitTextFillColor: selectColor,
-              ...props.selectInputStyle,
+              ...selectInputStyle,
             },
           }}
           sx={{

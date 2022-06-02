@@ -61,10 +61,6 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
     });
   }, [date, time]);
 
-  const getDateValue = useCallback(() => {
-    return formatDate().toLocaleString(DateTime.DATE_SHORT);
-  }, [formatDate]);
-
   useEffect(() => {
     methods.setValue(name, formatDate().toJSDate());
   }, [name, date, time, methods, formatDate]);
@@ -74,7 +70,7 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
     register(type) {
       if (type === "date") {
         return {
-          value: getDateValue(),
+          value: date,
           onChange: setDate,
         };
       } else if (type === "time") {
