@@ -31,3 +31,13 @@ export type UseDateTime = {
   dateTime: Date;
   register<T extends "date" | "time">(type: T): RegisterDateTimePicker;
 };
+
+type DateTimeRangeType = "startDate" | "startTime" | "endDate" | "endTime";
+
+export type UseDateTimeRange = {
+  startDateTime: Date;
+  endDateTime: Date;
+  register(type: DateTimeRangeType): RegisterDateTimePicker;
+  toggleMultiple(): void;
+  isMultipleDays: boolean;
+};

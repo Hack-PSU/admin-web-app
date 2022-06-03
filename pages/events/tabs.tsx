@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { NextPage } from "next";
-import { Button, darken, Grid, Typography, useTheme } from "@mui/material";
-import { DetailForm, EventFormSection, WorkshopForm } from "components/event";
+import {
+  alpha,
+  Button,
+  darken,
+  Grid,
+  lighten,
+  styled,
+  Tab,
+  Tabs,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import {
+  DetailForm,
+  EventFormPanel,
+  EventFormSection,
+  WorkshopForm,
+} from "components/event";
 import { FormProvider, useForm } from "react-hook-form";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { getAllEvents } from "api/index";
@@ -11,7 +27,35 @@ interface INewEventProps {
   events: IGetAllEventsResponse[];
 }
 
-const NewEvent: NextPage<INewEventProps> = ({ events }) => {
+interface IStyledTabProps {
+  label: string;
+}
+
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  borderBottom: `1px solid ${alpha(theme.palette.common.black, 0.4)}`,
+  "& .MuiTabs-indicator": {
+    backgroundColor: "black",
+  },
+}));
+
+const StyledTab = styled((props: IStyledTabProps) => (
+  <Tab disableRipple {...props} />
+))(({ theme }) => ({
+  textTransform: "none",
+  fontWeight: theme.typography.fontWeightRegular,
+  marginRight: theme.spacing(1),
+  fontSize: theme.typography.pxToRem(17),
+  color: alpha(theme.palette.common.black, 0.4),
+  "&:hover": {
+    color: lighten(theme.palette.common.black, 0.05),
+  },
+  "&.Mui-selected": {
+    color: "black",
+    fontWeight: 700,
+  },
+}));
+
+const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
   const methods = useForm();
   const eventType = methods.watch("type");
 
@@ -21,6 +65,12 @@ const NewEvent: NextPage<INewEventProps> = ({ events }) => {
     methods.handleSubmit((data) => {
       console.log(data);
     })();
+  };
+
+  const [tab, setTab] = useState<number>(0);
+
+  const onChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
   };
 
   return (
@@ -41,14 +91,24 @@ const NewEvent: NextPage<INewEventProps> = ({ events }) => {
         </Typography>
       </Grid>
       <FormProvider {...methods}>
-        <EventFormSection label={"Details"}>
+        <Grid item>
+          <StyledTabs
+            value={tab}
+            onChange={onChangeTab}
+            aria-label="new event tabs"
+          >
+            <StyledTab label="Details" />
+            {eventType && eventType.value === EventType.WORKSHOP && (
+              <StyledTab label="Workshop" />
+            )}
+          </StyledTabs>
+        </Grid>
+        <EventFormPanel value={tab} index={0}>
           <DetailForm />
-        </EventFormSection>
-        {eventType && eventType.value === EventType.WORKSHOP && (
-          <EventFormSection label={"Workshop"} sx={{ mt: 2 }}>
-            <WorkshopForm />
-          </EventFormSection>
-        )}
+        </EventFormPanel>
+        <EventFormPanel value={tab} index={1}>
+          <WorkshopForm />
+        </EventFormPanel>
         <Grid item mt={2}>
           <Button
             sx={{
@@ -88,4 +148,4 @@ export const getServerSideProps = withServerSideProps(async (token) => {
   };
 });
 
-export default withDefaultLayout(NewEvent);
+export default withDefaultLayout(TabbedEvent);

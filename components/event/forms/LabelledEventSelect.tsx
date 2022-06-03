@@ -7,7 +7,7 @@ const LabelledEventSelect: FC<LabelledSelectProps> = (props) => {
     <LabelledSelect
       menuWidth={"20%"}
       sx={{
-        width: "80%",
+        width: "90%",
         mt: 0.6,
         borderRadius: "15px",
       }}

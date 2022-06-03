@@ -10,6 +10,7 @@ import { Input, InputLabel } from "components/base/Input";
 import { Box, InputAdornment, Menu, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { useController } from "react-hook-form";
+import BaseMenuItem from "components/base/Select/BaseMenuItem";
 
 const ChevronDown: FC = () => (
   <EvaIcon name={"chevron-down-outline"} size="large" fill="#000" />
@@ -113,14 +114,12 @@ const Select = forwardRef<any, ISelectProps>(
               return renderItem({ item, index });
             } else {
               return (
-                <MenuItem
-                  onClick={(event) => onChangeItem(event, item)}
+                <BaseMenuItem
                   key={`${item.value}-${item.display}-${index}`}
-                  value={item.value}
-                  sx={{ fontSize: "0.95rem" }}
-                >
-                  {item.display}
-                </MenuItem>
+                  item={item}
+                  onChangeItem={onChangeItem}
+                  index={index}
+                />
               );
             }
           })}

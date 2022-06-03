@@ -118,8 +118,8 @@ const DownloadLinks: FC = () => {
       </Grid>
       <Grid container item>
         {fields.map((field, index) => (
-          // @ts-ignore
           <DownloadLinkInput
+            // @ts-ignore
             update={update}
             value={field}
             index={index}
