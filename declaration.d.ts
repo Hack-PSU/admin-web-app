@@ -13,6 +13,9 @@ declare module "@mui/material/styles" {
       main: string;
       placeholder: string;
     };
+    input: {
+      border: string;
+    };
   }
 
   /* eslint-disable-next-line */ // PaletteOptions is an interface from @mui
@@ -25,6 +28,9 @@ declare module "@mui/material/styles" {
     select?: {
       main?: string;
       placeholder?: string;
+    };
+    input?: {
+      border?: string;
     };
   }
 }

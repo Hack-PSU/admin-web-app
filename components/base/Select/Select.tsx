@@ -7,10 +7,10 @@ import {
 } from "types/components";
 import { EvaIcon } from "components/base";
 import { Input, InputLabel } from "components/base/Input";
-import { Box, InputAdornment, Menu, MenuItem } from "@mui/material";
+import { Box, InputAdornment, Menu } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { useController } from "react-hook-form";
-import BaseMenuItem from "components/base/Select/BaseMenuItem";
+import BaseMenuItem from "./BaseMenuItem";
 
 const ChevronDown: FC = () => (
   <EvaIcon name={"chevron-down-outline"} size="large" fill="#000" />
@@ -111,15 +111,16 @@ const Select = forwardRef<any, ISelectProps>(
         >
           {items.map((item, index) => {
             if (renderItem) {
-              return renderItem({ item, index });
+              return renderItem({ item, index, onChange: onChangeItem });
             } else {
               return (
                 <BaseMenuItem
                   key={`${item.value}-${item.display}-${index}`}
                   item={item}
                   onChangeItem={onChangeItem}
-                  index={index}
-                />
+                >
+                  {item.display}
+                </BaseMenuItem>
               );
             }
           })}
@@ -160,7 +161,6 @@ export const ControlledSelect: FC<ControlledSelectProps> = ({
   rules,
   defaultValue,
   items,
-  renderItem,
   ...props
 }) => {
   const {
@@ -176,10 +176,8 @@ export const ControlledSelect: FC<ControlledSelectProps> = ({
       <Component
         placeholder={placeholder}
         items={items}
-        renderItem={renderItem}
         onChange={onChange}
         onBlur={onBlur}
-        ref={ref}
         value={value}
         defaultValue={defaultValue}
         {...props}
@@ -191,7 +189,6 @@ export const ControlledSelect: FC<ControlledSelectProps> = ({
     <Select
       placeholder={placeholder}
       items={items}
-      renderItem={renderItem}
       onChange={onChange}
       onBlur={onBlur}
       ref={ref}

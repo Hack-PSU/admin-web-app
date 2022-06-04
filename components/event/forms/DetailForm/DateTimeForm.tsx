@@ -88,7 +88,7 @@ const DateTimeForm: FC = () => {
         </Grid>
         <Grid item>
           <Typography variant="subtitle1" sx={{ fontSize: "0.85rem" }}>
-            Toggle to select a range
+            Toggle to select a different end date
           </Typography>
         </Grid>
       </Grid>

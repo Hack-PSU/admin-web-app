@@ -2,3 +2,5 @@ export * from "./Input";
 export * from "./Select";
 export * from "./Error";
 export { default as EvaIcon } from "./EvaIcon";
+export * from "./Dropzone";
+export { default as Modal } from "./Modal";

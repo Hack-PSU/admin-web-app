@@ -2,10 +2,12 @@ import React from "react";
 import { InputProps, SxProps, Theme, SelectProps } from "@mui/material";
 import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
+import { DropzoneOptions } from "react-dropzone";
 
 type RenderItemData<T> = {
   item: T;
   index: number;
+  onChange(event: any, item: ISelectItem): void;
 };
 
 export type RenderItem<T = any> = (data: RenderItemData<T>) => React.ReactNode;
@@ -38,6 +40,7 @@ export type ControlledInputProps = WithControllerProps<
 
 export interface ISelectItem<T = any> {
   value: T;
+  type?: "option" | "button";
   display: string;
 }
 
@@ -106,9 +109,12 @@ export type ControlledTimePickerProps = WithControllerProps<
   Omit<ITimePickerProps, "value" | "onChange"> & Partial<InputLabelProps>
 >;
 
-export interface IDateTimePicker {
-  datePickerProps: Omit<IDateTimePicker, "value" | "onChange">;
-  timePickerProps: Omit<ITimePickerProps, "value" | "onChange">;
-  value: Date;
-  onChange: UseControllerReturn["field"]["onChange"];
+export interface IDropzoneProps extends DropzoneOptions {
+  containerStyle?: SxProps<Theme>;
 }
+
+export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;
+
+export type ControlledDropzoneProps = WithControllerProps<
+  Omit<IDropzoneProps, "onDrop"> & Partial<InputLabelProps>
+>;

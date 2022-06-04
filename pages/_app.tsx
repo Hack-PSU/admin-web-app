@@ -3,6 +3,7 @@ import "../styles/globals.css";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "styles";
 import { QueryClientProvider, QueryClient } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { FirebaseProvider } from "components/context";
 import { getAuth } from "@firebase/auth";
 import ApiProvider from "components/context/ApiProvider";
@@ -25,6 +26,7 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
         <QueryClientProvider client={client}>
           <ApiProvider baseURL={config.baseURL}>
             {getLayout(<Component {...pageProps} />)}
+            <ReactQueryDevtools initialIsOpen={false} />
           </ApiProvider>
         </QueryClientProvider>
       </FirebaseProvider>

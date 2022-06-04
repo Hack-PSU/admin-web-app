@@ -22,6 +22,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
+import ModalProvider from "components/context/ModalProvider";
+import AddNewLocationModal from "components/modal/AddNewLocationModal";
 
 interface INewEventProps {
   events: IGetAllEventsResponse[];
@@ -74,63 +76,70 @@ const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
   };
 
   return (
-    <Grid
-      container
-      sx={{
-        flexDirection: "column",
-      }}
-      gap={1.4}
-    >
-      <Grid item>
-        <Typography
-          component={"h1"}
-          variant="h1"
-          sx={{ fontSize: "0.8rem", fontWeight: "bold" }}
-        >
-          New Event
-        </Typography>
-      </Grid>
-      <FormProvider {...methods}>
+    <ModalProvider>
+      <AddNewLocationModal />
+      <Grid
+        container
+        sx={{
+          flexDirection: "column",
+        }}
+        gap={1.4}
+      >
         <Grid item>
-          <StyledTabs
-            value={tab}
-            onChange={onChangeTab}
-            aria-label="new event tabs"
-          >
-            <StyledTab label="Details" />
-            {eventType && eventType.value === EventType.WORKSHOP && (
-              <StyledTab label="Workshop" />
-            )}
-          </StyledTabs>
-        </Grid>
-        <EventFormPanel value={tab} index={0}>
-          <DetailForm />
-        </EventFormPanel>
-        <EventFormPanel value={tab} index={1}>
-          <WorkshopForm />
-        </EventFormPanel>
-        <Grid item mt={2}>
-          <Button
-            sx={{
-              borderRadius: "15px",
-              backgroundColor: "#f0f0f0",
-              lineHeight: "1.2rem",
-              textTransform: "none",
-              color: "black",
-              fontWeight: "bold",
-              fontSize: "1rem",
-              padding: theme.spacing(1, 5),
-              ":hover": {
-                backgroundColor: darken("#f0f0f0", 0.05),
-              },
+          <Typography
+            variant="h3"
+            style={{
+              fontSize: theme.typography.pxToRem(42),
             }}
-            onClick={onSubmit}
+            sx={{
+              fontWeight: "bold",
+            }}
           >
-            Submit
-          </Button>
+            New Event
+          </Typography>
         </Grid>
-      </FormProvider>
-    </Grid>
+        <FormProvider {...methods}>
+          <Grid item>
+            <StyledTabs
+              value={tab}
+              onChange={onChangeTab}
+              aria-label="new event tabs"
+            >
+              <StyledTab label="Details" />
+              {eventType && eventType.value === EventType.WORKSHOP && (
+                <StyledTab label="Workshop" />
+              )}
+            </StyledTabs>
+          </Grid>
+          <EventFormPanel value={tab} index={0}>
+            <DetailForm />
+          </EventFormPanel>
+          <EventFormPanel value={tab} index={1}>
+            <WorkshopForm />
+          </EventFormPanel>
+          <Grid item mt={2}>
+            <Button
+              sx={{
+                borderRadius: "15px",
+                backgroundColor: "#f0f0f0",
+                lineHeight: "1.2rem",
+                textTransform: "none",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                padding: theme.spacing(1, 5),
+                ":hover": {
+                  backgroundColor: darken("#f0f0f0", 0.05),
+                },
+              }}
+              onClick={onSubmit}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </FormProvider>
+      </Grid>
+    </ModalProvider>
   );
 };
 

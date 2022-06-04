@@ -7,11 +7,12 @@ interface IEvaIcon {
   name: string;
   size?: "small" | "medium" | "large" | "xlarge";
   fill?: string;
+  style?: React.CSSProperties;
 }
 
-const EvaIcon: FC<IEvaIcon> = ({ name, size, fill }) => {
+const EvaIcon: FC<IEvaIcon> = ({ name, size, fill, style }) => {
   return (
-    <div key={`${name}-${size ?? ""}-${fill ?? ""}`}>
+    <div key={`${name}-${size ?? ""}-${fill ?? ""}`} style={style}>
       <EvaBaseIcon name={name} fill={fill} size={size} />
     </div>
   );

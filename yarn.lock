@@ -1374,6 +1374,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-table@npm:^0.0.1-alpha.0":
+  version: 0.0.1-alpha.13
+  resolution: "@tanstack/react-table@npm:0.0.1-alpha.13"
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 54d667f2ce9d90f03b51333d66ea788401bf33b4525f3a3a2af86d28bf1ba5e2349450f5b280828d76df5e69bf3e93d4e803dcbfc5feabb559efbd718a232d86
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:^7.0.9":
   version: 7.0.11
   resolution: "@types/json-schema@npm:7.0.11"
@@ -1632,6 +1642,7 @@ __metadata:
     "@mui/icons-material": ^5.8.0
     "@mui/material": ^5.8.1
     "@mui/styled-engine-sc": ^5.8.0
+    "@tanstack/react-table": ^0.0.1-alpha.0
     "@types/luxon": ^2.3.2
     "@types/node": 17.0.35
     "@types/react": 18.0.9
@@ -1646,6 +1657,7 @@ __metadata:
     firebase: ^9.8.1
     framer-motion: ^6
     husky: ">=6"
+    immer: ^9.0.14
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
     luxon: ^2.4.0
@@ -1656,11 +1668,13 @@ __metadata:
     react: 18.1.0
     react-datepicker: ^4.8.0
     react-dom: 18.1.0
+    react-dropzone: ^14.2.1
     react-eva-icons: ^0.0.8
     react-hook-form: ^7.31.2
     react-query: ^3.39.0
     styled-components: ^5.3.5
     typescript: 4.6.4
+    use-immer: ^0.7.0
     yup: ^0.32.11
   languageName: unknown
   linkType: soft
@@ -1814,6 +1828,13 @@ __metadata:
   version: 0.4.0
   resolution: "asynckit@npm:0.4.0"
   checksum: 7b78c451df768adba04e2d02e63e2d0bf3b07adcd6e42b4cf665cb7ce899bedd344c69a1dcbce355b5f972d597b25aaa1c1742b52cffd9caccb22f348114f6be
+  languageName: node
+  linkType: hard
+
+"attr-accept@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "attr-accept@npm:2.2.2"
+  checksum: 496f7249354ab53e522510c1dc8f67a1887382187adde4dc205507d2f014836a247073b05e9d9ea51e2e9c7f71b0d2aa21730af80efa9af2d68303e5f0565c4d
   languageName: node
   linkType: hard
 
@@ -2772,6 +2793,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-selector@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "file-selector@npm:0.6.0"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 7d051b6e5d793f3c6e2ab287ba5e7c2c6a0971bccc9d56e044c8047ba483e18f60fc0b5771c951dc707c0d15f4f36ccb4f1f1aaf385d21ec8f7700dadf8325ba
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
@@ -3161,6 +3191,13 @@ __metadata:
   version: 3.0.6
   resolution: "immediate@npm:3.0.6"
   checksum: f9b3486477555997657f70318cc8d3416159f208bec4cca3ff3442fd266bc23f50f0c9bd8547e1371a6b5e82b821ec9a7044a4f7b944798b25aa3cc6d5e63e62
+  languageName: node
+  linkType: hard
+
+"immer@npm:^9.0.14":
+  version: 9.0.14
+  resolution: "immer@npm:9.0.14"
+  checksum: 17f1365c06d653e672a4f609f08e7203e9ab4b4284818332d6ca9b3f3577a0e3c0066ca7933b636fbae560df79a4b3fde70ed717ce3c6e95c39bf3d5861d5be9
   languageName: node
   linkType: hard
 
@@ -4284,6 +4321,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dropzone@npm:^14.2.1":
+  version: 14.2.1
+  resolution: "react-dropzone@npm:14.2.1"
+  dependencies:
+    attr-accept: ^2.2.2
+    file-selector: ^0.6.0
+    prop-types: ^15.8.1
+  peerDependencies:
+    react: ">= 16.8 || 18.0.0"
+  checksum: 8556d997d66bad79fe165a30d6dc8f917c67d8c7d23069c417eb2a0da6df824ba71b84b532707711e184da105122f6a6e81104341dc5b8c0f96e318267fdda91
+  languageName: node
+  linkType: hard
+
 "react-eva-icons@npm:^0.0.8":
   version: 0.0.8
   resolution: "react-eva-icons@npm:0.0.8"
@@ -4986,7 +5036,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.1.0":
+"tslib@npm:^2.1.0, tslib@npm:^2.4.0":
   version: 2.4.0
   resolution: "tslib@npm:2.4.0"
   checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
@@ -5075,6 +5125,16 @@ __metadata:
   dependencies:
     punycode: ^2.1.0
   checksum: 7167432de6817fe8e9e0c9684f1d2de2bb688c94388f7569f7dbdb1587c9f4ca2a77962f134ec90be0cc4d004c939ff0d05acc9f34a0db39a3c797dada262633
+  languageName: node
+  linkType: hard
+
+"use-immer@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "use-immer@npm:0.7.0"
+  peerDependencies:
+    immer: ">=2.0.0"
+    react: ^16.8.0 || ^17.0.1 || ^18.0.0
+  checksum: 4711403fa2c3648c06b8e6795433eb43adb2c6e9bd00f45971ce6948ba8fc1c3e3cf73820a8d597b22979caa6445d0b791508e147975c3cc435a1ec1e5ce47db
   languageName: node
   linkType: hard
 

@@ -33,9 +33,13 @@ const NewEvent: NextPage<INewEventProps> = ({ events }) => {
     >
       <Grid item>
         <Typography
-          component={"h1"}
-          variant="h1"
-          sx={{ fontSize: "0.8rem", fontWeight: "bold" }}
+          variant="h3"
+          style={{
+            fontSize: theme.typography.pxToRem(42),
+          }}
+          sx={{
+            fontWeight: "bold",
+          }}
         >
           New Event
         </Typography>

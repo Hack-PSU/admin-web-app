@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { forwardRef, FC, useEffect } from "react";
 import BaseDatePicker, {
   ReactDatePickerCustomHeaderProps,
 } from "react-datepicker";
@@ -26,19 +26,20 @@ const DatePickerAdornment: FC = () => (
   </InputAdornment>
 );
 
-const DatePickerInput: FC<Omit<IInputProps, "placeholder">> = ({
-  sx,
-  ...props
-}) => {
-  return (
-    <Input
-      placeholder={""}
-      sx={{ width: "100%", borderRadius: "15px", ...sx }}
-      endAdornment={<DatePickerAdornment />}
-      {...props}
-    />
-  );
-};
+const DatePickerInput: FC<Omit<IInputProps, "placeholder">> = forwardRef(
+  ({ sx, ...props }, ref) => {
+    return (
+      <Input
+        placeholder={""}
+        sx={{ width: "100%", borderRadius: "15px", ...sx }}
+        endAdornment={<DatePickerAdornment />}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+DatePickerInput.displayName = "DatePickerInput";
 
 const DatePickerHeader: FC<ReactDatePickerCustomHeaderProps> = ({
   date,

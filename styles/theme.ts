@@ -25,22 +25,28 @@ export const theme = responsiveFontSizes(
         main: "#1a1a1a",
         placeholder: "#a0a0a0",
       },
+      success: {
+        main: "#50c96c",
+      },
+      error: {
+        main: "#f25959",
+      },
+      input: {
+        border: "#aeaeae",
+      },
     },
     typography: {
       htmlFontSize: 16,
       fontFamily:
         "Open Sans, Poppins, -apple-system, 'Helvetica Neue', Arial, sans-serif",
       h1: {
-        fontSize: "2.8rem",
         fontWeight: "bold",
         fontFamily: "Open Sans",
       },
       h2: {
-        fontSize: "2.4rem",
         fontFamily: "Open Sans",
       },
       h4: {
-        fontSize: "1.2rem",
         fontFamily: "Open Sans",
       },
       body1: {

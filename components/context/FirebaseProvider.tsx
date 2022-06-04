@@ -79,7 +79,6 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
     async (user?: User) => {
       if (user) {
         if (await validateToken(user)) {
-          console.log(user);
           setUser(user);
           setIsAuthenticated(true);
         } else {

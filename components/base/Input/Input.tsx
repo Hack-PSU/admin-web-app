@@ -10,7 +10,7 @@ import { useController } from "react-hook-form";
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   padding: theme.spacing(1, 2),
-  border: "2px solid black",
+  border: `2px solid ${theme.palette.input.border}`,
   color: theme.palette.common.black,
   fontSize: "0.8rem",
   "&::placeholder": {
