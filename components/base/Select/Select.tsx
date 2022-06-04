@@ -21,7 +21,7 @@ const ChevronUp: FC = () => (
 );
 
 const SelectAdornment: FC<{ open: boolean }> = ({ open }) => (
-  <InputAdornment position={"end"}>
+  <InputAdornment position={"end"} style={{ cursor: "pointer" }}>
     <Box mt={0.5}>{open ? <ChevronUp /> : <ChevronDown />}</Box>
   </InputAdornment>
 );
@@ -33,12 +33,12 @@ const Select = forwardRef<any, ISelectProps>(
       items,
       renderItem,
       menuStyle,
-      selectStyle,
       menuWidth,
       value,
       onChange,
       onBlur,
       selectInputStyle,
+      sx,
       ...props
     },
     ref
@@ -80,16 +80,18 @@ const Select = forwardRef<any, ISelectProps>(
           inputProps={{
             style: {
               WebkitTextFillColor: selectColor,
+              cursor: "pointer",
               ...selectInputStyle,
             },
           }}
           sx={{
             width: "100%",
+            borderRadius: "15px",
             "&& > input.MuiInputBase-input.Mui-disabled": {
               color: selectColor,
               WebkitTextFillColor: selectColor,
             },
-            ...selectStyle,
+            ...sx,
           }}
           // @ts-ignore
           value={value ? value.display : placeholder}

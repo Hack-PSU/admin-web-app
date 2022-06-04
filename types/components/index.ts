@@ -51,7 +51,6 @@ export interface ISelectProps
   renderItem?: RenderItem;
   placeholderStyles?: SxProps<Theme>;
   menuStyle?: SxProps<Theme>;
-  selectStyle?: SxProps<Theme>;
   menuWidth?: string;
   onChange?: UseControllerReturn["field"]["onChange"];
   selectInputStyle?: React.CSSProperties;

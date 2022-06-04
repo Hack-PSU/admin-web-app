@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { NextPage } from "next";
 import {
   alpha,
-  Button,
   darken,
   Grid,
   lighten,
@@ -12,6 +11,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { Button } from "components/base";
 import {
   DetailForm,
   EventFormPanel,
@@ -121,15 +121,13 @@ const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
             <Button
               sx={{
                 borderRadius: "15px",
-                backgroundColor: "#f0f0f0",
                 lineHeight: "1.2rem",
-                textTransform: "none",
                 color: "black",
                 fontWeight: "bold",
                 fontSize: "1rem",
                 padding: theme.spacing(1, 5),
                 ":hover": {
-                  backgroundColor: darken("#f0f0f0", 0.05),
+                  backgroundColor: darken(theme.palette.button.grey, 0.05),
                 },
               }}
               onClick={onSubmit}
@@ -143,18 +141,18 @@ const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(async (token) => {
-  const resp = await getAllEvents(undefined, undefined, token);
-  let events: IGetAllEventsResponse[] = [];
-
-  if (resp && resp.data) {
-    events = resp.data.body.data;
-  }
-  return {
-    props: {
-      events,
-    },
-  };
-});
+// export const getServerSideProps = withServerSideProps(async (token) => {
+//   const resp = await getAllEvents(undefined, undefined, token);
+//   let events: IGetAllEventsResponse[] = [];
+//
+//   if (resp && resp.data) {
+//     events = resp.data.body.data;
+//   }
+//   return {
+//     props: {
+//       events,
+//     },
+//   };
+// });
 
 export default withDefaultLayout(TabbedEvent);

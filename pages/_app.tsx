@@ -22,14 +22,14 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
 
   return (
     <ThemeProvider theme={theme}>
-      <FirebaseProvider auth={auth}>
-        <QueryClientProvider client={client}>
-          <ApiProvider baseURL={config.baseURL}>
-            {getLayout(<Component {...pageProps} />)}
-            <ReactQueryDevtools initialIsOpen={false} />
-          </ApiProvider>
-        </QueryClientProvider>
-      </FirebaseProvider>
+      {/*<FirebaseProvider auth={auth}>*/}
+      <QueryClientProvider client={client}>
+        {/*<ApiProvider baseURL={config.baseURL}>*/}
+        {getLayout(<Component {...pageProps} />)}
+        <ReactQueryDevtools initialIsOpen={false} />
+        {/*</ApiProvider>*/}
+      </QueryClientProvider>
+      {/*</FirebaseProvider>*/}
     </ThemeProvider>
   );
 }

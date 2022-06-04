@@ -28,7 +28,7 @@ interface IModalProviderHooks {
   showModal(name: string): void;
   register(name: string): void;
   handleHide(name: string): void;
-  modalState: ModalState;
+  getState(name: string): boolean | null;
 }
 
 const ModalContext = createContext<IModalProviderHooks>(
@@ -67,14 +67,24 @@ const ModalProvider: FC<WithChildren> = ({ children }) => {
     [setModalState]
   );
 
+  const getState = useCallback(
+    (name: string) => {
+      if (name in modalState) {
+        return modalState[name].show;
+      }
+      return null;
+    },
+    [modalState]
+  );
+
   const value = useMemo(
     () => ({
       showModal,
       register,
       handleHide,
-      modalState,
+      getState,
     }),
-    [showModal, register, handleHide, modalState]
+    [showModal, register, handleHide, getState]
   );
 
   return (
@@ -85,14 +95,14 @@ const ModalProvider: FC<WithChildren> = ({ children }) => {
 export const useModalContext = () => useContext(ModalContext);
 
 export function useModal(name: string): UseModalReturn {
-  const { modalState, handleHide: hideModal, register } = useModalContext();
+  const { getState, handleHide: hideModal, register } = useModalContext();
 
   useEffect(() => {
     register(name);
   }, [name, register]);
 
   return {
-    show: name in modalState ? modalState[name].show : false,
+    show: getState(name) ?? false,
     handleHide() {
       hideModal(name);
     },

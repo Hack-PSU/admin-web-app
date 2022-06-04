@@ -4,3 +4,4 @@ export * from "./Error";
 export { default as EvaIcon } from "./EvaIcon";
 export * from "./Dropzone";
 export { default as Modal } from "./Modal";
+export { default as Button } from "./Button";

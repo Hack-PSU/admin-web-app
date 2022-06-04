@@ -16,6 +16,9 @@ export const theme = responsiveFontSizes(
         black: "#1a1a1a",
         white: "#ffffff",
       },
+      button: {
+        grey: "#f0f0f0",
+      },
       menu: {
         main: "#f5f5f5",
         line: "#d6d6d6",
@@ -55,6 +58,19 @@ export const theme = responsiveFontSizes(
       },
     },
     components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
+            borderRadius: "15px",
+          },
+        },
+        defaultProps: {
+          sx: {
+            color: "common.black",
+          },
+        },
+      },
       MuiInputBase: {
         styleOverrides: {
           root: {

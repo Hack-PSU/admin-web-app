@@ -8,7 +8,7 @@ const HackathonSelect: FC<ISelectProps> = ({ ...props }) => {
 
   return (
     <Select
-      selectStyle={{
+      sx={{
         border: "none",
         padding: theme.spacing(1, 2),
         width: "90%",
