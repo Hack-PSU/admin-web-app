@@ -1,9 +1,8 @@
-import { NextPage } from 'next'
+import { NextPage } from "next";
+import { withDefaultLayout } from "common/HOCs";
 
 const Hackers: NextPage = () => {
-  return (
-    <></>
-  )
-}
+  return <></>;
+};
 
-export default Hackers
+export default withDefaultLayout(Hackers);

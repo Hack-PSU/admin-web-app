@@ -20,7 +20,9 @@
       "types/*": ["./types/*"],
       "types": ["./types"],
       "styles": ["./styles"],
-      "common/*": ["./common/*"]
+      "common/*": ["./common/*"],
+      "api/*": ["./common/api/*"],
+      "query": ["./common/api"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

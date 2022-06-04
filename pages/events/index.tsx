@@ -1,9 +1,8 @@
 import { NextPage } from "next";
+import { withDefaultLayout } from "common/HOCs";
 
 const Events: NextPage = () => {
-  return (
-    <></>
-  );
+  return <></>;
 };
 
-export default Events;
+export default withDefaultLayout(Events);
