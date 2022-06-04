@@ -6,7 +6,6 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { FirebaseProvider } from "components/context";
 import { getAuth } from "@firebase/auth";
-import ApiProvider from "components/context/ApiProvider";
 import { getEnvironment } from "common/config";
 import { initializeApp } from "@firebase/app";
 import { AppPropsLayout } from "types/common";
@@ -22,14 +21,12 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
 
   return (
     <ThemeProvider theme={theme}>
-      {/*<FirebaseProvider auth={auth}>*/}
-      <QueryClientProvider client={client}>
-        {/*<ApiProvider baseURL={config.baseURL}>*/}
-        {getLayout(<Component {...pageProps} />)}
-        <ReactQueryDevtools initialIsOpen={false} />
-        {/*</ApiProvider>*/}
-      </QueryClientProvider>
-      {/*</FirebaseProvider>*/}
+      <FirebaseProvider auth={auth}>
+        <QueryClientProvider client={client}>
+          {getLayout(<Component {...pageProps} />)}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </FirebaseProvider>
     </ThemeProvider>
   );
 }
