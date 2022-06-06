@@ -21,12 +21,12 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
 
   return (
     <ThemeProvider theme={theme}>
-      <FirebaseProvider auth={auth}>
-        <QueryClientProvider client={client}>
-          {getLayout(<Component {...pageProps} />)}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </FirebaseProvider>
+      {/*<FirebaseProvider auth={auth}>*/}
+      <QueryClientProvider client={client}>
+        {getLayout(<Component {...pageProps} />)}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+      {/*</FirebaseProvider>*/}
     </ThemeProvider>
   );
 }

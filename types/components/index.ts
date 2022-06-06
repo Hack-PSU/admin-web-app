@@ -3,6 +3,7 @@ import { InputProps, SxProps, Theme, SelectProps } from "@mui/material";
 import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
+import { UseTableOptions } from "react-table";
 
 type RenderItemData<T> = {
   item: T;
@@ -62,11 +63,7 @@ export type ControlledSelectProps = WithControllerProps<
   ISelectProps & Partial<InputLabelProps>
 >;
 
-export interface ITableProps<T = any> {
-  items: T[];
-  // renderItems renders a single row given some data
-  renderItems?: RenderItem<T>;
-}
+export type TableProps<T extends object = {}> = UseTableOptions<T>;
 
 export interface IBaseErrorProps {
   error: string;

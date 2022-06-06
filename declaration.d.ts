@@ -19,6 +19,10 @@ declare module "@mui/material/styles" {
     button: {
       grey: string;
     };
+    table: {
+      header: string;
+      divider: string;
+    };
   }
 
   /* eslint-disable-next-line */ // PaletteOptions is an interface from @mui
@@ -37,6 +41,10 @@ declare module "@mui/material/styles" {
     };
     button?: {
       grey?: string;
+    };
+    table?: {
+      header?: string;
+      divider?: string;
     };
   }
 }

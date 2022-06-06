@@ -24,9 +24,13 @@ export const theme = responsiveFontSizes(
         line: "#d6d6d6",
         accent: "#2878DA",
       },
+      table: {
+        header: "#969696",
+        divider: "#bdbdbd",
+      },
       select: {
         main: "#1a1a1a",
-        placeholder: "#a0a0a0",
+        placeholder: "#bebebe",
       },
       success: {
         main: "#50c96c",

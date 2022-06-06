@@ -1,7 +1,15 @@
 import { useQuery } from "react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AddColumnConfig,
+  AddGroupConfig,
+  BuilderCallback,
+  ColumnBuilder,
+  ColumnOptions,
+  ColumnState,
   PaginatedQueryFn,
+  TableColumnBuilder,
+  TableColumnBuilderConfig,
   UseDateTime,
   UseDateTimeRange,
   UsePaginatedQuery,
@@ -9,6 +17,10 @@ import {
 } from "types/hooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
+import { UseTableOptions } from "react-table";
+import { nanoid } from "nanoid";
+import produce from "immer";
+import _ from "lodash";
 
 export function usePaginatedQuery<TData>(
   queryKey: string,
@@ -170,4 +182,42 @@ export function useDateTimeRange(
     toggleMultiple,
     isMultipleDays,
   };
+}
+
+const _builder: TableColumnBuilderConfig = <T extends object>(
+  state: ColumnState<T>
+) => ({
+  addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T> {
+    const id = nanoid(10);
+    if (options) {
+      const { hideHeader, ...rest } = options;
+      return _addColumn(state, {
+        id,
+        ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
+        ...rest,
+      });
+    }
+    return _addColumn(state, { id, Header: name, accessor: _.camelCase(name) });
+  },
+  save(): ColumnState<T> {
+    return state;
+  },
+});
+
+const _addColumn: AddColumnConfig = (state, options) => {
+  return _builder(
+    produce(state, (draft) => {
+      // @ts-ignore
+      draft.push(options);
+    })
+  );
+};
+
+export function useColumnBuilder<T extends object>(
+  builder: BuilderCallback<T>
+): UseTableOptions<T>["columns"] {
+  return useMemo(
+    () => (builder(_builder([])) as ColumnBuilder<T>).save(),
+    [builder]
+  );
 }

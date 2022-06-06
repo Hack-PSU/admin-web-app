@@ -1,5 +1,6 @@
 import { UseQueryResult } from "react-query";
 import { UseControllerReturn } from "react-hook-form";
+import { Column, ColumnWithLooseAccessor, UseTableOptions } from "react-table";
 
 export type PaginatedQueryFn<TData> = (
   offset?: number,
@@ -41,3 +42,34 @@ export type UseDateTimeRange = {
   toggleMultiple(): void;
   isMultipleDays: boolean;
 };
+
+export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns" | "id"> & {
+  hideHeader?: boolean;
+};
+
+export type ColumnState<T extends object> = UseTableOptions<T>["columns"];
+
+export type TableColumnBuilder<T extends object> = {
+  addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T>;
+};
+
+export type ColumnBuilder<T extends object> = TableColumnBuilder<T> & {
+  save(): ColumnState<T>;
+};
+
+export type BuilderCallback<
+  T extends object,
+  TBuilder = TableColumnBuilder<T>
+> = (builder: TBuilder) => TBuilder;
+
+export type TableColumnBuilderConfig = <T extends object>(
+  state: ColumnState<T>
+) => ColumnBuilder<T>;
+export type AddColumnConfig = <T extends object>(
+  state: ColumnState<T>,
+  options: Column
+) => TableColumnBuilder<T>;
+export type AddGroupConfig = <T extends object>(
+  state: ColumnState<T>,
+  options: Column
+) => TableColumnBuilder<T>;

@@ -1374,16 +1374,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-table@npm:^0.0.1-alpha.0":
-  version: 0.0.1-alpha.13
-  resolution: "@tanstack/react-table@npm:0.0.1-alpha.13"
-  peerDependencies:
-    react: ">=16"
-    react-dom: ">=16"
-  checksum: 54d667f2ce9d90f03b51333d66ea788401bf33b4525f3a3a2af86d28bf1ba5e2349450f5b280828d76df5e69bf3e93d4e803dcbfc5feabb559efbd718a232d86
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:^7.0.9":
   version: 7.0.11
   resolution: "@types/json-schema@npm:7.0.11"
@@ -1467,6 +1457,15 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: 6abb7c47d54f012272650df8a962a28bd82f219291e5ef8b4dfa7fe0bb98ae243b060bf9fbe8ceff6213141794855a006db194b490b00ffd15842ae19d0ce1f0
+  languageName: node
+  linkType: hard
+
+"@types/react-table@npm:^7.7.12":
+  version: 7.7.12
+  resolution: "@types/react-table@npm:7.7.12"
+  dependencies:
+    "@types/react": "*"
+  checksum: 287ea68e75b56c2e70e6d6491cd172348c7302b032789047eb2dca1b25b240684e48a60f58140575828b790f95724b9f3ec4d3adce82fc1c05d994def1449009
   languageName: node
   linkType: hard
 
@@ -1642,12 +1641,12 @@ __metadata:
     "@mui/icons-material": ^5.8.0
     "@mui/material": ^5.8.1
     "@mui/styled-engine-sc": ^5.8.0
-    "@tanstack/react-table": ^0.0.1-alpha.0
     "@types/luxon": ^2.3.2
     "@types/node": 17.0.35
     "@types/react": 18.0.9
     "@types/react-datepicker": ^4.4.1
     "@types/react-dom": 18.0.5
+    "@types/react-table": ^7.7.12
     "@typescript-eslint/eslint-plugin": ^5.26.0
     "@typescript-eslint/parser": ^5.26.0
     axios: ^0.27.2
@@ -1672,6 +1671,7 @@ __metadata:
     react-eva-icons: ^0.0.8
     react-hook-form: ^7.31.2
     react-query: ^3.39.0
+    react-table: ^7.8.0
     styled-components: ^5.3.5
     typescript: 4.6.4
     use-immer: ^0.7.0
@@ -4415,6 +4415,15 @@ __metadata:
     react-native:
       optional: true
   checksum: 18fd745ef86375c73496d6bcffdd4a6d02b48feb1e63c05bcb1881406a91ecf776543d0751b776a6ff6ffddd3d7bf31973a37df8e4eb72d1626c41b815396aef
+  languageName: node
+  linkType: hard
+
+"react-table@npm:^7.8.0":
+  version: 7.8.0
+  resolution: "react-table@npm:7.8.0"
+  peerDependencies:
+    react: ^16.8.3 || ^17.0.0-0 || ^18.0.0
+  checksum: 44ca0fb848c6869cd793cede8dc33072b38ebb8f8d2833565afe7cf3eac5d1fa455ac5fb9d06838b16fab0523d5d03e3e82f7645032f71245096e67b892313b9
   languageName: node
   linkType: hard
 
