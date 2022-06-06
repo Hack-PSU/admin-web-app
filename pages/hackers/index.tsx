@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import {
-  redirectLoginFromError,
+  resolveError,
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
@@ -60,7 +60,7 @@ export const getServerSideProps = withServerSideProps(
         };
       }
     } catch (e: any) {
-      redirectLoginFromError(context, e);
+      resolveError(context, e);
     }
     return {
       props: {

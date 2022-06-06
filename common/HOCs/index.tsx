@@ -33,7 +33,7 @@ export function withDefaultLayout<TProps>(page: NextPageLayout<TProps>) {
   return page;
 }
 
-export const redirectLoginFromError = (
+export const resolveError = (
   context: GetServerSidePropsContext,
   error: any
 ) => {
