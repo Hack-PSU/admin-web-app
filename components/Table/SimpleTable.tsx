@@ -1,16 +1,26 @@
 import React, { FC, useMemo } from "react";
 import { TableProps } from "types/components";
-import { useFlexLayout, useTable } from "react-table";
+import { Cell, useFlexLayout, useTable } from "react-table";
 import { Grid, useTheme } from "@mui/material";
 import TableCell from "./TableCell";
 import TableRow from "./TableRow";
 
 const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
+  const theme = useTheme();
+
   const defaultColumn = useMemo(
     () => ({
       minWidth: 30,
       width: 150,
       maxWidth: 200,
+      Cell: ({ cell }: { cell: Cell }) => (
+        <TableCell
+          {...cell.getCellProps()}
+          sx={{ padding: theme.spacing(0, 2, 0, 0) }}
+        >
+          {cell.value}
+        </TableCell>
+      ),
     }),
     []
   );
@@ -25,8 +35,6 @@ const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
     useFlexLayout
   );
 
-  const theme = useTheme();
-
   /* eslint-disable react/jsx-key */
   // eslint disabled since library handles jsx-key insertion
   return (
@@ -35,7 +43,15 @@ const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
         {headerGroups.map((headerGroup) => (
           <TableRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((header) => (
-              <TableCell header={header}>{header.render("Header")}</TableCell>
+              <TableCell
+                header
+                sx={{
+                  padding: theme.spacing(0, 2, 0, 0),
+                }}
+                {...header.getHeaderProps()}
+              >
+                {header.render("Header")}
+              </TableCell>
             ))}
           </TableRow>
         ))}
@@ -50,9 +66,7 @@ const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
               }}
               {...row.getRowProps()}
             >
-              {row.cells.map((cell) => (
-                <TableCell cell={cell}>{cell.render("Cell")}</TableCell>
-              ))}
+              {row.cells.map((cell) => cell.render("Cell"))}
             </TableRow>
           );
         })}

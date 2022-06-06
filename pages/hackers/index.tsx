@@ -1,17 +1,73 @@
 import { NextPage } from "next";
-import { withDefaultLayout } from "common/HOCs";
+import {
+  redirectLoginFromError,
+  withDefaultLayout,
+  withServerSideProps,
+} from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
+import { getAllHackers } from "query";
+import { IGetAllHackersResponse } from "types/api";
+import { SimpleTable } from "components/Table";
+import { useMemo } from "react";
 
-const Hackers: NextPage = () => {
+interface IHackersPageProps {
+  hackers: IGetAllHackersResponse[];
+}
+
+const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const columns = useColumnBuilder((builder) =>
     builder
-      .addColumn("Name")
-      .addColumn("Pin")
-      .addColumn("Email")
+      .addColumn("Name", {
+        maxWidth: 120,
+      })
+      .addColumn("Pin", {
+        maxWidth: 80,
+        minWidth: 50,
+        width: 50,
+      })
+      .addColumn("Email", {
+        minWidth: 150,
+        maxWidth: 250,
+      })
       .addColumn("University")
   );
 
-  return <></>;
+  const hackersData = useMemo(
+    () =>
+      hackers
+        ? hackers.map(({ firstname, lastname, pin, email, university }) => ({
+            name: `${firstname} ${lastname}`,
+            pin,
+            email,
+            university,
+          }))
+        : [],
+    [hackers]
+  );
+
+  return <SimpleTable columns={columns} data={hackersData} />;
 };
+
+export const getServerSideProps = withServerSideProps(
+  async (context, token) => {
+    try {
+      const resp = await getAllHackers(undefined, undefined, token);
+      if (resp && resp.data) {
+        return {
+          props: {
+            hackers: resp.data.body.data,
+          },
+        };
+      }
+    } catch (e: any) {
+      redirectLoginFromError(context, e);
+    }
+    return {
+      props: {
+        hackers: [],
+      },
+    };
+  }
+);
 
 export default withDefaultLayout(Hackers);

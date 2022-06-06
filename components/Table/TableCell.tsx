@@ -1,42 +1,65 @@
 import { FC } from "react";
-import { Cell, CellProps, HeaderGroup } from "react-table";
-import { Grid, GridProps, Typography, TypographyProps } from "@mui/material";
+import {
+  Grid,
+  GridProps,
+  styled,
+  Typography,
+  TypographyProps,
+  useTheme,
+} from "@mui/material";
 import { WithChildren } from "types/common";
 
-interface ITableHeaderProps {
-  header?: HeaderGroup;
-  containerProps?: Omit<GridProps, "children" | "style">;
+interface ITableHeaderProps extends Omit<GridProps, "style"> {
+  header?: boolean;
   textProps?: Omit<TypographyProps, "children">;
-  cell?: Cell;
+  link?: boolean;
+  textComponent?: (props: WithChildren) => JSX.Element;
 }
+
+export const DefaultCell = styled(Typography)({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+});
 
 const TableCell: FC<WithChildren<ITableHeaderProps>> = ({
   children,
-  cell,
-  header,
-  containerProps,
   textProps,
+  header,
+  textComponent,
+  link,
+  sx: gridSx,
+  ...props
 }) => {
   const { sx, ...rest } = textProps ?? { sx: {} };
+
+  const theme = useTheme();
 
   return (
     <Grid
       item
-      {...containerProps}
-      {...(header ? header.getHeaderProps() : {})}
-      {...(cell ? cell.getCellProps() : {})}
+      sx={{
+        padding: theme.spacing(0, 2, 0, 0),
+        ...gridSx,
+      }}
+      {...props}
     >
-      <Typography
-        variant="body1"
-        sx={{
-          fontWeight: header ? "bold" : 600,
-          color: header ? "table.header" : "common.black",
-          ...sx,
-        }}
-        {...rest}
-      >
-        {children}
-      </Typography>
+      {textComponent ? (
+        textComponent({ children })
+      ) : (
+        <DefaultCell
+          variant="body1"
+          as={link ? "a" : undefined}
+          sx={{
+            fontWeight: header ? "bold" : 600,
+            color: header ? "table.header" : "common.black",
+            ...sx,
+          }}
+          {...rest}
+        >
+          {children}
+        </DefaultCell>
+      )}
     </Grid>
   );
 };

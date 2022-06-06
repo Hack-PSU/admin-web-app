@@ -36,9 +36,9 @@ export const getAllHackers: PaginatedQueryFn<
 > = async (offset, limit, token) =>
   api.get("/admin/data", {
     params: {
-      type: "registration",
-      ...(offset ? { offset } : {}),
-      ...(limit ? { limit } : {}),
+      type: "registration_stats",
+      // ...(offset ? { offset } : {}),
+      // ...(limit ? { limit } : {}),
     },
     ...(token
       ? {

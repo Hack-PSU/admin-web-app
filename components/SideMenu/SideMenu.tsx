@@ -7,6 +7,7 @@ import { IHackathonEntity } from "types/api";
 import { useQuery } from "react-query";
 import { getAllHackathons } from "api/index";
 import HackathonSelect from "components/SideMenu/HackathonSelect";
+import Option from "./Option";
 
 const Container = styled(Grid)(({ theme }) => ({
   width: "100%",
@@ -16,12 +17,12 @@ const Container = styled(Grid)(({ theme }) => ({
 }));
 
 const HackathonContainer = styled(Grid)(({ theme }) => ({
-  padding: theme.spacing(2.5, 4),
+  padding: theme.spacing(2.5, 3),
   borderBottom: `5px solid ${theme.palette.menu.line}`,
 }));
 
 const MenuOptions = styled(Grid)(({ theme }) => ({
-  padding: theme.spacing(2, 4),
+  padding: theme.spacing(2, 3),
   flexDirection: "column",
 }));
 
@@ -51,7 +52,36 @@ const SideMenu: FC = () => {
             as={HackathonSelect}
           />
         </HackathonContainer>
-        <MenuOptions item gap={1}></MenuOptions>
+        <MenuOptions container item gap={2.3}>
+          <Option to={"/hackers"} icon={"people-outline"} option={"Hackers"} />
+          <Option
+            to={"/events"}
+            icon={"calendar-outline"}
+            option={"Events/Workshops"}
+          />
+          <Option to={"/locations"} icon={"pin-outline"} option={"Locations"} />
+          <Option
+            to={"/extra-credit"}
+            icon={"award-outline"}
+            option={"Extra Credit"}
+          />
+          <Option
+            to={"/checkout"}
+            icon={"shopping-cart-outline"}
+            option={"Item Checkout"}
+          />
+          <Option
+            to={"/analytics"}
+            icon={"bar-chart-2-outline"}
+            option={"Analytics"}
+          />
+          <Option
+            to={"/sponsorship"}
+            icon={"gift-outline"}
+            option={"Sponsorship"}
+          />
+          <Option to={"/judging"} icon={"star-outline"} option={"Judging"} />
+        </MenuOptions>
       </Container>
     </FormProvider>
   );

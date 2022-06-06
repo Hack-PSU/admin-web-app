@@ -22,7 +22,7 @@
       "styles": ["./styles"],
       "common/*": ["./common/*"],
       "api/*": ["./common/api/*"],
-      "query": ["./common/api"]
+      "query": ["./common/api"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
