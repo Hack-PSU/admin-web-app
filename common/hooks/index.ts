@@ -1,8 +1,6 @@
-import { useQuery } from "react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AddColumnConfig,
-  AddGroupConfig,
   BuilderCallback,
   ColumnBuilder,
   ColumnOptions,
@@ -15,12 +13,10 @@ import {
   UseDateTimeRange,
   UsePaginatedQuery,
   UsePaginatedQueryOptions,
-  UsePaginationOptions,
-  UseServerSidePaginationReturn,
 } from "types/hooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
-import { useTable, UseTableOptions } from "react-table";
+import { UseTableOptions } from "react-table";
 import { nanoid } from "nanoid";
 import produce from "immer";
 import _ from "lodash";
@@ -32,33 +28,39 @@ export function usePaginatedQuery<
   TRequest = AxiosResponse<ApiResponse<TData>>
 >(
   queryFn: PaginatedQueryFn<TRequest>,
-  { page: initialPage, limit }: UsePaginatedQueryOptions
+  { page: initialPage = 1, limit }: UsePaginatedQueryOptions
 ): UsePaginatedQuery<TData> {
-  const [offset, setOffset] = useState(0);
+  // const [offset, setOffset] = useState(0);
   const [page, setPage] = useState(initialPage);
+  //
+  // useEffect(() => {
+  //   console.log(page, limit);
+  //   setOffset((page - 1) * limit);
+  // }, [limit, page]);
 
-  useEffect(() => {
-    setOffset((page - 1) * limit + 1);
-  }, [limit, page]);
-
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
+    console.log(page);
     setPage(page);
-  };
+  }, []);
 
-  const request = useCallback(async () => {
-    const resp = await queryFn(offset, limit);
-    console.log(resp);
-    // @ts-ignore
-    if (resp && resp.data) {
+  const request = useCallback(
+    async (page: number) => {
+      const offset = (page - 1) * limit;
+      const resp = await queryFn(offset, limit);
       // @ts-ignore
-      return resp.data.body.data;
-    }
-  }, [queryFn, offset, limit]);
+      if (resp && resp.data) {
+        // @ts-ignore
+        return resp.data.body.data;
+      }
+    },
+    [queryFn, limit]
+  );
 
   return {
-    page,
-    handlePageChange,
     request,
+    limit,
+    handlePageChange,
+    page,
   };
 }
 

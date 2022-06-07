@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import React, { FC } from "react";
 import {
   resolveError,
   withDefaultLayout,
@@ -7,8 +8,7 @@ import {
 import { useColumnBuilder, usePaginatedQuery } from "common/hooks";
 import { getAllHackers } from "query";
 import { IGetAllHackersResponse } from "types/api";
-import { SimpleTable } from "components/Table";
-import { FC, useMemo } from "react";
+import { PaginatedTable } from "components/Table";
 import { Box, Grid, InputAdornment, useTheme } from "@mui/material";
 import { Button, EvaIcon, Input } from "components/base";
 import Link from "next/link";
@@ -17,6 +17,8 @@ import { useQuery } from "react-query";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
+  page: number;
+  limit: number;
 }
 
 const SearchAdornment: FC = () => (
@@ -27,7 +29,11 @@ const SearchAdornment: FC = () => (
   </InputAdornment>
 );
 
-const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
+const Hackers: NextPage<IHackersPageProps> = ({
+  hackers,
+  page: initialPage,
+  limit: initialLimit,
+}) => {
   const theme = useTheme();
   const { register } = useForm();
 
@@ -50,41 +56,33 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
   const {
     page,
+    limit,
     handlePageChange,
     request: getHackers,
   } = usePaginatedQuery<IGetAllHackersResponse[]>(getAllHackers, {
-    page: 1,
-    limit: 10,
+    page: initialPage,
+    limit: initialLimit,
   });
 
-  const { data: hackersData } = useQuery(["hackers", page], getHackers, {
-    select: (data) => {
-      if (data) {
-        return data.map((d) => ({
-          name: d.name,
-          pin: d.pin,
-          email: d.email,
-          university: d.university,
-        }));
-      }
-      return [];
-    },
-    keepPreviousData: true,
-    initialData: hackers,
-  });
-
-  // const hackersData = useMemo(
-  //   () =>
-  //     hackers
-  //       ? hackers.map(({ firstname, lastname, pin, email, university }) => ({
-  //           name: `${firstname} ${lastname}`,
-  //           pin,
-  //           email,
-  //           university,
-  //         }))
-  //       : [],
-  //   [hackers]
-  // );
+  const { data: hackersData } = useQuery(
+    ["hackers", page],
+    ({ queryKey }) => getHackers(Number(queryKey[1])),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            name: d.name,
+            pin: d.pin,
+            email: d.email,
+            university: d.university,
+          }));
+        }
+        return [];
+      },
+      keepPreviousData: true,
+      initialData: hackers,
+    }
+  );
 
   return (
     <Grid container gap={1.5}>
@@ -126,7 +124,13 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
         </Grid>
       </Grid>
       <Grid item>
-        <SimpleTable columns={columns} data={hackersData ?? []} />
+        <PaginatedTable
+          page={page}
+          limit={limit}
+          handlePageChange={handlePageChange}
+          columns={columns}
+          data={hackersData ?? []}
+        />
       </Grid>
     </Grid>
   );
@@ -134,12 +138,16 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
 export const getServerSideProps = withServerSideProps(
   async (context, token) => {
+    const offset = 0;
+    const limit = 10;
     try {
-      const resp = await getAllHackers(0, 10, token);
+      const resp = await getAllHackers(offset, limit, token);
       if (resp && resp.data) {
         return {
           props: {
             hackers: resp.data.body.data,
+            page: 1,
+            limit,
           },
         };
       }
@@ -149,6 +157,8 @@ export const getServerSideProps = withServerSideProps(
     return {
       props: {
         hackers: [],
+        page: 1,
+        limit,
       },
     };
   }

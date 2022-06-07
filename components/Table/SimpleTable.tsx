@@ -4,7 +4,6 @@ import { Cell, useFlexLayout, useTable } from "react-table";
 import { Grid, useTheme } from "@mui/material";
 import TableCell from "./TableCell";
 import TableRow from "./TableRow";
-import { useClipboard } from "common/hooks";
 
 const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
   const theme = useTheme();
@@ -44,13 +43,7 @@ const SimpleTable: FC<TableProps> = ({ columns, data, ...props }) => {
         {headerGroups.map((headerGroup) => (
           <TableRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((header) => (
-              <TableCell
-                header
-                sx={{
-                  padding: theme.spacing(0, 2, 0, 0),
-                }}
-                {...header.getHeaderProps()}
-              >
+              <TableCell header {...header.getHeaderProps()}>
                 {header.render("Header")}
               </TableCell>
             ))}

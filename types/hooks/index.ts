@@ -14,8 +14,9 @@ export type UsePaginatedQueryOptions = {
 };
 
 export type UsePaginatedQuery<TData> = {
-  request(): Promise<TData | undefined>;
+  request(page: number): Promise<TData | undefined>;
   page: number;
+  limit: number;
   handlePageChange(page: number): void;
 };
 

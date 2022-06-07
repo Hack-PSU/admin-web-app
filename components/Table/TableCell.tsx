@@ -40,6 +40,7 @@ const TableCell: FC<WithChildren<ITableHeaderProps>> = ({
       item
       sx={{
         padding: theme.spacing(0, 2, 0, 0),
+        my: "auto",
         ...gridSx,
       }}
       {...props}
