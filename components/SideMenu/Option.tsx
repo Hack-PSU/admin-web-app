@@ -17,15 +17,15 @@ const OptionLink = styled(Typography)(({ theme }) => ({
   ":hover": {
     opacity: 1,
   },
-  fontFamily: "Open Sans",
-  fontWeight: 700,
+  fontFamily: "Poppins",
+  fontWeight: 600,
 }));
 
 const Option: FC<IOptionProps> = ({ to, icon, option }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const isActive = to === router.pathname;
+  const isActive = to === router.pathname || router.pathname.includes(to);
 
   return (
     <Link href={to} passHref>
@@ -46,7 +46,7 @@ const Option: FC<IOptionProps> = ({ to, icon, option }) => {
               fill={
                 isActive
                   ? theme.palette.common.black
-                  : alpha(theme.palette.common.black, 0.5)
+                  : alpha(theme.palette.common.black, 0.4)
               }
             />
           </Box>
@@ -56,7 +56,7 @@ const Option: FC<IOptionProps> = ({ to, icon, option }) => {
             as={"a"}
             variant="body1"
             sx={{
-              opacity: isActive ? 1 : 0.5,
+              opacity: isActive ? 1 : 0.3,
             }}
           >
             {option}

@@ -10,21 +10,28 @@ import {
   PaginatedQueryFn,
   TableColumnBuilder,
   TableColumnBuilderConfig,
+  UseClipboardReturn,
   UseDateTime,
   UseDateTimeRange,
   UsePaginatedQuery,
   UsePaginatedQueryOptions,
+  UsePaginationOptions,
+  UseServerSidePaginationReturn,
 } from "types/hooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
-import { UseTableOptions } from "react-table";
+import { useTable, UseTableOptions } from "react-table";
 import { nanoid } from "nanoid";
 import produce from "immer";
 import _ from "lodash";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "types/api";
 
-export function usePaginatedQuery<TData>(
-  queryKey: string,
-  queryFn: PaginatedQueryFn<TData>,
+export function usePaginatedQuery<
+  TData,
+  TRequest = AxiosResponse<ApiResponse<TData>>
+>(
+  queryFn: PaginatedQueryFn<TRequest>,
   { page: initialPage, limit }: UsePaginatedQueryOptions
 ): UsePaginatedQuery<TData> {
   const [offset, setOffset] = useState(0);
@@ -34,30 +41,24 @@ export function usePaginatedQuery<TData>(
     setOffset((page - 1) * limit + 1);
   }, [limit, page]);
 
-  const handleNext = () => {
-    setPage((page) => page + 1);
+  const handlePageChange = (page: number) => {
+    setPage(page);
   };
 
-  const handlePrev = () => {
-    setPage((page) => page - 1);
-  };
-
-  const handleJump = (to: number) => {
-    setPage(to);
-  };
-
-  const query = useQuery(
-    [queryKey, offset, limit],
-    ({ queryKey }) => queryFn(Number(queryKey[1]), Number(queryKey[2])),
-    { keepPreviousData: true }
-  );
+  const request = useCallback(async () => {
+    const resp = await queryFn(offset, limit);
+    console.log(resp);
+    // @ts-ignore
+    if (resp && resp.data) {
+      // @ts-ignore
+      return resp.data.body.data;
+    }
+  }, [queryFn, offset, limit]);
 
   return {
-    ...query,
     page,
-    handlePrev,
-    handleNext,
-    handleJump,
+    handlePageChange,
+    request,
   };
 }
 
@@ -220,4 +221,12 @@ export function useColumnBuilder<T extends object>(
     () => (builder(_builder([])) as ColumnBuilder<T>).save(),
     [builder]
   );
+}
+
+export function useClipboard(): UseClipboardReturn {
+  return {
+    onClickToCopy(value) {
+      void navigator.clipboard.writeText(value);
+    },
+  };
 }

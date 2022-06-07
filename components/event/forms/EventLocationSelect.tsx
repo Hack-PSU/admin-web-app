@@ -35,25 +35,23 @@ const EventLocationSelect: FC<LabelledSelectProps> = ({ ...props }) => {
   };
 
   return (
-    <>
-      <LabelledEventSelect
-        renderItem={({ item, index, onChange }) => {
-          const isButton = item.type && item.type === "button";
-          return (
-            <BaseMenuItem
-              key={`${item.value}-${index}`}
-              item={item}
-              // onChangeItem ignored if isButton
-              onChangeItem={onChange}
-              onClickOverride={isButton ? onClickAddNewLocation : undefined}
-            >
-              {getMenuItem(item)}
-            </BaseMenuItem>
-          );
-        }}
-        {...props}
-      />
-    </>
+    <LabelledEventSelect
+      renderItem={({ item, index, onChange }) => {
+        const isButton = item.type && item.type === "button";
+        return (
+          <BaseMenuItem
+            key={`${item.value}-${index}`}
+            item={item}
+            // onChangeItem ignored if isButton
+            onChangeItem={onChange}
+            onClickOverride={isButton ? onClickAddNewLocation : undefined}
+          >
+            {getMenuItem(item)}
+          </BaseMenuItem>
+        );
+      }}
+      {...props}
+    />
   );
 };
 

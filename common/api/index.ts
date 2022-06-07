@@ -37,8 +37,8 @@ export const getAllHackers: PaginatedQueryFn<
   api.get("/admin/data", {
     params: {
       type: "registration_stats",
-      // ...(offset ? { offset } : {}),
-      // ...(limit ? { limit } : {}),
+      ...(offset ? { offset } : {}),
+      ...(limit ? { limit } : {}),
     },
     ...(token
       ? {

@@ -14,9 +14,7 @@ import DateTimeForm from "./DateTimeForm";
 import { useFormContext } from "react-hook-form";
 import produce from "immer";
 import { ISelectItem } from "types/components";
-import { theme } from "styles";
 import EventLocationSelect from "components/event/forms/EventLocationSelect";
-import { useModalContext } from "components/context/ModalProvider";
 
 const locationItems: ISelectItem[] = [
   { value: "Location1", display: "Location 1" },
@@ -107,7 +105,7 @@ const DetailForm: FC = () => {
             }}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} pt={1.5}>
           {(images ?? []).map((image: File, index: number) => (
             <DropzoneItem
               onRemove={onRemoveItem}

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Box, Grid } from "@mui/material";
 import { styled } from "@mui/system";
 import { ControlledSelect, Select } from "components/base";
@@ -8,6 +8,7 @@ import { useQuery } from "react-query";
 import { getAllHackathons } from "api/index";
 import HackathonSelect from "components/SideMenu/HackathonSelect";
 import Option from "./Option";
+import { ISelectItem } from "types/components";
 
 const Container = styled(Grid)(({ theme }) => ({
   width: "100%",
@@ -26,14 +27,26 @@ const MenuOptions = styled(Grid)(({ theme }) => ({
   flexDirection: "column",
 }));
 
+const items: ISelectItem[] = [
+  { value: "/members", type: "button", display: "Members" },
+  { value: "/members/new", type: "button", display: "Add Members" },
+  { value: "/settings", type: "button", display: "Settings" },
+  { value: "/settings/hackathon", type: "button", display: "Switch Hackathon" },
+];
+
 const SideMenu: FC = () => {
   const methods = useForm();
 
   const { data } = useQuery("hackathon", () => getAllHackathons());
-  const hackathons = data?.data.body.data.map((hackathon) => ({
-    value: hackathon.uid,
-    display: hackathon.name,
-  }));
+
+  const hackathons = useMemo(
+    () =>
+      data?.data.body.data.map((hackathon) => ({
+        value: hackathon.uid,
+        display: hackathon.name,
+      })),
+    [data]
+  );
 
   useEffect(() => {
     if (hackathons && hackathons.length > 0) {
@@ -47,8 +60,8 @@ const SideMenu: FC = () => {
         <HackathonContainer item>
           <ControlledSelect
             name="hackathon"
-            placeholder={hackathons ? "" : "No hackathon"}
-            items={hackathons || []}
+            placeholder={"Hackathon"}
+            items={items}
             as={HackathonSelect}
           />
         </HackathonContainer>

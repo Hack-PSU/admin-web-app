@@ -1,19 +1,32 @@
 import { NextPage } from "next";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
+import { useColumnBuilder, usePaginatedQuery } from "common/hooks";
 import { DefaultCell, SimpleTable, TableCell } from "components/Table";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
-import { useMemo } from "react";
+import { FC, useMemo } from "react";
 import { DateTime } from "luxon";
-import { Typography, useTheme } from "@mui/material";
+import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { Button, EvaIcon, Input } from "components/base";
+import Link from "next/link";
+import { useQuery } from "react-query";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
 
+const SearchAdornment: FC = () => (
+  <InputAdornment position={"start"}>
+    <Box mt={0.5}>
+      <EvaIcon name={"search-outline"} size="medium" fill="#1a1a1a" />
+    </Box>
+  </InputAdornment>
+);
+
 const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
+  const { register } = useForm();
 
   const columns = useColumnBuilder((builder) =>
     builder
@@ -63,32 +76,81 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       })
   );
 
-  const eventsData = useMemo(
-    () =>
-      events.map(
-        ({
-          event_title,
-          location_name,
-          event_start_time,
-          event_end_time,
-          event_type,
-        }) => ({
-          event_title,
-          location_name,
-          event_start_time,
-          event_end_time,
-          event_type,
-        })
-      ),
-    [events]
-  );
+  const {
+    page,
+    handlePageChange,
+    request: getEvents,
+  } = usePaginatedQuery<IGetAllEventsResponse[]>(getAllEvents, {
+    page: 1,
+    limit: 10,
+  });
 
-  return <SimpleTable columns={columns} data={eventsData} />;
+  const { data: eventsData } = useQuery(["events", page], getEvents, {
+    keepPreviousData: true,
+    initialData: events,
+    select: (data) => {
+      if (data) {
+        return data.map((d) => ({
+          event_title: d.event_title,
+          location_name: d.location_name,
+          event_start_time: d.event_start_time,
+          event_end_time: d.event_end_time,
+          event_type: d.event_type,
+        }));
+      }
+      return [];
+    },
+  });
+
+  return (
+    <Grid container gap={1.5}>
+      <Grid container item justifyContent="space-between" alignItems="center">
+        <Grid item xs={10}>
+          <Input
+            startAdornment={<SearchAdornment />}
+            placeholder={"Search events"}
+            inputProps={{
+              style: {
+                fontSize: theme.typography.pxToRem(16),
+              },
+            }}
+            sx={{
+              width: "95%",
+              padding: theme.spacing(0.7, 2),
+              borderRadius: "18px",
+            }}
+            {...register("query")}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Link href={"/events/tabs"} passHref>
+            <Button
+              variant="text"
+              sx={{
+                width: "100%",
+                padding: theme.spacing(1, 3.5),
+              }}
+              textProps={{
+                sx: {
+                  lineHeight: "1.8rem",
+                },
+              }}
+            >
+              Add an Event
+            </Button>
+          </Link>
+        </Grid>
+      </Grid>
+      <Grid item>
+        <SimpleTable columns={columns} data={eventsData ?? []} />
+      </Grid>
+    </Grid>
+  );
 };
 
 export const getServerSideProps = withServerSideProps(
   async (context, token) => {
-    const resp = await getAllEvents(undefined, undefined, token);
+    const resp = await getAllEvents(0, 10, token);
     if (resp && resp.data) {
       return {
         props: {

@@ -1,4 +1,4 @@
-import { UseQueryResult } from "react-query";
+import { UseQueryOptions, UseQueryResult } from "react-query";
 import { UseControllerReturn } from "react-hook-form";
 import { Column, ColumnWithLooseAccessor, UseTableOptions } from "react-table";
 
@@ -13,14 +13,10 @@ export type UsePaginatedQueryOptions = {
   limit: number;
 };
 
-export type UsePaginatedQuery<TData> = UseQueryResult<
-  TData | undefined,
-  unknown
-> & {
+export type UsePaginatedQuery<TData> = {
+  request(): Promise<TData | undefined>;
   page: number;
-  handleNext(): void;
-  handlePrev(): void;
-  handleJump(to: number): void;
+  handlePageChange(page: number): void;
 };
 
 type RegisterDateTimePicker = {
@@ -73,3 +69,18 @@ export type AddGroupConfig = <T extends object>(
   state: ColumnState<T>,
   options: Column
 ) => TableColumnBuilder<T>;
+
+export type UseClipboardReturn = {
+  onClickToCopy(value: string): void;
+};
+
+export type UsePaginationOptions = Omit<
+  UseQueryOptions,
+  "queryKey" | "queryFn"
+> &
+  UsePaginatedQueryOptions;
+
+export type UseServerSidePaginationReturn<TData> = UseQueryResult<
+  TData,
+  unknown
+> & {};
