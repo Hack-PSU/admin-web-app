@@ -66,7 +66,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const { register } = useForm();
 
-  const columns = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder((builder) =>
     builder
       .addColumn("Name", {
         accessor: "event_title",
@@ -174,10 +174,10 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       </Grid>
       <Grid item>
         <PaginatedTable
-          page={page}
+          // page={page}
           limit={limit}
-          handlePageChange={handlePageChange}
           columns={columns}
+          names={names}
           data={eventsData ?? []}
         />
       </Grid>

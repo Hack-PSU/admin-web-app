@@ -1,3 +1,4 @@
+import React from "react";
 import { UseQueryOptions, UseQueryResult } from "react-query";
 import { UseControllerReturn } from "react-hook-form";
 import { Column, ColumnWithLooseAccessor, UseTableOptions } from "react-table";
@@ -20,6 +21,10 @@ export type UsePaginatedQuery<TData> = {
   handlePageChange(page: number): void;
 };
 
+export type UseApiQueryReturn<TData> = {
+  request(...params: any[]): Promise<TData | undefined>;
+};
+
 type RegisterDateTimePicker = {
   value: Date;
   onChange: UseControllerReturn["field"]["onChange"];
@@ -40,11 +45,26 @@ export type UseDateTimeRange = {
   isMultipleDays: boolean;
 };
 
-export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns" | "id"> & {
-  hideHeader?: boolean;
+export type FilterOptions = {
+  type: "checkbox" | "input" | "date" | "time" | "hide";
+  options?: string[];
 };
 
-export type ColumnState<T extends object> = UseTableOptions<T>["columns"];
+export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns" | "id"> & {
+  hideHeader?: boolean;
+  filterOption?: FilterOptions;
+};
+
+export type NamesState = {
+  name: string;
+  type: FilterOptions["type"];
+  options: string[];
+};
+
+export type ColumnState<T extends object> = {
+  columns: UseTableOptions<T>["columns"];
+  names: NamesState[];
+};
 
 export type TableColumnBuilder<T extends object> = {
   addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T>;
@@ -59,17 +79,23 @@ export type BuilderCallback<
   TBuilder = TableColumnBuilder<T>
 > = (builder: TBuilder) => TBuilder;
 
+export type AddConfigOptions = Column & {
+  name: string;
+  filterOption: FilterOptions;
+};
+
 export type TableColumnBuilderConfig = <T extends object>(
   state: ColumnState<T>
 ) => ColumnBuilder<T>;
 export type AddColumnConfig = <T extends object>(
   state: ColumnState<T>,
-  options: Column
+  options: AddConfigOptions
 ) => TableColumnBuilder<T>;
-export type AddGroupConfig = <T extends object>(
-  state: ColumnState<T>,
-  options: Column
-) => TableColumnBuilder<T>;
+
+export type UseColumnBuilderReturn<T extends object> = {
+  columns: UseTableOptions<T>["columns"];
+  filters: string[];
+};
 
 export type UseClipboardReturn = {
   onClickToCopy(value: string): void;

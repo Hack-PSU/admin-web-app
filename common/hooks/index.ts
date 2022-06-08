@@ -8,7 +8,9 @@ import {
   PaginatedQueryFn,
   TableColumnBuilder,
   TableColumnBuilderConfig,
+  UseApiQueryReturn,
   UseClipboardReturn,
+  UseColumnBuilderReturn,
   UseDateTime,
   UseDateTimeRange,
   UsePaginatedQuery,
@@ -22,6 +24,20 @@ import produce from "immer";
 import _ from "lodash";
 import { AxiosResponse } from "axios";
 import { ApiResponse } from "types/api";
+
+export function useQueryResolver<
+  TData,
+  TQuery = AxiosResponse<ApiResponse<TData>>
+>(queryFn: () => Promise<TQuery | undefined>): UseApiQueryReturn<TData> {
+  return {
+    async request(...params: any[]) {
+      const resp: any = await queryFn.bind(params)();
+      if (resp && resp.data) {
+        return resp.data.body.data;
+      }
+    },
+  };
+}
 
 export function usePaginatedQuery<
   TData,
@@ -193,14 +209,27 @@ const _builder: TableColumnBuilderConfig = <T extends object>(
   addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T> {
     const id = nanoid(10);
     if (options) {
-      const { hideHeader, ...rest } = options;
+      const { hideHeader, filterOption, ...rest } = options;
+      // TODO -- use default Filter component for each type of filterOption
       return _addColumn(state, {
         id,
+        name,
+        filterOption: filterOption
+          ? { type: filterOption.type, options: filterOption.options }
+          : { type: "hide" },
         ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
         ...rest,
       });
     }
-    return _addColumn(state, { id, Header: name, accessor: _.camelCase(name) });
+    return _addColumn(state, {
+      id,
+      name,
+      filterOption: {
+        type: "hide",
+      },
+      Header: name,
+      accessor: _.camelCase(name),
+    });
   },
   save(): ColumnState<T> {
     return state;
@@ -210,17 +239,27 @@ const _builder: TableColumnBuilderConfig = <T extends object>(
 const _addColumn: AddColumnConfig = (state, options) => {
   return _builder(
     produce(state, (draft) => {
+      const { name, filterOption, ...rest } = options;
       // @ts-ignore
-      draft.push(options);
+      draft.columns.push({ ...rest });
+      /// @ts-ignore
+      draft.names.push({
+        name,
+        type: filterOption.type,
+        options: filterOption.options ?? [],
+      });
     })
   );
 };
 
 export function useColumnBuilder<T extends object>(
   builder: BuilderCallback<T>
-): UseTableOptions<T>["columns"] {
+): ColumnState<T> {
   return useMemo(
-    () => (builder(_builder([])) as ColumnBuilder<T>).save(),
+    () =>
+      (
+        builder(_builder({ columns: [], names: [] })) as ColumnBuilder<T>
+      ).save(),
     [builder]
   );
 }

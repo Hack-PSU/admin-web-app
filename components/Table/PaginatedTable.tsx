@@ -5,18 +5,17 @@ import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import TableRow from "./TableRow";
 import TableCell from "./TableCell";
 import { EvaIcon } from "components/base";
+import { NamesState } from "types/hooks";
 
 interface IPaginatedTableProps extends TableProps {
-  page: number;
   limit: number;
-  handlePageChange(page: number): void;
+  names: NamesState[];
 }
 
 const PaginatedTable: FC<IPaginatedTableProps> = ({
-  handlePageChange,
   columns,
   data,
-  page,
+  names,
   limit,
   ...props
 }) => {
@@ -45,7 +44,9 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     headerGroups,
     prepareRow,
 
+    page,
     // gotoPage,
+    state: { pageIndex, pageSize },
     nextPage,
     previousPage,
   } = useTable(
@@ -53,11 +54,11 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
       columns,
       data,
       defaultColumn,
+      pageCount: data ? data.length : 0,
       initialState: {
-        pageIndex: page,
+        pageIndex: 1,
         pageSize: limit,
       },
-      manualPagination: true,
       ...props,
     },
     usePagination,
@@ -65,15 +66,13 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
   );
 
   const onClickPreviousPage = () => {
-    if (page - 1 > 0) {
-      handlePageChange(page - 1);
+    if (pageIndex - 1 > 0) {
       previousPage();
     }
   };
 
   const onClickNextPage = () => {
     if (data && data.length >= limit) {
-      handlePageChange(page + 1);
       nextPage();
     }
   };
@@ -99,7 +98,7 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
         ))}
       </Grid>
       <Grid container item>
-        {rows.map((row) => {
+        {page.map((row) => {
           prepareRow(row);
           return (
             <TableRow
@@ -122,7 +121,7 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
       >
         <Grid item>
           <IconButton
-            onClick={onClickPreviousPage}
+            onClick={previousPage}
             sx={{
               padding: theme.spacing(0.5, 1),
             }}
@@ -138,12 +137,12 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
         </Grid>
         <Grid item>
           <Typography variant={"body1"} sx={{ mb: 0.2 }}>
-            {page}
+            {pageIndex}
           </Typography>
         </Grid>
         <Grid item>
           <IconButton
-            onClick={onClickNextPage}
+            onClick={nextPage}
             sx={{
               padding: theme.spacing(0.5, 1),
             }}

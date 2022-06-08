@@ -5,7 +5,7 @@ import {
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
-import { useColumnBuilder, usePaginatedQuery } from "common/hooks";
+import { useColumnBuilder, useQueryResolver } from "common/hooks";
 import { getAllHackers } from "query";
 import { IGetAllHackersResponse } from "types/api";
 import { PaginatedTable } from "components/Table";
@@ -37,7 +37,7 @@ const Hackers: NextPage<IHackersPageProps> = ({
   const theme = useTheme();
   const { register } = useForm();
 
-  const columns = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder((builder) =>
     builder
       .addColumn("Name", {
         maxWidth: 120,
@@ -54,35 +54,34 @@ const Hackers: NextPage<IHackersPageProps> = ({
       .addColumn("University")
   );
 
-  const {
-    page,
-    limit,
-    handlePageChange,
-    request: getHackers,
-  } = usePaginatedQuery<IGetAllHackersResponse[]>(getAllHackers, {
-    page: initialPage,
-    limit: initialLimit,
-  });
+  // const {
+  //   page,
+  //   limit,
+  //   handlePageChange,
+  //   request: getHackers,
+  // } = usePaginatedQuery<IGetAllHackersResponse[]>(getAllHackers, {
+  //   page: initialPage,
+  //   limit: initialLimit,
+  // });
 
-  const { data: hackersData } = useQuery(
-    ["hackers", page],
-    ({ queryKey }) => getHackers(Number(queryKey[1])),
-    {
-      select: (data) => {
-        if (data) {
-          return data.map((d) => ({
-            name: d.name,
-            pin: d.pin,
-            email: d.email,
-            university: d.university,
-          }));
-        }
-        return [];
-      },
-      keepPreviousData: true,
-      initialData: hackers,
-    }
+  const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
+    () => getAllHackers()
   );
+
+  const { data: hackersData } = useQuery("hackers", () => getHackers(), {
+    select: (data) => {
+      if (data) {
+        return data.map((d) => ({
+          name: d.name,
+          pin: d.pin,
+          email: d.email,
+          university: d.university,
+        }));
+      }
+    },
+    keepPreviousData: true,
+    initialData: hackers,
+  });
 
   return (
     <Grid container gap={1.5}>
@@ -125,10 +124,9 @@ const Hackers: NextPage<IHackersPageProps> = ({
       </Grid>
       <Grid item>
         <PaginatedTable
-          page={page}
-          limit={limit}
-          handlePageChange={handlePageChange}
+          limit={initialLimit}
           columns={columns}
+          names={names}
           data={hackersData ?? []}
         />
       </Grid>
