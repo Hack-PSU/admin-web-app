@@ -1,5 +1,12 @@
 import React from "react";
-import { InputProps, SxProps, Theme, SelectProps } from "@mui/material";
+import {
+  InputProps,
+  SxProps,
+  Theme,
+  SelectProps,
+  CheckboxProps,
+  TypographyProps,
+} from "@mui/material";
 import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
@@ -113,4 +120,24 @@ export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;
 
 export type ControlledDropzoneProps = WithControllerProps<
   Omit<IDropzoneProps, "onDrop"> & Partial<InputLabelProps>
+>;
+
+export type CheckboxSelectionState = {
+  [key: string]: boolean;
+};
+
+export interface ICheckboxProps
+  extends Omit<
+    CheckboxProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledCheckboxProps = WithLabelledProps<ICheckboxProps>;
+
+export type ControlledCheckboxProps = WithControllerProps<
+  Omit<ICheckboxProps, "value" | "onChange"> & Partial<LabelledCheckboxProps>
 >;

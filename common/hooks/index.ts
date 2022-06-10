@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AddColumnConfig,
+  AddConfigOptions,
   BuilderCallback,
   ColumnBuilder,
   ColumnOptions,
   ColumnState,
+  FilterOptions,
   PaginatedQueryFn,
   TableColumnBuilder,
   TableColumnBuilderConfig,
   UseApiQueryReturn,
   UseClipboardReturn,
-  UseColumnBuilderReturn,
   UseDateTime,
   UseDateTimeRange,
   UsePaginatedQuery,
@@ -18,12 +19,17 @@ import {
 } from "types/hooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
-import { UseTableOptions } from "react-table";
 import { nanoid } from "nanoid";
 import produce from "immer";
 import _ from "lodash";
 import { AxiosResponse } from "axios";
 import { ApiResponse } from "types/api";
+import {
+  CheckboxFilter,
+  CheckboxFilterRows,
+  InputFilter,
+  InputFilterRows,
+} from "components/Table/filters";
 
 export function useQueryResolver<
   TData,
@@ -206,29 +212,28 @@ export function useDateTimeRange(
 const _builder: TableColumnBuilderConfig = <T extends object>(
   state: ColumnState<T>
 ) => ({
-  addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T> {
+  addColumn(name: string, options: ColumnOptions): TableColumnBuilder<T> {
     const id = nanoid(10);
-    if (options) {
-      const { hideHeader, filterOption, ...rest } = options;
-      // TODO -- use default Filter component for each type of filterOption
-      return _addColumn(state, {
-        id,
-        name,
-        filterOption: filterOption
-          ? { type: filterOption.type, options: filterOption.options }
-          : { type: "hide" },
-        ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
-        ...rest,
-      });
-    }
-    return _addColumn(state, {
+    const { hideHeader, type, filterOption, ...rest } = options;
+
+    let configOptions: AddConfigOptions = {
       id,
       name,
-      filterOption: {
-        type: "hide",
-      },
-      Header: name,
-      accessor: _.camelCase(name),
+      defaultCanFilter: true,
+      type,
+      ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
+    };
+
+    if (filterOption) {
+      configOptions = {
+        ...configOptions,
+        ...getFilterByType(filterOption.type),
+      };
+    }
+
+    return _addColumn(state, {
+      ...configOptions,
+      ...rest,
     });
   },
   save(): ColumnState<T> {
@@ -239,17 +244,37 @@ const _builder: TableColumnBuilderConfig = <T extends object>(
 const _addColumn: AddColumnConfig = (state, options) => {
   return _builder(
     produce(state, (draft) => {
-      const { name, filterOption, ...rest } = options;
+      const { name, type, ...rest } = options;
       // @ts-ignore
       draft.columns.push({ ...rest });
       /// @ts-ignore
       draft.names.push({
         name,
-        type: filterOption.type,
-        options: filterOption.options ?? [],
+        type,
       });
     })
   );
+};
+
+const getFilterByType = (type: FilterOptions["type"]) => {
+  switch (type) {
+    case "checkbox":
+      return {
+        Filter: CheckboxFilter,
+        filter: CheckboxFilterRows,
+      };
+    case "input":
+      return {
+        Filter: InputFilter,
+        filter: InputFilterRows,
+      };
+    case "date":
+      break;
+    case "time":
+      break;
+    case "hide":
+      return null;
+  }
 };
 
 export function useColumnBuilder<T extends object>(

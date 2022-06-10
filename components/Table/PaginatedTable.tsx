@@ -7,7 +7,7 @@ import TableCell from "./TableCell";
 import { EvaIcon } from "components/base";
 import { NamesState } from "types/hooks";
 
-interface IPaginatedTableProps extends TableProps {
+interface IPaginatedTableProps extends TableProps<any> {
   limit: number;
   names: NamesState[];
 }

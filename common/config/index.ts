@@ -1,3 +1,6 @@
+import { initializeApp } from "@firebase/app";
+import { getAuth } from "firebase/auth";
+
 export function getEnvironment() {
   return {
     firebase: {
@@ -14,3 +17,9 @@ export function getEnvironment() {
     baseURL: String(process.env.NEXT_PUBLIC_BASE_URL),
   };
 }
+
+const config = getEnvironment();
+const app = initializeApp(config.firebase);
+const auth = getAuth(app);
+
+export { auth };

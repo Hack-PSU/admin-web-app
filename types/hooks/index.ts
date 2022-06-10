@@ -50,15 +50,17 @@ export type FilterOptions = {
   options?: string[];
 };
 
+type ColumnDataType = "text" | "date" | "custom";
+
 export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns" | "id"> & {
+  type: ColumnDataType;
   hideHeader?: boolean;
   filterOption?: FilterOptions;
 };
 
 export type NamesState = {
   name: string;
-  type: FilterOptions["type"];
-  options: string[];
+  type: ColumnDataType;
 };
 
 export type ColumnState<T extends object> = {
@@ -79,9 +81,10 @@ export type BuilderCallback<
   TBuilder = TableColumnBuilder<T>
 > = (builder: TBuilder) => TBuilder;
 
-export type AddConfigOptions = Column & {
+export type AddConfigOptions = ColumnWithLooseAccessor & {
   name: string;
-  filterOption: FilterOptions;
+  type: ColumnDataType;
+  // filterOption: FilterOptions;
 };
 
 export type TableColumnBuilderConfig = <T extends object>(
