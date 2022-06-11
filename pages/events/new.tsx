@@ -78,18 +78,20 @@ const NewEvent: NextPage<INewEventProps> = ({ events }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(async (token) => {
-  const resp = await getAllEvents(undefined, undefined, token);
-  let events: IGetAllEventsResponse[] = [];
+export const getServerSideProps = withServerSideProps(
+  async (context, token) => {
+    const resp = await getAllEvents(undefined, undefined, token);
+    let events: IGetAllEventsResponse[] = [];
 
-  if (resp && resp.data) {
-    events = resp.data.body.data;
+    if (resp && resp.data) {
+      events = resp.data.body.data;
+    }
+    return {
+      props: {
+        events,
+      },
+    };
   }
-  return {
-    props: {
-      events,
-    },
-  };
-});
+);
 
 export default withDefaultLayout(NewEvent);

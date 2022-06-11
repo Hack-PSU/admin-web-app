@@ -1,10 +1,14 @@
 import { NextPage } from "next";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder, usePaginatedQuery } from "common/hooks";
+import {
+  useColumnBuilder,
+  usePaginatedQuery,
+  useQueryResolver,
+} from "common/hooks";
 import { DefaultCell, PaginatedTable, TableCell } from "components/Table";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { DateTime } from "luxon";
 import { Box, Grid, InputAdornment, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
@@ -69,25 +73,38 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const { columns, names } = useColumnBuilder((builder) =>
     builder
       .addColumn("Name", {
+        id: "name",
+        type: "text",
+        filterType: "input",
         accessor: "event_title",
         maxWidth: 120,
       })
       .addColumn("Location", {
+        id: "location",
+        type: "text",
+        filterType: "input",
         accessor: "location_name",
         minWidth: 150,
       })
       .addColumn("Start Date", {
+        type: "date",
+        filterType: "date",
         accessor: "event_start_time",
         maxWidth: 100,
         width: 100,
         Cell: ({ cell }) => <DateTimeCell cell={cell} />,
       })
       .addColumn("End Date", {
+        filterType: "date",
+        type: "date",
         accessor: "event_end_time",
         width: 100,
         Cell: ({ cell }) => <DateTimeCell cell={cell} />,
       })
       .addColumn("Type", {
+        id: "type",
+        filterType: "checkbox",
+        type: "text",
         accessor: "event_type",
         width: 100,
         Cell: ({ cell }) => {
@@ -95,26 +112,20 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
             <TableCell {...cell.getCellProps()}>
               {cell.value === EventType.FOOD && "FOOD"}
               {cell.value === EventType.WORKSHOP && "WORKSHOP"}
-              {cell.value === EventType.ACTIVITY && "EVENT"}
+              {cell.value === EventType.ACTIVITY && "ACTIVITY"}
             </TableCell>
           );
         },
       })
   );
 
-  const {
-    page,
-    handlePageChange,
-    limit,
-    request: getEvents,
-  } = usePaginatedQuery<IGetAllEventsResponse[]>(getAllEvents, {
-    page: 1,
-    limit: 8,
-  });
+  const { request: getEvents } = useQueryResolver<IGetAllEventsResponse[]>(() =>
+    getAllEvents()
+  );
 
   const { data: eventsData } = useQuery(
-    ["events", page],
-    ({ queryKey }) => getEvents(Number(queryKey[1])),
+    "events",
+    ({ queryKey }) => getEvents(),
     {
       keepPreviousData: true,
       initialData: events,
@@ -174,8 +185,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       </Grid>
       <Grid item>
         <PaginatedTable
-          // page={page}
-          limit={limit}
+          limit={8}
           columns={columns}
           names={names}
           data={eventsData ?? []}
@@ -185,22 +195,20 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(
-  async (context, token) => {
-    const resp = await getAllEvents(0, 8, token);
-    if (resp && resp.data) {
-      return {
-        props: {
-          events: resp.data.body.data,
-        },
-      };
-    }
+export const getServerSideProps = withServerSideProps(async () => {
+  const resp = await getAllEvents();
+  if (resp && resp.data) {
     return {
       props: {
-        events: [],
+        events: resp.data.body.data,
       },
     };
   }
-);
+  return {
+    props: {
+      events: [],
+    },
+  };
+});
 
 export default withDefaultLayout(Events);

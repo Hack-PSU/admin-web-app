@@ -41,17 +41,26 @@ const Hackers: NextPage<IHackersPageProps> = ({
     builder
       .addColumn("Name", {
         maxWidth: 120,
+        type: "text",
+        filterType: "input",
       })
       .addColumn("Pin", {
         maxWidth: 80,
         minWidth: 50,
         width: 50,
+        type: "text",
+        filterType: "hide",
       })
       .addColumn("Email", {
         minWidth: 150,
         maxWidth: 250,
+        type: "text",
+        filterType: "input",
       })
-      .addColumn("University")
+      .addColumn("University", {
+        type: "text",
+        filterType: "input",
+      })
   );
 
   // const {
@@ -124,7 +133,7 @@ const Hackers: NextPage<IHackersPageProps> = ({
       </Grid>
       <Grid item>
         <PaginatedTable
-          limit={initialLimit}
+          limit={8}
           columns={columns}
           names={names}
           data={hackersData ?? []}

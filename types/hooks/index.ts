@@ -45,22 +45,23 @@ export type UseDateTimeRange = {
   isMultipleDays: boolean;
 };
 
-export type FilterOptions = {
-  type: "checkbox" | "input" | "date" | "time" | "hide";
-  options?: string[];
-};
+// export type FilterOptions = {
+//   type:
+//   // options?: string[];
+// };
 
 type ColumnDataType = "text" | "date" | "custom";
 
-export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns" | "id"> & {
+export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns"> & {
   type: ColumnDataType;
+  filterType: "checkbox" | "input" | "date" | "time" | "hide";
   hideHeader?: boolean;
-  filterOption?: FilterOptions;
 };
 
 export type NamesState = {
   name: string;
   type: ColumnDataType;
+  columnId: string;
 };
 
 export type ColumnState<T extends object> = {

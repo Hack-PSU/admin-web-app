@@ -1,13 +1,21 @@
 import React, { FC, useMemo } from "react";
 import { TableProps } from "types/components";
-import { Cell, useFlexLayout, usePagination, useTable } from "react-table";
+import {
+  Cell,
+  useFilters,
+  useFlexLayout,
+  usePagination,
+  useTable,
+} from "react-table";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import TableRow from "./TableRow";
 import TableCell from "./TableCell";
 import { EvaIcon } from "components/base";
 import { NamesState } from "types/hooks";
+import TableActions from "components/Table/TableActions";
+import { InputFilter, InputFilterRows } from "components/Table/filters";
 
-interface IPaginatedTableProps extends TableProps<any> {
+interface IPaginatedTableProps extends TableProps<object> {
   limit: number;
   names: NamesState[];
 }
@@ -43,6 +51,8 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     rows,
     headerGroups,
     prepareRow,
+    headers,
+    preFilteredRows,
 
     page,
     // gotoPage,
@@ -56,13 +66,14 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
       defaultColumn,
       pageCount: data ? data.length : 0,
       initialState: {
-        pageIndex: 1,
+        pageIndex: 0,
         pageSize: limit,
       },
       ...props,
     },
-    usePagination,
-    useFlexLayout
+    useFlexLayout,
+    useFilters,
+    usePagination
   );
 
   const onClickPreviousPage = () => {
@@ -77,6 +88,8 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     }
   };
 
+  // console.log(columns);
+
   // const jumpToPage = (page: number) => {
   //   handlePageChange(page);
   //   gotoPage(page);
@@ -86,6 +99,7 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
   // eslint disabled since library handles jsx-key insertion
   return (
     <Grid container {...getTableProps()}>
+      <TableActions headers={headers} names={names} />
       <Grid container item>
         {headerGroups.map((headerGroup) => (
           <TableRow {...headerGroup.getHeaderGroupProps()}>
@@ -137,7 +151,7 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
         </Grid>
         <Grid item>
           <Typography variant={"body1"} sx={{ mb: 0.2 }}>
-            {pageIndex}
+            {pageIndex + 1}
           </Typography>
         </Grid>
         <Grid item>

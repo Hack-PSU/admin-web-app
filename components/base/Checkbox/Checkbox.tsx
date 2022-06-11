@@ -22,7 +22,7 @@ const Checkbox: FC<ICheckboxProps> = ({
         curr[item.value] = false;
         return curr;
       }, {} as CheckboxSelectionState),
-    [items]
+    []
   );
 
   const [selected, setSelected] =
@@ -44,7 +44,7 @@ const Checkbox: FC<ICheckboxProps> = ({
   return (
     <>
       {items.map((item, index) => (
-        <Grid container item key={`${item.value}-${index}`}>
+        <Grid container item key={`${item.value}-${index}`} alignItems="center">
           <Grid item>
             <MuiCheckbox
               checked={selected[item.value]}
@@ -55,7 +55,14 @@ const Checkbox: FC<ICheckboxProps> = ({
             />
           </Grid>
           <Grid item>
-            <Typography variant="body1" {...labelProps}>
+            <Typography
+              variant="body1"
+              sx={{
+                color: "common.black",
+                fontWeight: 600,
+              }}
+              {...labelProps}
+            >
               {item.display}
             </Typography>
           </Grid>

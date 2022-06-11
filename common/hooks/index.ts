@@ -6,7 +6,6 @@ import {
   ColumnBuilder,
   ColumnOptions,
   ColumnState,
-  FilterOptions,
   PaginatedQueryFn,
   TableColumnBuilder,
   TableColumnBuilderConfig,
@@ -30,6 +29,9 @@ import {
   InputFilter,
   InputFilterRows,
 } from "components/Table/filters";
+import DateFilter, {
+  DateFilterRows,
+} from "components/Table/filters/DateFilter";
 
 export function useQueryResolver<
   TData,
@@ -214,20 +216,20 @@ const _builder: TableColumnBuilderConfig = <T extends object>(
 ) => ({
   addColumn(name: string, options: ColumnOptions): TableColumnBuilder<T> {
     const id = nanoid(10);
-    const { hideHeader, type, filterOption, ...rest } = options;
+    const { hideHeader, type, filterType, ...rest } = options;
 
     let configOptions: AddConfigOptions = {
       id,
       name,
-      defaultCanFilter: true,
+      defaultCanFilter: false,
       type,
       ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
     };
 
-    if (filterOption) {
+    if (filterType && filterType !== "hide") {
       configOptions = {
         ...configOptions,
-        ...getFilterByType(filterOption.type),
+        ...getFilterByType(filterType),
       };
     }
 
@@ -249,6 +251,7 @@ const _addColumn: AddColumnConfig = (state, options) => {
       draft.columns.push({ ...rest });
       /// @ts-ignore
       draft.names.push({
+        columnId: String(rest.id),
         name,
         type,
       });
@@ -256,24 +259,32 @@ const _addColumn: AddColumnConfig = (state, options) => {
   );
 };
 
-const getFilterByType = (type: FilterOptions["type"]) => {
+const getFilterByType = (type: ColumnOptions["filterType"]) => {
   switch (type) {
     case "checkbox":
       return {
+        defaultCanFilter: true,
         Filter: CheckboxFilter,
         filter: CheckboxFilterRows,
       };
     case "input":
       return {
+        defaultCanFilter: true,
         Filter: InputFilter,
         filter: InputFilterRows,
       };
     case "date":
-      break;
+      return {
+        defaultCanFilter: true,
+        Filter: DateFilter,
+        filter: DateFilterRows,
+      };
     case "time":
       break;
     case "hide":
-      return null;
+      return {
+        canFilter: false,
+      };
   }
 };
 
@@ -285,7 +296,8 @@ export function useColumnBuilder<T extends object>(
       (
         builder(_builder({ columns: [], names: [] })) as ColumnBuilder<T>
       ).save(),
-    [builder]
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */ // should not rerender
+    []
   );
 }
 
