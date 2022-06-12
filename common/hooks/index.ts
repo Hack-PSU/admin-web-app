@@ -105,7 +105,7 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
     methods.setValue(name, formatDate().toJSDate());
   }, [name, date, time, methods, formatDate]);
 
-  return <UseDateTime>{
+  return {
     dateTime: formatDate().toJSDate(),
     register(type) {
       if (type === "date") {
@@ -120,7 +120,7 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
         };
       }
     },
-  };
+  } as UseDateTime;
 }
 
 export function useDateTimeRange(

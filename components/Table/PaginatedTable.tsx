@@ -5,19 +5,26 @@ import {
   useFilters,
   useFlexLayout,
   usePagination,
+  useRowSelect,
+  useSortBy,
   useTable,
 } from "react-table";
-import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Grid,
+  lighten,
+  useTheme,
+  Checkbox as MuiCheckbox,
+} from "@mui/material";
 import TableRow from "./TableRow";
 import TableCell from "./TableCell";
-import { EvaIcon } from "components/base";
 import { NamesState } from "types/hooks";
 import TableActions from "components/Table/TableActions";
-import { InputFilter, InputFilterRows } from "components/Table/filters";
 
-interface IPaginatedTableProps extends TableProps<object> {
+export interface IPaginatedTableProps extends TableProps<object> {
   limit: number;
   names: NamesState[];
+  onRefresh(): void;
+  onDelete(): void;
 }
 
 const PaginatedTable: FC<IPaginatedTableProps> = ({
@@ -25,6 +32,8 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
   data,
   names,
   limit,
+  onRefresh,
+  onDelete,
   ...props
 }) => {
   const theme = useTheme();
@@ -46,17 +55,30 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     [theme]
   );
 
+  // const columns2 = useMemo(
+  //   () => [
+  //     {
+  //       id: "name",
+  //       Header: "name",
+  //       accessor: "name",
+  //       canFilter: false,
+  //     }
+  //   ],
+  //   []
+  // );
+
   const {
+    // Table instance
     getTableProps,
-    rows,
     headerGroups,
     prepareRow,
     headers,
-    preFilteredRows,
 
+    // Pagination
     page,
-    // gotoPage,
-    state: { pageIndex, pageSize },
+    gotoPage,
+    state: { pageIndex },
+    pageCount,
     nextPage,
     previousPage,
   } = useTable(
@@ -73,23 +95,31 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     },
     useFlexLayout,
     useFilters,
-    usePagination
+    useSortBy,
+    usePagination,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        {
+          id: "selection",
+          Header: ({ getToggleAllPageRowsSelectedProps }) => (
+            <TableCell empty>
+              <MuiCheckbox {...getToggleAllPageRowsSelectedProps()} />
+            </TableCell>
+          ),
+          Cell: ({ row }) => (
+            <TableCell empty>
+              <MuiCheckbox {...row.getToggleRowSelectedProps()} />
+            </TableCell>
+          ),
+        },
+        ...columns,
+      ]);
+    }
   );
 
-  const onClickPreviousPage = () => {
-    if (pageIndex - 1 > 0) {
-      previousPage();
-    }
-  };
-
-  const onClickNextPage = () => {
-    if (data && data.length >= limit) {
-      nextPage();
-    }
-  };
-
   // console.log(columns);
-
+  //
   // const jumpToPage = (page: number) => {
   //   handlePageChange(page);
   //   gotoPage(page);
@@ -98,16 +128,54 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
   /* eslint-disable react/jsx-key */
   // eslint disabled since library handles jsx-key insertion
   return (
-    <Grid container {...getTableProps()}>
-      <TableActions headers={headers} names={names} />
+    <Grid
+      container
+      sx={{
+        border: `1px solid ${theme.palette.table.border}`,
+        borderRadius: "10px",
+      }}
+      {...getTableProps()}
+    >
+      <TableActions
+        pageCount={pageCount}
+        pageIndex={pageIndex}
+        previousPage={previousPage}
+        headers={headers}
+        names={names}
+        gotoPage={gotoPage}
+        nextPage={nextPage}
+        onRefresh={onRefresh}
+        onDelete={onDelete}
+      />
       <Grid container item>
         {headerGroups.map((headerGroup) => (
-          <TableRow {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((header) => (
-              <TableCell header {...header.getHeaderProps()}>
-                {header.render("Header")}
-              </TableCell>
-            ))}
+          <TableRow
+            {...headerGroup.getHeaderGroupProps()}
+            sx={{
+              padding: theme.spacing(1, 1.5),
+              backgroundColor: lighten(theme.palette.table.border, 0.3),
+              borderBottom: `2px solid ${theme.palette.table.border}`,
+            }}
+          >
+            {headerGroup.headers.map((header) => {
+              if (header.id === "selection") {
+                return header.render("Header");
+              } else {
+                return (
+                  <TableCell
+                    header
+                    {...header.getHeaderProps()}
+                    textProps={{
+                      sx: {
+                        fontSize: theme.typography.pxToRem(15),
+                      },
+                    }}
+                  >
+                    {header.render("Header")}
+                  </TableCell>
+                );
+              }
+            })}
           </TableRow>
         ))}
       </Grid>
@@ -117,7 +185,10 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
           return (
             <TableRow
               sx={{
-                padding: theme.spacing(1.8, 0),
+                padding: theme.spacing(1.5, 1.5),
+                ":last-child": {
+                  borderBottom: 0,
+                },
               }}
               {...row.getRowProps()}
             >
@@ -125,51 +196,6 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
             </TableRow>
           );
         })}
-      </Grid>
-      <Grid
-        container
-        item
-        sx={{ width: "100%" }}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Grid item>
-          <IconButton
-            onClick={previousPage}
-            sx={{
-              padding: theme.spacing(0.5, 1),
-            }}
-          >
-            <Box mt={0.5}>
-              <EvaIcon
-                name={"chevron-left-outline"}
-                size="large"
-                fill="#1a1a1a"
-              />
-            </Box>
-          </IconButton>
-        </Grid>
-        <Grid item>
-          <Typography variant={"body1"} sx={{ mb: 0.2 }}>
-            {pageIndex + 1}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <IconButton
-            onClick={nextPage}
-            sx={{
-              padding: theme.spacing(0.5, 1),
-            }}
-          >
-            <Box mt={0.5}>
-              <EvaIcon
-                name={"chevron-right-outline"}
-                size="large"
-                fill="#1a1a1a"
-              />
-            </Box>
-          </IconButton>
-        </Grid>
       </Grid>
     </Grid>
   );

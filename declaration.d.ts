@@ -70,6 +70,7 @@ declare module "@mui/material/styles" {
     table: {
       header: string;
       divider: string;
+      border: string;
     };
   }
 
@@ -93,6 +94,7 @@ declare module "@mui/material/styles" {
     table?: {
       header?: string;
       divider?: string;
+      border?: string;
     };
   }
 }
@@ -172,8 +174,7 @@ declare module "react-table" {
 
   /* eslint-disable-next-line */
   export interface Cell<
-    T extends Record<string, unknown> = Record<string, unknown>,
-    TV = any
+    T extends Record<string, unknown> = Record<string, unknown>
   > extends UseGroupByCellProps<T>,
       UseRowStateCellProps<T> {}
 

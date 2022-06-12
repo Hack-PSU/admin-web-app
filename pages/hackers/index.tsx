@@ -81,7 +81,7 @@ const Hackers: NextPage<IHackersPageProps> = ({
     select: (data) => {
       if (data) {
         return data.map((d) => ({
-          name: d.name,
+          name: `${d.firstname} ${d.lastname}`,
           pin: d.pin,
           email: d.email,
           university: d.university,
@@ -91,6 +91,14 @@ const Hackers: NextPage<IHackersPageProps> = ({
     keepPreviousData: true,
     initialData: hackers,
   });
+
+  const onRefresh = () => {
+    return undefined;
+  };
+
+  const onDelete = () => {
+    return undefined;
+  };
 
   return (
     <Grid container gap={1.5}>
@@ -137,6 +145,8 @@ const Hackers: NextPage<IHackersPageProps> = ({
           columns={columns}
           names={names}
           data={hackersData ?? []}
+          onRefresh={onRefresh}
+          onDelete={onDelete}
         />
       </Grid>
     </Grid>

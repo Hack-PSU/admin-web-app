@@ -27,6 +27,7 @@ export const theme = responsiveFontSizes(
       table: {
         header: "#969696",
         divider: "#bdbdbd",
+        border: "#e4e4e4",
       },
       select: {
         main: "#1a1a1a",

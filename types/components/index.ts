@@ -6,6 +6,7 @@ import {
   SelectProps,
   CheckboxProps,
   TypographyProps,
+  RadioProps,
 } from "@mui/material";
 import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
@@ -35,15 +36,14 @@ export type WithControllerProps<TProps> = UseControllerProps &
     as?: React.FC<any>;
   };
 
-export interface IInputProps
-  extends Omit<InputProps, "name" | "defaultValue" | "placeholder"> {
+export interface IInputProps extends Omit<InputProps, "name" | "placeholder"> {
   placeholder: string;
 }
 
 export type LabelledInputProps = WithLabelledProps<IInputProps>;
 
 export type ControlledInputProps = WithControllerProps<
-  IInputProps & Partial<InputLabelProps>
+  Omit<IInputProps, "defaultValue"> & Partial<InputLabelProps>
 >;
 
 export interface ISelectItem<T = any> {
@@ -140,4 +140,20 @@ export type LabelledCheckboxProps = WithLabelledProps<ICheckboxProps>;
 
 export type ControlledCheckboxProps = WithControllerProps<
   Omit<ICheckboxProps, "value" | "onChange"> & Partial<LabelledCheckboxProps>
+>;
+
+export interface IRadioProps
+  extends Omit<
+    RadioProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledRadioProps = WithLabelledProps<IRadioProps>;
+
+export type ControlledRadioProps = WithControllerProps<
+  Omit<IRadioProps, "value" | "onChange"> & Partial<LabelledRadioProps>
 >;

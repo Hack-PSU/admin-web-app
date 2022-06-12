@@ -1,7 +1,6 @@
-import React from "react";
 import { UseQueryOptions, UseQueryResult } from "react-query";
 import { UseControllerReturn } from "react-hook-form";
-import { Column, ColumnWithLooseAccessor, UseTableOptions } from "react-table";
+import { ColumnWithLooseAccessor, UseTableOptions } from "react-table";
 
 export type PaginatedQueryFn<TData> = (
   offset?: number,
@@ -54,7 +53,7 @@ type ColumnDataType = "text" | "date" | "custom";
 
 export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns"> & {
   type: ColumnDataType;
-  filterType: "checkbox" | "input" | "date" | "time" | "hide";
+  filterType?: "checkbox" | "input" | "date" | "time" | "hide";
   hideHeader?: boolean;
 };
 

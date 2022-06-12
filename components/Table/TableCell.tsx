@@ -9,11 +9,11 @@ import {
 } from "@mui/material";
 import { WithChildren } from "types/common";
 
-interface ITableHeaderProps extends Omit<GridProps, "style"> {
+interface ITableCellProps extends Omit<GridProps, "style"> {
   header?: boolean;
   textProps?: Omit<TypographyProps, "children">;
   link?: boolean;
-  textComponent?: (props: WithChildren) => JSX.Element;
+  empty?: boolean;
 }
 
 export const DefaultCell = styled(Typography)({
@@ -22,18 +22,20 @@ export const DefaultCell = styled(Typography)({
   whiteSpace: "nowrap",
 });
 
-const TableCell: FC<WithChildren<ITableHeaderProps>> = ({
+const TableCell: FC<WithChildren<ITableCellProps>> = ({
   children,
   textProps,
   header,
-  textComponent,
   link,
+  empty,
   sx: gridSx,
   ...props
 }) => {
   const { sx, ...rest } = textProps ?? { sx: {} };
 
   const theme = useTheme();
+
+  console.log(empty);
 
   return (
     <Grid
@@ -45,8 +47,8 @@ const TableCell: FC<WithChildren<ITableHeaderProps>> = ({
       }}
       {...props}
     >
-      {textComponent ? (
-        textComponent({ children })
+      {empty ? (
+        children
       ) : (
         <DefaultCell
           variant="body1"

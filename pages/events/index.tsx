@@ -1,14 +1,10 @@
 import { NextPage } from "next";
+import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import {
-  useColumnBuilder,
-  usePaginatedQuery,
-  useQueryResolver,
-} from "common/hooks";
-import { DefaultCell, PaginatedTable, TableCell } from "components/Table";
+import { useColumnBuilder, useQueryResolver } from "common/hooks";
+import { DefaultCell, TableCell } from "components/Table";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
-import { FC, useCallback } from "react";
 import { DateTime } from "luxon";
 import { Box, Grid, InputAdornment, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
@@ -20,6 +16,14 @@ import { Cell } from "react-table";
 interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
+
+import dynamic from "next/dynamic";
+import { IPaginatedTableProps } from "components/Table/PaginatedTable";
+
+const PaginatedTable = dynamic<IPaginatedTableProps>(
+  () => import("components/Table/PaginatedTable"),
+  { ssr: false }
+);
 
 const SearchAdornment: FC = () => (
   <InputAdornment position={"start"}>
@@ -123,27 +127,32 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     getAllEvents()
   );
 
-  const { data: eventsData } = useQuery(
-    "events",
-    ({ queryKey }) => getEvents(),
-    {
-      keepPreviousData: true,
-      initialData: events,
-      select: (data) => {
-        if (data) {
-          return data.map((d) => ({
-            event_title: d.event_title,
-            location_name: d.location_name,
-            event_start_time: d.event_start_time,
-            event_end_time: d.event_end_time,
-            event_type: d.event_type,
-          }));
-        }
-        return [];
-      },
-    }
-  );
+  const { data: eventsData } = useQuery("events", () => getEvents(), {
+    keepPreviousData: true,
+    initialData: events,
+    select: (data) => {
+      if (data) {
+        return data.map((d) => ({
+          event_title: d.event_title,
+          location_name: d.location_name,
+          event_start_time: d.event_start_time,
+          event_end_time: d.event_end_time,
+          event_type: d.event_type,
+        }));
+      }
+      return [];
+    },
+  });
 
+  const onRefresh = () => {
+    return undefined;
+  };
+
+  const onDelete = () => {
+    return undefined;
+  };
+
+  // @ts-ignore
   return (
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
@@ -189,6 +198,8 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
           columns={columns}
           names={names}
           data={eventsData ?? []}
+          onRefresh={onRefresh}
+          onDelete={onDelete}
         />
       </Grid>
     </Grid>

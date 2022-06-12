@@ -1,22 +1,16 @@
 import React, { FC, useState } from "react";
-import { Button, EvaIcon } from "components/base";
+import { EvaIcon } from "components/base";
 import {
   Accordion as MuiAccordion,
   AccordionDetails,
   AccordionSummary,
   Box,
-  Popover,
   styled,
   useTheme,
 } from "@mui/material";
-import { Column, ColumnInstance, HeaderGroup } from "react-table";
-import { NamesState } from "types/hooks";
 import { WithChildren } from "types/common";
-
-interface IFilterActionProps {
-  headers: { [p: string]: ColumnInstance<object> };
-  names: NamesState[];
-}
+import ActionButton from "./ActionButton";
+import { ITableActionProps } from "./types";
 
 interface IAccordionProps {
   title: string;
@@ -74,73 +68,22 @@ const Accordion: FC<WithChildren<IAccordionProps>> = ({ children, title }) => {
   );
 };
 
-const FilterAction: FC<IFilterActionProps> = ({ headers, names }) => {
-  const theme = useTheme();
-
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const open = Boolean(anchorEl);
-
-  const id = open ? "filter-popover" : undefined;
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
+const FilterAction: FC<ITableActionProps> = ({ headers, names }) => {
   return (
-    <>
-      <Button
-        aria-describedby={id}
-        startIcon={
-          <Box pt={0.5}>
-            <EvaIcon name={"funnel-outline"} size="large" fill="#1a1a1a" />
-          </Box>
-        }
-        sx={{
-          lineHeight: "1.5rem",
-          alignItems: "center",
-          borderRadius: "10px",
-          padding: theme.spacing(0.5, 2),
-        }}
-        onClick={handleClick}
-      >
-        Filters
-      </Button>
-      <Popover
-        id={id}
-        open={open}
-        keepMounted
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        PaperProps={{
-          sx: {
-            boxShadow: 1,
-            borderRadius: "10px",
-            width: 350,
-          },
-        }}
-      >
-        {names.map((state) => {
-          const id = state.columnId;
-          const header = headers[id];
+    <ActionButton type={"filter"} title={"Filters"} icon={"funnel-outline"}>
+      {names.map((state) => {
+        const id = state.columnId;
+        const header = headers[id];
 
-          if (header.canFilter && state.type !== "date" && header.Filter) {
-            return (
-              <Accordion title={state.name} key={`${id}-filter`}>
-                {header.render("Filter")}
-              </Accordion>
-            );
-          }
-        })}
-      </Popover>
-    </>
+        if (header.canFilter && state.type !== "date" && header.Filter) {
+          return (
+            <Accordion title={state.name} key={`${id}-filter`}>
+              {header.render("Filter")}
+            </Accordion>
+          );
+        }
+      })}
+    </ActionButton>
   );
 };
 
