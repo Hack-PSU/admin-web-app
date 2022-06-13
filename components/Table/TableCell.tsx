@@ -32,10 +32,7 @@ const TableCell: FC<WithChildren<ITableCellProps>> = ({
   ...props
 }) => {
   const { sx, ...rest } = textProps ?? { sx: {} };
-
   const theme = useTheme();
-
-  console.log(empty);
 
   return (
     <Grid

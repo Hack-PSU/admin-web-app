@@ -5,9 +5,9 @@ import { LabelledSelect } from "components/base";
 const LabelledEventSelect: FC<LabelledSelectProps> = (props) => {
   return (
     <LabelledSelect
-      menuWidth={"20%"}
+      menuWidth={"35%"}
       sx={{
-        width: "90%",
+        width: "100%",
         mt: 0.6,
         borderRadius: "15px",
       }}

@@ -4,6 +4,7 @@ import {
   Cell,
   useFilters,
   useFlexLayout,
+  useGlobalFilter,
   usePagination,
   useRowSelect,
   useSortBy,
@@ -18,7 +19,8 @@ import {
 import TableRow from "./TableRow";
 import TableCell from "./TableCell";
 import { NamesState } from "types/hooks";
-import TableActions from "components/Table/TableActions";
+import TableActions from "./TableActions";
+import GlobalActions from "./GlobalActions";
 
 export interface IPaginatedTableProps extends TableProps<object> {
   limit: number;
@@ -55,18 +57,6 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     [theme]
   );
 
-  // const columns2 = useMemo(
-  //   () => [
-  //     {
-  //       id: "name",
-  //       Header: "name",
-  //       accessor: "name",
-  //       canFilter: false,
-  //     }
-  //   ],
-  //   []
-  // );
-
   const {
     // Table instance
     getTableProps,
@@ -74,13 +64,14 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     prepareRow,
     headers,
 
-    // Pagination
+    // Pagination and Filter
     page,
     gotoPage,
-    state: { pageIndex },
-    pageCount,
+    setGlobalFilter,
     nextPage,
     previousPage,
+    pageCount,
+    state: { pageIndex, globalFilter },
   } = useTable(
     {
       columns,
@@ -93,11 +84,12 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
       },
       ...props,
     },
-    useFlexLayout,
-    useFilters,
-    useSortBy,
-    usePagination,
-    useRowSelect,
+    useFlexLayout, // use flexbox instead of HTML tables
+    useFilters, // use column filters
+    useGlobalFilter, // use global filters
+    useSortBy, // use column sorting
+    usePagination, // use row pagination
+    useRowSelect, // use row selection with checkbox
     (hooks) => {
       hooks.visibleColumns.push((columns) => [
         {
@@ -118,84 +110,84 @@ const PaginatedTable: FC<IPaginatedTableProps> = ({
     }
   );
 
-  // console.log(columns);
-  //
-  // const jumpToPage = (page: number) => {
-  //   handlePageChange(page);
-  //   gotoPage(page);
-  // };
-
   /* eslint-disable react/jsx-key */
   // eslint disabled since library handles jsx-key insertion
   return (
-    <Grid
-      container
-      sx={{
-        border: `1px solid ${theme.palette.table.border}`,
-        borderRadius: "10px",
-      }}
-      {...getTableProps()}
-    >
-      <TableActions
-        pageCount={pageCount}
-        pageIndex={pageIndex}
-        previousPage={previousPage}
-        headers={headers}
+    <Grid container gap={1.5} flexDirection="column">
+      <GlobalActions
+        setGlobalFilter={setGlobalFilter}
+        globalFilter={globalFilter}
         names={names}
-        gotoPage={gotoPage}
-        nextPage={nextPage}
-        onRefresh={onRefresh}
-        onDelete={onDelete}
       />
-      <Grid container item>
-        {headerGroups.map((headerGroup) => (
-          <TableRow
-            {...headerGroup.getHeaderGroupProps()}
-            sx={{
-              padding: theme.spacing(1, 1.5),
-              backgroundColor: lighten(theme.palette.table.border, 0.3),
-              borderBottom: `2px solid ${theme.palette.table.border}`,
-            }}
-          >
-            {headerGroup.headers.map((header) => {
-              if (header.id === "selection") {
-                return header.render("Header");
-              } else {
-                return (
-                  <TableCell
-                    header
-                    {...header.getHeaderProps()}
-                    textProps={{
-                      sx: {
-                        fontSize: theme.typography.pxToRem(15),
-                      },
-                    }}
-                  >
-                    {header.render("Header")}
-                  </TableCell>
-                );
-              }
-            })}
-          </TableRow>
-        ))}
-      </Grid>
-      <Grid container item>
-        {page.map((row) => {
-          prepareRow(row);
-          return (
+      <Grid
+        container
+        sx={{
+          border: `1px solid ${theme.palette.table.border}`,
+          borderRadius: "10px",
+        }}
+        {...getTableProps()}
+      >
+        <TableActions
+          pageCount={pageCount}
+          pageIndex={pageIndex}
+          previousPage={previousPage}
+          headers={headers}
+          names={names}
+          gotoPage={gotoPage}
+          nextPage={nextPage}
+          onRefresh={onRefresh}
+          onDelete={onDelete}
+        />
+        <Grid container item>
+          {headerGroups.map((headerGroup) => (
             <TableRow
+              {...headerGroup.getHeaderGroupProps()}
               sx={{
-                padding: theme.spacing(1.5, 1.5),
-                ":last-child": {
-                  borderBottom: 0,
-                },
+                padding: theme.spacing(1, 1.5),
+                backgroundColor: lighten(theme.palette.table.border, 0.3),
+                borderBottom: `2px solid ${theme.palette.table.border}`,
               }}
-              {...row.getRowProps()}
             >
-              {row.cells.map((cell) => cell.render("Cell"))}
+              {headerGroup.headers.map((header) => {
+                if (header.id === "selection") {
+                  return header.render("Header");
+                } else {
+                  return (
+                    <TableCell
+                      header
+                      {...header.getHeaderProps()}
+                      textProps={{
+                        sx: {
+                          fontSize: theme.typography.pxToRem(15),
+                        },
+                      }}
+                    >
+                      {header.render("Header")}
+                    </TableCell>
+                  );
+                }
+              })}
             </TableRow>
-          );
-        })}
+          ))}
+        </Grid>
+        <Grid container item>
+          {page.map((row) => {
+            prepareRow(row);
+            return (
+              <TableRow
+                sx={{
+                  padding: theme.spacing(1.5, 1.5),
+                  ":last-child": {
+                    borderBottom: 0,
+                  },
+                }}
+                {...row.getRowProps()}
+              >
+                {row.cells.map((cell) => cell.render("Cell"))}
+              </TableRow>
+            );
+          })}
+        </Grid>
       </Grid>
     </Grid>
   );

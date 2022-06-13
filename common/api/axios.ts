@@ -4,6 +4,7 @@ import { getApp } from "@firebase/app";
 import { User, getAuth, getIdToken, getIdTokenResult } from "@firebase/auth";
 import moment from "moment";
 import { DateTime } from "luxon";
+import nookies from "nookies";
 
 type ApiAxiosInstance = AxiosInstance & {
   defaults: {
@@ -44,6 +45,9 @@ const refreshToken = async (config: ApiAxiosRequestConfig) => {
     // required for request retry
     config.headers.idtoken = token;
 
+    // set in cookies
+    nookies.set(undefined, "idtoken", token);
+
     // for subsequent requests
     api.defaults.headers.common["idtoken"] = token;
     api.defaults.headers.common["exp"] = expirationTime;
@@ -59,10 +63,10 @@ api.interceptors.response.use(
     const isRefreshNeeded =
       shouldRefreshToken(request) &&
       error.response.status === 401 &&
-      !request._canRetry;
+      !request._retried;
 
     if (isRefreshNeeded) {
-      request._canRetry = true;
+      request._retried = true;
       await refreshToken(request);
       return api(request);
     }
@@ -80,24 +84,5 @@ export const resetApi = () => {
   delete api.defaults.headers.common["idtoken"];
   delete api.defaults.headers.common["exp"];
 };
-
-// api.interceptors.request.use(async (request) => {
-//   if (request.headers && request.headers.idtoken) {
-//     return request;
-//   }
-//
-//   const user = getAuth(getApp()).currentUser;
-//
-//   if (user) {
-//     const token = await user.getIdToken(true);
-//     if (request.headers) {
-//       request.headers["idtoken"] = token;
-//     }
-//   } else {
-//     throw Error("Unauthorized");
-//   }
-//
-//   return request;
-// });
 
 export default api;

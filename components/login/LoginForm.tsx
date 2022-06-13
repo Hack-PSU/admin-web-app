@@ -1,13 +1,13 @@
-import React, { FC, useCallback, useState } from "react";
-import { ControlledInput, EvaIcon } from "components/base";
+import React, { FC, useState } from "react";
+import { ControlledInput, EvaIcon, LabelledInput } from "components/base";
 import { Grid, IconButton, InputAdornment } from "@mui/material";
 
 const EyeVisible: FC = () => (
-  <EvaIcon name="eye-outline" size="medium" fill="#000000" />
+  <EvaIcon name="eye-outline" size="medium" fill="#1a1a1a" />
 );
 
 const EyeOff: FC = () => (
-  <EvaIcon name="eye-off-outline" size="medium" fill="#000000" />
+  <EvaIcon name="eye-off-outline" size="medium" fill="#1a1a1a" />
 );
 
 const PasswordInputAdornment: FC<{
@@ -32,10 +32,19 @@ const LoginForm: FC = () => {
 
   return (
     <>
-      <Grid item>
-        <ControlledInput name="email" placeholder="Enter your email" />
+      <Grid item sx={{ width: "80%" }}>
+        <ControlledInput
+          name="email"
+          placeholder="Enter your email"
+          label="Email"
+          id="email"
+          as={LabelledInput}
+          sx={{
+            width: "100%",
+          }}
+        />
       </Grid>
-      <Grid item>
+      <Grid item sx={{ width: "80%" }}>
         <ControlledInput
           name="password"
           type={hidden ? "password" : "text"}
@@ -48,6 +57,12 @@ const LoginForm: FC = () => {
               onToggleHidden={onTogglePassword}
             />
           }
+          as={LabelledInput}
+          label="Password"
+          id="password"
+          sx={{
+            width: "100%",
+          }}
         />
       </Grid>
     </>

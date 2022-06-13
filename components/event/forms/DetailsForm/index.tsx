@@ -28,7 +28,7 @@ const eventTypeItems = [
   { value: EventType.WORKSHOP, display: "Workshop" },
 ];
 
-const DetailForm: FC = () => {
+const DetailsForm: FC = () => {
   const { getValues, setValue, watch } = useFormContext();
   const images = watch("images");
 
@@ -46,9 +46,10 @@ const DetailForm: FC = () => {
       container
       sx={{ width: "100%", flexWrap: "wrap" }}
       rowGap={3}
-      justifyContent="space-evenly"
+      justifyContent="space-between"
+      columnSpacing={2}
     >
-      <Grid item xs={4}>
+      <Grid item xs={12}>
         <ControlledInput
           name="name"
           placeholder="Enter event name"
@@ -57,7 +58,7 @@ const DetailForm: FC = () => {
           id="name"
         />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={6}>
         <ControlledSelect
           items={locationItems}
           name="location"
@@ -67,7 +68,7 @@ const DetailForm: FC = () => {
           as={EventLocationSelect}
         />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={6}>
         <ControlledSelect
           items={eventTypeItems}
           name="type"
@@ -87,14 +88,11 @@ const DetailForm: FC = () => {
           multiline
           fullWidth
           as={LabelledEventInput}
-          sx={{
-            width: "100%",
-          }}
           rows={3}
         />
       </Grid>
       <Grid container item xs={12} gap={3}>
-        <Grid item xs={5}>
+        <Grid item xs={7}>
           <ControlledDropzone
             name="images"
             id="images"
@@ -105,7 +103,7 @@ const DetailForm: FC = () => {
             }}
           />
         </Grid>
-        <Grid item xs={6} pt={1.5}>
+        <Grid item xs={4} pt={1.5}>
           {(images ?? []).map((image: File, index: number) => (
             <DropzoneItem
               onRemove={onRemoveItem}
@@ -120,4 +118,4 @@ const DetailForm: FC = () => {
   );
 };
 
-export default DetailForm;
+export default DetailsForm;

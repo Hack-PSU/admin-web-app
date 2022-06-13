@@ -1,7 +1,8 @@
 import { NextPage } from "next";
-import React, { FC } from "react";
+import React from "react";
 import {
   resolveError,
+  withProtectedRoute,
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
@@ -9,33 +10,18 @@ import { useColumnBuilder, useQueryResolver } from "common/hooks";
 import { getAllHackers } from "query";
 import { IGetAllHackersResponse } from "types/api";
 import { PaginatedTable } from "components/Table";
-import { Box, Grid, InputAdornment, useTheme } from "@mui/material";
-import { Button, EvaIcon, Input } from "components/base";
+import { Grid, Typography, useTheme } from "@mui/material";
+import { Button } from "components/base";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
 import { useQuery } from "react-query";
+import { AuthPermission } from "types/context";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
-  page: number;
-  limit: number;
 }
 
-const SearchAdornment: FC = () => (
-  <InputAdornment position={"start"}>
-    <Box mt={0.5}>
-      <EvaIcon name={"search-outline"} size="medium" fill="#1a1a1a" />
-    </Box>
-  </InputAdornment>
-);
-
-const Hackers: NextPage<IHackersPageProps> = ({
-  hackers,
-  page: initialPage,
-  limit: initialLimit,
-}) => {
+const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
-  const { register } = useForm();
 
   const { columns, names } = useColumnBuilder((builder) =>
     builder
@@ -62,16 +48,6 @@ const Hackers: NextPage<IHackersPageProps> = ({
         filterType: "input",
       })
   );
-
-  // const {
-  //   page,
-  //   limit,
-  //   handlePageChange,
-  //   request: getHackers,
-  // } = usePaginatedQuery<IGetAllHackersResponse[]>(getAllHackers, {
-  //   page: initialPage,
-  //   limit: initialLimit,
-  // });
 
   const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
     () => getAllHackers()
@@ -104,21 +80,9 @@ const Hackers: NextPage<IHackersPageProps> = ({
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
-          <Input
-            startAdornment={<SearchAdornment />}
-            placeholder={"Search hackers"}
-            inputProps={{
-              style: {
-                fontSize: theme.typography.pxToRem(16),
-              },
-            }}
-            sx={{
-              width: "95%",
-              padding: theme.spacing(0.7, 2),
-              borderRadius: "18px",
-            }}
-            {...register("query")}
-          />
+          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            Hackers
+          </Typography>
         </Grid>
         <Grid item xs={2}>
           <Link href={"/hackers/new"} passHref>
@@ -134,7 +98,7 @@ const Hackers: NextPage<IHackersPageProps> = ({
                 },
               }}
             >
-              Add an Event
+              Add a Hacker
             </Button>
           </Link>
         </Grid>
@@ -153,32 +117,26 @@ const Hackers: NextPage<IHackersPageProps> = ({
   );
 };
 
-export const getServerSideProps = withServerSideProps(
-  async (context, token) => {
-    const offset = 0;
-    const limit = 10;
-    try {
-      const resp = await getAllHackers(offset, limit, token);
-      if (resp && resp.data) {
-        return {
-          props: {
-            hackers: resp.data.body.data,
-            page: 1,
-            limit,
-          },
-        };
-      }
-    } catch (e: any) {
-      resolveError(context, e);
+export const getServerSideProps = withServerSideProps(async (context) => {
+  try {
+    const resp = await getAllHackers();
+    if (resp && resp.data) {
+      return {
+        props: {
+          hackers: resp.data.body.data,
+        },
+      };
     }
-    return {
-      props: {
-        hackers: [],
-        page: 1,
-        limit,
-      },
-    };
+  } catch (e: any) {
+    resolveError(context, e);
   }
-);
+  return {
+    props: {
+      hackers: [],
+    },
+  };
+});
 
-export default withDefaultLayout(Hackers);
+export default withDefaultLayout(
+  withProtectedRoute(Hackers, AuthPermission.VOLUNTEER)
+);

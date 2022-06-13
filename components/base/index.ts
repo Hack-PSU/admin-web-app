@@ -8,3 +8,4 @@ export { default as Button } from "./Button";
 export * from "./Checkbox";
 export * from "./Radio";
 export * from "./SwitchTab";
+export { default as Root } from "./Root";

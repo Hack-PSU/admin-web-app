@@ -23,6 +23,7 @@
       "common/*": ["./common/*"],
       "api/*": ["./common/api/*"],
       "query": ["./common/api"],
+      "assets/*": ["./assets/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

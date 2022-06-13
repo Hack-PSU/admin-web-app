@@ -1654,11 +1654,12 @@ __metadata:
     eslint-config-next: ^12.1.6
     eslint-config-prettier: ^8.5.0
     firebase: ^9.8.1
-    framer-motion: ^6
+    framer-motion: ^6.3.11
     husky: ">=6"
     immer: ^9.0.14
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
+    lottie-react: ^2.2.1
     luxon: ^2.4.0
     match-sorter: ^6.3.1
     moment: ^2.29.3
@@ -2900,9 +2901,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^6":
-  version: 6.3.6
-  resolution: "framer-motion@npm:6.3.6"
+"framer-motion@npm:^6.3.11":
+  version: 6.3.11
+  resolution: "framer-motion@npm:6.3.11"
   dependencies:
     "@emotion/is-prop-valid": ^0.8.2
     framesync: 6.0.1
@@ -2916,7 +2917,7 @@ __metadata:
   dependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  checksum: 2d82ff7ce3fdac97a2e52aa6d92907f3ff4ba37389202e0b5efd2b0e9842ca5b3913ed325783e29edea8ccf7ba16077a0b48ec5ae548283f96b6e81ac6ae6cc5
+  checksum: 2333b296a109ec0ef86421453f66a92b63e07930a491102f1007bbe48f40594d8c51a96ca937f8f3f013ba658147049bf1fa9feebc44487b8e7617bb674fb254
   languageName: node
   linkType: hard
 
@@ -3679,6 +3680,25 @@ __metadata:
   bin:
     loose-envify: cli.js
   checksum: 6517e24e0cad87ec9888f500c5b5947032cdfe6ef65e1c1936a0c48a524b81e65542c9c3edc91c97d5bddc806ee2a985dbc79be89215d613b1de5db6d1cfe6f4
+  languageName: node
+  linkType: hard
+
+"lottie-react@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "lottie-react@npm:2.2.1"
+  dependencies:
+    lottie-web: ^5.8.1
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+    react-dom: ^16.8.0 || ^17.0.0
+  checksum: 37ca04e2baf0ae18def7e82b1746175a742410e8adcadd2d8c0f4206eee4dac65a4ba1d14709134fac2d8251d514b866af1d62e6d87fea345eb7af383e569efa
+  languageName: node
+  linkType: hard
+
+"lottie-web@npm:^5.8.1":
+  version: 5.9.4
+  resolution: "lottie-web@npm:5.9.4"
+  checksum: b7da159779791c92dc45bd7861bf37babef43a7139a6b12d0c1596773fbc338562e4547df766a42ce73516fe82ec790e8ddcebe7d4c9d7fa2ee4d42e0072904c
   languageName: node
   linkType: hard
 

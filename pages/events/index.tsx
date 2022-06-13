@@ -6,24 +6,23 @@ import { DefaultCell, TableCell } from "components/Table";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
 import { DateTime } from "luxon";
-import { Box, Grid, InputAdornment, useTheme } from "@mui/material";
+import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Button, EvaIcon, Input } from "components/base";
 import Link from "next/link";
 import { useQuery } from "react-query";
 import { Cell } from "react-table";
+import dynamic from "next/dynamic";
+import { PaginatedTable } from "components/Table";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
 
-import dynamic from "next/dynamic";
-import { IPaginatedTableProps } from "components/Table/PaginatedTable";
-
-const PaginatedTable = dynamic<IPaginatedTableProps>(
-  () => import("components/Table/PaginatedTable"),
-  { ssr: false }
-);
+// const PaginatedTable = dynamic<IPaginatedTableProps>(
+//   () => import("components/Table/PaginatedTable"),
+//   { ssr: false }
+// );
 
 const SearchAdornment: FC = () => (
   <InputAdornment position={"start"}>
@@ -157,21 +156,9 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
-          <Input
-            startAdornment={<SearchAdornment />}
-            placeholder={"Search events"}
-            inputProps={{
-              style: {
-                fontSize: theme.typography.pxToRem(16),
-              },
-            }}
-            sx={{
-              width: "95%",
-              padding: theme.spacing(0.7, 2),
-              borderRadius: "18px",
-            }}
-            {...register("query")}
-          />
+          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            Events
+          </Typography>
         </Grid>
         <Grid item xs={2}>
           <Link href={"/events/tabs"} passHref>

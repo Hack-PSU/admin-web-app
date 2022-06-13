@@ -8,7 +8,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-interface IButtonProps extends Omit<ButtonProps, "ref"> {
+interface IButtonProps extends Omit<ButtonProps, "ref" | "touchRippleRef"> {
   textProps?: Omit<TypographyProps, "children" | "variant" | "ref">;
 }
 

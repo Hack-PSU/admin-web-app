@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { FirebaseProvider } from "components/context";
 import { auth } from "common/config";
 import { AppPropsLayout } from "types/common";
+import { Root } from "components/base";
 
 const client = new QueryClient();
 
@@ -17,8 +18,10 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
     <ThemeProvider theme={theme}>
       <FirebaseProvider auth={auth}>
         <QueryClientProvider client={client}>
-          {getLayout(<Component {...pageProps} />)}
-          <ReactQueryDevtools initialIsOpen={false} />
+          <Root>
+            {getLayout(<Component {...pageProps} />)}
+            <ReactQueryDevtools initialIsOpen={false} />
+          </Root>
         </QueryClientProvider>
       </FirebaseProvider>
     </ThemeProvider>

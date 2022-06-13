@@ -12,7 +12,10 @@ import { NextPageLayout } from "types/common";
 import nookies from "nookies";
 import { AxiosError } from "axios";
 
-export function withAuthPage(Component: NextPage, permission: AuthPermission) {
+export function withProtectedRoute(
+  Component: NextPage | NextPageLayout,
+  permission: AuthPermission
+) {
   const Page: NextPage = () => {
     const { validatePermissions } = useFirebase();
 
@@ -70,7 +73,7 @@ export function withServerSideProps<TProps>(
     } else {
       return {
         redirect: {
-          destination: `/login?from=${ctx.resolvedUrl}`,
+          destination: `/login?return_to=${encodeURI(ctx.resolvedUrl)}`,
           permanent: false,
         },
       };
