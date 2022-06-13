@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import {
-  withAuthPage,
+  withProtectedRoute,
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";

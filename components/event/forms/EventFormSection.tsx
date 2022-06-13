@@ -1,7 +1,13 @@
 import { FC } from "react";
 import { WithChildren } from "types/common";
-import { Grid, SxProps, Theme, Typography } from "@mui/material";
-import { useTheme } from "@mui/system";
+import {
+  alpha,
+  Grid,
+  SxProps,
+  Theme,
+  Typography,
+  useTheme,
+} from "@mui/material";
 
 interface IEventFormSectionProps {
   label: string;
@@ -17,14 +23,18 @@ const EventFormSection: FC<WithChildren<IEventFormSectionProps>> = ({
 
   return (
     <>
-      <Grid item sx={sx}>
+      <Grid
+        item
+        sx={{
+          borderBottom: `1.5px solid ${alpha(theme.palette.common.black, 0.1)}`,
+          ...sx,
+        }}
+      >
         <Typography
-          variant="h4"
+          variant="body1"
           sx={{
-            borderBottom: `3px solid ${theme.palette.common.black}`,
+            fontSize: theme.typography.pxToRem(22),
             fontWeight: "bold",
-            width: "fit-content",
-            lineHeight: "2rem",
           }}
         >
           {label}

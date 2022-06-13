@@ -24,9 +24,14 @@ export const theme = responsiveFontSizes(
         line: "#d6d6d6",
         accent: "#2878DA",
       },
+      table: {
+        header: "#969696",
+        divider: "#bdbdbd",
+        border: "#e4e4e4",
+      },
       select: {
         main: "#1a1a1a",
-        placeholder: "#a0a0a0",
+        placeholder: "#bebebe",
       },
       success: {
         main: "#50c96c",
@@ -35,26 +40,35 @@ export const theme = responsiveFontSizes(
         main: "#f25959",
       },
       input: {
-        border: "#aeaeae",
+        border: "#d5d8dc",
       },
     },
     typography: {
       htmlFontSize: 16,
       fontFamily:
-        "Open Sans, Poppins, -apple-system, 'Helvetica Neue', Arial, sans-serif",
+        "Inter, Poppins, -apple-system, 'Helvetica Neue', Arial, sans-serif",
       h1: {
         fontWeight: "bold",
-        fontFamily: "Open Sans",
+        fontFamily: "Poppins",
       },
       h2: {
-        fontFamily: "Open Sans",
+        fontFamily: "Poppins",
+      },
+      h3: {
+        fontFamily: "Poppins",
       },
       h4: {
-        fontFamily: "Open Sans",
+        fontFamily: "Inter",
       },
       body1: {
         fontSize: "0.9rem",
-        fontFamily: "Poppins",
+        fontFamily: "Inter",
+      },
+      body2: {
+        fontFamily: "Inter",
+      },
+      button: {
+        fontFamily: "Inter",
       },
     },
     components: {

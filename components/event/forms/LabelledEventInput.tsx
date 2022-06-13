@@ -21,7 +21,7 @@ const LabelledEventInput: FC<LabelledInputProps> = ({
       showError={showError}
       error={error}
       sx={{
-        width: "90%",
+        width: "100%",
         mt: 0.6,
         borderRadius: "15px",
         ...sx,

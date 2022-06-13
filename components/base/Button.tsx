@@ -8,8 +8,8 @@ import {
   useTheme,
 } from "@mui/material";
 
-interface IButtonProps extends ButtonProps {
-  textProps?: Omit<TypographyProps, "children" | "variant">;
+interface IButtonProps extends Omit<ButtonProps, "ref" | "touchRippleRef"> {
+  textProps?: Omit<TypographyProps, "children" | "variant" | "ref">;
 }
 
 const Button: FC<IButtonProps> = ({ children, sx, textProps, ...props }) => {

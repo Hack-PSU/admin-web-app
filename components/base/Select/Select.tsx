@@ -43,6 +43,7 @@ const Select = forwardRef<any, ISelectProps>(
     },
     ref
   ) => {
+    console.log(sx);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -143,6 +144,7 @@ export const LabelledSelect: FC<LabelledSelectProps> = ({
   renderItem,
   ...props
 }) => {
+  console.log(props.sx);
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />

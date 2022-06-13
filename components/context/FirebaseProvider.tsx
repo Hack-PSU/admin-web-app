@@ -11,6 +11,7 @@ import { WithChildren } from "types/common";
 import {
   getIdToken,
   onAuthStateChanged,
+  onIdTokenChanged,
   signInWithEmailAndPassword,
   signOut,
   User,
@@ -25,6 +26,7 @@ import {
 import jwtDecode from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
+import { initApi, resetApi } from "api/axios";
 
 const FirebaseContext = createContext<IFirebaseProviderHooks>(
   {} as IFirebaseProviderHooks
@@ -139,6 +141,16 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
       await resolveAuthState(user ?? undefined);
     });
   }, [auth, resolveAuthState]);
+
+  useEffect(() => {
+    return onIdTokenChanged(auth, async (user) => {
+      if (user) {
+        await initApi(user);
+      } else {
+        resetApi();
+      }
+    });
+  }, [auth]);
 
   const value = useMemo(
     () => ({

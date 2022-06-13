@@ -10,8 +10,12 @@ import UnauthorizedError from "components/base/Error/UnauthorizedError";
 import { DefaultLayout } from "components/layout";
 import { NextPageLayout } from "types/common";
 import nookies from "nookies";
+import { AxiosError } from "axios";
 
-export function withAuthPage(Component: NextPage, permission: AuthPermission) {
+export function withProtectedRoute(
+  Component: NextPage | NextPageLayout,
+  permission: AuthPermission
+) {
   const Page: NextPage = () => {
     const { validatePermissions } = useFirebase();
 
@@ -32,8 +36,26 @@ export function withDefaultLayout<TProps>(page: NextPageLayout<TProps>) {
   return page;
 }
 
+export const resolveError = (
+  context: GetServerSidePropsContext,
+  error: any
+) => {
+  if (error instanceof AxiosError && error.response) {
+    if (error.response.status === 401) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/login?from=${context.resolvedUrl}`,
+          permanent: false,
+        },
+      };
+    }
+  }
+};
+
 export function withServerSideProps<TProps>(
   getServerSideProps?: (
+    context: GetServerSidePropsContext,
     token: string
   ) => Promise<GetServerSidePropsResult<TProps>>
 ) {
@@ -42,7 +64,7 @@ export function withServerSideProps<TProps>(
 
     if (cookies.idtoken) {
       if (getServerSideProps) {
-        return getServerSideProps(cookies.idtoken);
+        return getServerSideProps(ctx, cookies.idtoken);
       } else {
         return {
           props: {},
@@ -51,7 +73,7 @@ export function withServerSideProps<TProps>(
     } else {
       return {
         redirect: {
-          destination: `/login?from=${ctx.resolvedUrl}`,
+          destination: `/login?return_to=${encodeURI(ctx.resolvedUrl)}`,
           permanent: false,
         },
       };

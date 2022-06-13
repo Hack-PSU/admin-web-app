@@ -23,7 +23,7 @@ const AddNewLocationModal: FC = () => {
       position="center"
       alignment="center"
     >
-      <Modal.Header>Add New Location</Modal.Header>
+      <Modal.Header>New Location</Modal.Header>
       <Modal.Body alignItems="center">
         <Grid container item>
           <Grid item xs={6}>

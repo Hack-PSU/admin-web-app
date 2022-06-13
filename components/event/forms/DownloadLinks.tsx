@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   useFieldArray,
   UseFieldArrayRemove,
@@ -7,14 +7,13 @@ import {
 } from "react-hook-form";
 import {
   Box,
-  Button,
   darken,
   Grid,
   IconButton,
   Typography,
   useTheme,
 } from "@mui/material";
-import { EvaIcon, Input } from "components/base";
+import { EvaIcon, Input, Button } from "components/base";
 
 type FieldValues = {
   link: string;
@@ -33,12 +32,39 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
   index,
   remove,
 }) => {
-  const { register, handleSubmit } = useForm({ defaultValues: value });
+  const { register, handleSubmit, watch } = useForm({ defaultValues: value });
   const theme = useTheme();
 
+  const [confirm, setConfirm] = useState<boolean>(false);
+
+  const onClickSubmit = () => {
+    setConfirm(true);
+    handleSubmit((data) => {
+      update(index, data);
+    });
+  };
+
+  useEffect(() => {
+    const subscription = watch((data) => {
+      if (data.link !== value.link) {
+        setConfirm(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [value.link, watch]);
+
   return (
-    <Grid container item gap={1} alignItems="center">
-      <Grid item xs={6}>
+    <Grid
+      container
+      item
+      gap={1}
+      alignItems="center"
+      justifyContent="space-between"
+    >
+      <Grid item sx={{ flexGrow: 1 }}>
         <Input
           {...register("link")}
           placeholder={"Enter a download link"}
@@ -52,22 +78,29 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
           autoCorrect="url"
         />
       </Grid>
-      <Grid item xs={1}>
-        <IconButton
-          sx={{ height: "40px" }}
-          onClick={handleSubmit((data) => update(index, data))}
-        >
-          <Box mt={0.5}>
-            <EvaIcon name={"checkmark"} fill="#000" size="large" />
-          </Box>
-        </IconButton>
-      </Grid>
-      <Grid item xs={1}>
-        <IconButton sx={{ height: "40px" }} onClick={() => remove(index)}>
-          <Box mt={0.5}>
-            <EvaIcon name="trash-outline" fill="#F37A7A" size="large" />
-          </Box>
-        </IconButton>
+      <Grid container item justifyContent="flex-end" sx={{ width: "10%" }}>
+        <Grid item>
+          <IconButton sx={{ height: "40px" }} onClick={onClickSubmit}>
+            <Box mt={0.5}>
+              <EvaIcon
+                name={"checkmark"}
+                fill={
+                  confirm
+                    ? theme.palette.success.main
+                    : theme.palette.common.black
+                }
+                size="large"
+              />
+            </Box>
+          </IconButton>
+        </Grid>
+        <Grid item>
+          <IconButton sx={{ height: "40px" }} onClick={() => remove(index)}>
+            <Box mt={0.5}>
+              <EvaIcon name="trash-outline" fill="#F37A7A" size="large" />
+            </Box>
+          </IconButton>
+        </Grid>
       </Grid>
     </Grid>
   );
@@ -80,7 +113,7 @@ const DownloadLinks: FC = () => {
   const theme = useTheme();
 
   return (
-    <Grid container item gap={2} flexDirection="column" xs={7}>
+    <Grid container item gap={2} flexDirection="column">
       <Grid container item alignItems="center" sx={{ height: "fit-content" }}>
         <Grid item xs={4}>
           <Typography
@@ -90,33 +123,8 @@ const DownloadLinks: FC = () => {
             Download Links
           </Typography>
         </Grid>
-        <Grid item xs={4}>
-          <Button
-            startIcon={
-              <Box pt={0.5}>
-                <EvaIcon name={"plus-outline"} size="medium" fill="#000" />
-              </Box>
-            }
-            sx={{
-              borderRadius: "15px",
-              backgroundColor: "#efefef",
-              color: "black",
-              textTransform: "none",
-              fontWeight: 500,
-              fontFamily: "Poppins",
-              lineHeight: "1.5rem",
-              padding: theme.spacing(0.5, 2),
-              ":hover": {
-                backgroundColor: darken("#efefef", 0.05),
-              },
-            }}
-            onClick={() => append({ link: "" })}
-          >
-            Add Link
-          </Button>
-        </Grid>
       </Grid>
-      <Grid container item>
+      <Grid container item flexDirection="column" gap={0.5}>
         {fields.map((field, index) => (
           <DownloadLinkInput
             // @ts-ignore
@@ -127,6 +135,36 @@ const DownloadLinks: FC = () => {
             remove={remove}
           />
         ))}
+      </Grid>
+      <Grid item>
+        <Button
+          startIcon={
+            <Box pt={0.5}>
+              <EvaIcon name={"plus-outline"} size="medium" fill="#2878DA" />
+            </Box>
+          }
+          sx={{
+            lineHeight: "1.5rem",
+            padding: theme.spacing(0),
+            backgroundColor: "transparent",
+            ":hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+          onClick={() => append({ link: "" })}
+          textProps={{
+            sx: {
+              color: "#2878DA",
+              ":hover": {
+                color: darken("#2878DA", 0.3),
+              },
+            },
+          }}
+          disableRipple
+          variant="text"
+        >
+          Add Link
+        </Button>
       </Grid>
     </Grid>
   );

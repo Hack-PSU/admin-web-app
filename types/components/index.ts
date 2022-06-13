@@ -1,8 +1,17 @@
 import React from "react";
-import { InputProps, SxProps, Theme, SelectProps } from "@mui/material";
+import {
+  InputProps,
+  SxProps,
+  Theme,
+  SelectProps,
+  CheckboxProps,
+  TypographyProps,
+  RadioProps,
+} from "@mui/material";
 import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
+import { UseTableOptions } from "react-table";
 
 type RenderItemData<T> = {
   item: T;
@@ -27,15 +36,14 @@ export type WithControllerProps<TProps> = UseControllerProps &
     as?: React.FC<any>;
   };
 
-export interface IInputProps
-  extends Omit<InputProps, "name" | "defaultValue" | "placeholder"> {
+export interface IInputProps extends Omit<InputProps, "name" | "placeholder"> {
   placeholder: string;
 }
 
 export type LabelledInputProps = WithLabelledProps<IInputProps>;
 
 export type ControlledInputProps = WithControllerProps<
-  IInputProps & Partial<InputLabelProps>
+  Omit<IInputProps, "defaultValue"> & Partial<InputLabelProps>
 >;
 
 export interface ISelectItem<T = any> {
@@ -62,11 +70,7 @@ export type ControlledSelectProps = WithControllerProps<
   ISelectProps & Partial<InputLabelProps>
 >;
 
-export interface ITableProps<T = any> {
-  items: T[];
-  // renderItems renders a single row given some data
-  renderItems?: RenderItem<T>;
-}
+export type TableProps<T extends object = {}> = UseTableOptions<T>;
 
 export interface IBaseErrorProps {
   error: string;
@@ -116,4 +120,40 @@ export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;
 
 export type ControlledDropzoneProps = WithControllerProps<
   Omit<IDropzoneProps, "onDrop"> & Partial<InputLabelProps>
+>;
+
+export type CheckboxSelectionState = {
+  [key: string]: boolean;
+};
+
+export interface ICheckboxProps
+  extends Omit<
+    CheckboxProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledCheckboxProps = WithLabelledProps<ICheckboxProps>;
+
+export type ControlledCheckboxProps = WithControllerProps<
+  Omit<ICheckboxProps, "value" | "onChange"> & Partial<LabelledCheckboxProps>
+>;
+
+export interface IRadioProps
+  extends Omit<
+    RadioProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledRadioProps = WithLabelledProps<IRadioProps>;
+
+export type ControlledRadioProps = WithControllerProps<
+  Omit<IRadioProps, "value" | "onChange"> & Partial<LabelledRadioProps>
 >;

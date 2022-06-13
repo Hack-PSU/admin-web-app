@@ -1,7 +1,16 @@
-import { useQuery } from "react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AddColumnConfig,
+  AddConfigOptions,
+  BuilderCallback,
+  ColumnBuilder,
+  ColumnOptions,
+  ColumnState,
   PaginatedQueryFn,
+  TableColumnBuilder,
+  TableColumnBuilderConfig,
+  UseApiQueryReturn,
+  UseClipboardReturn,
   UseDateTime,
   UseDateTimeRange,
   UsePaginatedQuery,
@@ -9,43 +18,73 @@ import {
 } from "types/hooks";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
+import { nanoid } from "nanoid";
+import produce from "immer";
+import _ from "lodash";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "types/api";
+import {
+  CheckboxFilter,
+  CheckboxFilterRows,
+  InputFilter,
+  InputFilterRows,
+} from "components/Table/filters";
+import DateFilter, {
+  DateFilterRows,
+} from "components/Table/filters/DateFilter";
 
-export function usePaginatedQuery<TData>(
-  queryKey: string,
-  queryFn: PaginatedQueryFn<TData>,
-  { page: initialPage, limit }: UsePaginatedQueryOptions
+export function useQueryResolver<
+  TData,
+  TQuery = AxiosResponse<ApiResponse<TData>>
+>(queryFn: () => Promise<TQuery | undefined>): UseApiQueryReturn<TData> {
+  return {
+    async request(...params: any[]) {
+      const resp: any = await queryFn.bind(params)();
+      if (resp && resp.data) {
+        return resp.data.body.data;
+      }
+    },
+  };
+}
+
+export function usePaginatedQuery<
+  TData,
+  TRequest = AxiosResponse<ApiResponse<TData>>
+>(
+  queryFn: PaginatedQueryFn<TRequest>,
+  { page: initialPage = 1, limit }: UsePaginatedQueryOptions
 ): UsePaginatedQuery<TData> {
-  const [offset, setOffset] = useState(0);
+  // const [offset, setOffset] = useState(0);
   const [page, setPage] = useState(initialPage);
+  //
+  // useEffect(() => {
+  //   console.log(page, limit);
+  //   setOffset((page - 1) * limit);
+  // }, [limit, page]);
 
-  useEffect(() => {
-    setOffset((page - 1) * limit + 1);
-  }, [limit, page]);
+  const handlePageChange = useCallback((page: number) => {
+    console.log(page);
+    setPage(page);
+  }, []);
 
-  const handleNext = () => {
-    setPage((page) => page + 1);
-  };
-
-  const handlePrev = () => {
-    setPage((page) => page - 1);
-  };
-
-  const handleJump = (to: number) => {
-    setPage(to);
-  };
-
-  const query = useQuery(
-    [queryKey, offset, limit],
-    ({ queryKey }) => queryFn(Number(queryKey[1]), Number(queryKey[2])),
-    { keepPreviousData: true }
+  const request = useCallback(
+    async (page: number) => {
+      const offset = (page - 1) * limit;
+      const resp = await queryFn(offset, limit);
+      // @ts-ignore
+      if (resp && resp.data) {
+        // @ts-ignore
+        return resp.data.body.data;
+      }
+    },
+    [queryFn, limit]
   );
 
   return {
-    ...query,
+    request,
+    limit,
+    handlePageChange,
     page,
-    handlePrev,
-    handleNext,
-    handleJump,
   };
 }
 
@@ -66,7 +105,7 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
     methods.setValue(name, formatDate().toJSDate());
   }, [name, date, time, methods, formatDate]);
 
-  return <UseDateTime>{
+  return {
     dateTime: formatDate().toJSDate(),
     register(type) {
       if (type === "date") {
@@ -81,7 +120,7 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
         };
       }
     },
-  };
+  } as UseDateTime;
 }
 
 export function useDateTimeRange(
@@ -169,5 +208,103 @@ export function useDateTimeRange(
     endDateTime: getValue()[1],
     toggleMultiple,
     isMultipleDays,
+  };
+}
+
+const _builder: TableColumnBuilderConfig = <T extends object>(
+  state: ColumnState<T>
+) => ({
+  addColumn(name: string, options: ColumnOptions): TableColumnBuilder<T> {
+    const id = nanoid(10);
+    const { hideHeader, type, filterType, ...rest } = options;
+
+    let configOptions: AddConfigOptions = {
+      id,
+      name,
+      defaultCanFilter: false,
+      type,
+      ...(hideHeader ? {} : { Header: name, accessor: _.camelCase(name) }),
+    };
+
+    if (filterType && filterType !== "hide") {
+      configOptions = {
+        ...configOptions,
+        ...getFilterByType(filterType),
+      };
+    }
+
+    return _addColumn(state, {
+      ...configOptions,
+      ...rest,
+    });
+  },
+  save(): ColumnState<T> {
+    return state;
+  },
+});
+
+const _addColumn: AddColumnConfig = (state, options) => {
+  return _builder(
+    produce(state, (draft) => {
+      const { name, type, ...rest } = options;
+      // @ts-ignore
+      draft.columns.push({ ...rest });
+      /// @ts-ignore
+      draft.names.push({
+        columnId: String(rest.id),
+        name,
+        type,
+      });
+    })
+  );
+};
+
+const getFilterByType = (type: ColumnOptions["filterType"]) => {
+  switch (type) {
+    case "checkbox":
+      return {
+        defaultCanFilter: true,
+        Filter: CheckboxFilter,
+        filter: CheckboxFilterRows,
+      };
+    case "input":
+      return {
+        defaultCanFilter: true,
+        Filter: InputFilter,
+        filter: InputFilterRows,
+      };
+    case "date":
+      return {
+        defaultCanFilter: true,
+        Filter: DateFilter,
+        filter: DateFilterRows,
+      };
+    case "time":
+      break;
+    case "hide":
+      return {
+        canFilter: false,
+      };
+  }
+};
+
+export function useColumnBuilder<T extends object>(
+  builder: BuilderCallback<T>
+): ColumnState<T> {
+  return useMemo(
+    () =>
+      (
+        builder(_builder({ columns: [], names: [] })) as ColumnBuilder<T>
+      ).save(),
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */ // should not rerender
+    []
+  );
+}
+
+export function useClipboard(): UseClipboardReturn {
+  return {
+    onClickToCopy(value) {
+      void navigator.clipboard.writeText(value);
+    },
   };
 }

@@ -5,3 +5,7 @@ export { default as EvaIcon } from "./EvaIcon";
 export * from "./Dropzone";
 export { default as Modal } from "./Modal";
 export { default as Button } from "./Button";
+export * from "./Checkbox";
+export * from "./Radio";
+export * from "./SwitchTab";
+export { default as Root } from "./Root";

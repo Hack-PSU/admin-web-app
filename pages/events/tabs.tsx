@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Button } from "components/base";
 import {
-  DetailForm,
+  DetailsForm,
   EventFormPanel,
   EventFormSection,
   WorkshopForm,
@@ -88,9 +88,6 @@ const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
         <Grid item>
           <Typography
             variant="h3"
-            style={{
-              fontSize: theme.typography.pxToRem(42),
-            }}
             sx={{
               fontWeight: "bold",
             }}
@@ -112,7 +109,7 @@ const TabbedEvent: NextPage<INewEventProps> = ({ events }) => {
             </StyledTabs>
           </Grid>
           <EventFormPanel value={tab} index={0}>
-            <DetailForm />
+            <DetailsForm />
           </EventFormPanel>
           <EventFormPanel value={tab} index={1}>
             <WorkshopForm />

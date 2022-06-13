@@ -1,8 +1,142 @@
 import { NextPage } from "next";
-import { withDefaultLayout } from "common/HOCs";
+import React from "react";
+import {
+  resolveError,
+  withProtectedRoute,
+  withDefaultLayout,
+  withServerSideProps,
+} from "common/HOCs";
+import { useColumnBuilder, useQueryResolver } from "common/hooks";
+import { getAllHackers } from "query";
+import { IGetAllHackersResponse } from "types/api";
+import { PaginatedTable } from "components/Table";
+import { Grid, Typography, useTheme } from "@mui/material";
+import { Button } from "components/base";
+import Link from "next/link";
+import { useQuery } from "react-query";
+import { AuthPermission } from "types/context";
 
-const Hackers: NextPage = () => {
-  return <></>;
+interface IHackersPageProps {
+  hackers: IGetAllHackersResponse[];
+}
+
+const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
+  const theme = useTheme();
+
+  const { columns, names } = useColumnBuilder((builder) =>
+    builder
+      .addColumn("Name", {
+        maxWidth: 120,
+        type: "text",
+        filterType: "input",
+      })
+      .addColumn("Pin", {
+        maxWidth: 80,
+        minWidth: 50,
+        width: 50,
+        type: "text",
+        filterType: "hide",
+      })
+      .addColumn("Email", {
+        minWidth: 150,
+        maxWidth: 250,
+        type: "text",
+        filterType: "input",
+      })
+      .addColumn("University", {
+        type: "text",
+        filterType: "input",
+      })
+  );
+
+  const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
+    () => getAllHackers()
+  );
+
+  const { data: hackersData } = useQuery("hackers", () => getHackers(), {
+    select: (data) => {
+      if (data) {
+        return data.map((d) => ({
+          name: `${d.firstname} ${d.lastname}`,
+          pin: d.pin,
+          email: d.email,
+          university: d.university,
+        }));
+      }
+    },
+    keepPreviousData: true,
+    initialData: hackers,
+  });
+
+  const onRefresh = () => {
+    return undefined;
+  };
+
+  const onDelete = () => {
+    return undefined;
+  };
+
+  return (
+    <Grid container gap={1.5}>
+      <Grid container item justifyContent="space-between" alignItems="center">
+        <Grid item xs={10}>
+          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            Hackers
+          </Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Link href={"/hackers/new"} passHref>
+            <Button
+              variant="text"
+              sx={{
+                width: "100%",
+                padding: theme.spacing(1, 3.5),
+              }}
+              textProps={{
+                sx: {
+                  lineHeight: "1.8rem",
+                },
+              }}
+            >
+              Add a Hacker
+            </Button>
+          </Link>
+        </Grid>
+      </Grid>
+      <Grid item>
+        <PaginatedTable
+          limit={8}
+          columns={columns}
+          names={names}
+          data={hackersData ?? []}
+          onRefresh={onRefresh}
+          onDelete={onDelete}
+        />
+      </Grid>
+    </Grid>
+  );
 };
 
-export default withDefaultLayout(Hackers);
+export const getServerSideProps = withServerSideProps(async (context) => {
+  try {
+    const resp = await getAllHackers();
+    if (resp && resp.data) {
+      return {
+        props: {
+          hackers: resp.data.body.data,
+        },
+      };
+    }
+  } catch (e: any) {
+    resolveError(context, e);
+  }
+  return {
+    props: {
+      hackers: [],
+    },
+  };
+});
+
+export default withDefaultLayout(
+  withProtectedRoute(Hackers, AuthPermission.VOLUNTEER)
+);
