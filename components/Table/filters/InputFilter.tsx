@@ -1,20 +1,22 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { ColumnFilter } from "components/Table/filters/types";
 import { EvaIcon, Input } from "components/base";
 import { FilterType } from "react-table";
 import { matchSorter } from "match-sorter";
 import { Box, InputAdornment, useTheme } from "@mui/material";
 
-const InputFilter: FC<ColumnFilter> = ({
-  column: { filterValue, setFilter },
-}) => {
+const InputFilter: FC<ColumnFilter> = ({ column: { setFilter } }) => {
+  const [value, setValue] = useState<string>("");
   const theme = useTheme();
 
   return (
     <Input
       placeholder={`Search column`}
-      value={filterValue || ""}
-      onChange={(e) => setFilter(e.target.value || undefined)}
+      value={value}
+      onChange={(e) => {
+        setValue(e.target.value);
+        setFilter(e.target.value || undefined);
+      }}
       inputProps={{
         style: {
           fontSize: "0.85rem",
