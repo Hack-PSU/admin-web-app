@@ -59,7 +59,7 @@ API documentation for reference.
 
 ### useQueryResolver
 
-The `useQueryResolver` hook is a utility function that helps resolve types before passing them
+The `useQueryResolver` is a hook that helps resolve types before passing them
 into the useQuery hook or useMutation hook for `react-query`. This helps with some features of `react-query`
 to resolve any potential TypeScript errors.
 
@@ -157,7 +157,7 @@ There are currently two ways to create a table. The first way is to use the `Pag
 that provides a simple preset to render a full-featured table. The second way is to use the `Table` API to
 incrementally compose a table by combining individual pieces of the table.
 
-Render a full-featured table:
+Render a fully-featured table:
 
 ```tsx
 import { PaginatedTable } from "components/Table";
