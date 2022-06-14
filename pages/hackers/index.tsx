@@ -9,7 +9,7 @@ import {
 import { useColumnBuilder, useQueryResolver } from "common/hooks";
 import { getAllHackers } from "query";
 import { IGetAllHackersResponse } from "types/api";
-import { PaginatedTable } from "components/Table";
+import { PaginatedTable, Table } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { Button } from "components/base";
 import Link from "next/link";
@@ -104,14 +104,33 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
         </Grid>
       </Grid>
       <Grid item>
-        <PaginatedTable
+        <Table
           limit={8}
-          columns={columns}
           names={names}
-          data={hackersData ?? []}
           onRefresh={onRefresh}
           onDelete={onDelete}
-        />
+          columns={columns}
+          data={hackersData ?? []}
+        >
+          <Table.GlobalActions />
+          <Table.Container>
+            <Table.Actions>
+              <Table.ActionsLeft>
+                <Table.Filter />
+                <Table.Sort />
+              </Table.ActionsLeft>
+              <Table.ActionsCenter>
+                <Table.Pagination />
+              </Table.ActionsCenter>
+              <Table.ActionsRight>
+                <Table.Refresh />
+                <Table.Delete />
+              </Table.ActionsRight>
+            </Table.Actions>
+            <Table.Header />
+            <Table.Body />
+          </Table.Container>
+        </Table>
       </Grid>
     </Grid>
   );

@@ -42,6 +42,34 @@ The project is configured to run a pre-commit hook on all staged files.
 This script runs every time the `git commit` command is run. This script
 will run `eslint` and `prettier` to format code and look for code-style deviations.
 
+## Data Fetching
+
+When working with data fetching, some API endpoints require an authenticated user to pass in
+their tokens as part of the request. We will use `react-query`, which is a data fetching API that
+manages local caches and complex data fetching use-cases. As `react-query` is a framework-agnostic
+API, we also `axios`, which is a promise-based HTTP client. Built into the axios client is a
+way to inject the authentication tokens and refresh them when needed. Therefore, it is not
+required to the API token manually.
+
+All endpoint requests can be found in `common/api/index.ts`. Each endpoint is provides a link to the
+API documentation for reference.
+
+- [React Query](https://react-query.tanstack.com/overview)
+- [Axios](https://axios-http.com/docs/intro)
+
+### useQueryResolver
+
+The `useQueryResolver` hook is a utility function that helps resolve types before passing them
+into the useQuery hook or useMutation hook for `react-query`. This helps with some features of `react-query`
+to resolve any potential TypeScript errors.
+
+```ts
+const { request } = useQueryResolver<TResponse>(() => apiCall());
+```
+
+`TResponse` is the type generic that can help resolve the return type of the API call.
+The `request` variable can then be passed into the `queryFn` from `react-query`.
+
 ## Creating a new page
 
 There are a some important functions to include when rendering a new page in order to
@@ -124,6 +152,72 @@ const { columns, names } = useColumnBuilder((builder) =>
 The two hooks: `columns` and `names` should be passed into the `PaginatedTable` component.
 The `filterType` field will determine what the element will be shown under the filter action.
 While the `type` field will determine what is available to be queried in the global filter input.
+
+There are currently two ways to create a table. The first way is to use the `PaginatedTable` component
+that provides a simple preset to render a full-featured table. The second way is to use the `Table` API to
+incrementally compose a table by combining individual pieces of the table.
+
+Render a full-featured table:
+
+```tsx
+import { PaginatedTable } from "components/Table";
+
+return (
+  <PaginatedTable
+    limit={limit}
+    names={names}
+    columns={columns}
+    onRefresh={onRefresh}
+    onDelete={onDelete}
+    data={data}
+  />
+);
+```
+
+Render a table through composition:
+
+```tsx
+import { Table } from "components/Table";
+
+return (
+  <Table
+    limit={limit}
+    names={names}
+    onRefresh={onRefresh}
+    columns={columns}
+    onDelete={onDelete}
+    data={data}
+  >
+    <Table.GlobalActions />
+    <Table.Container>
+      <Table.Actions>
+        <Table.ActionsLeft>
+          <Table.Filter />
+          <Table.Sort />
+        </Table.ActionsLeft>
+        <Table.ActionsCenter>
+          <Table.Pagination />
+        </Table.ActionsCenter>
+        <Table.ActionsRight>
+          <Table.Refresh />
+          <Table.Delete />
+        </Table.ActionsRight>
+      </Table.Actions>
+      <Table.Header />
+      <Table.Body />
+    </Table.Container>
+  </Table>
+);
+```
+
+1. `Table`
+2. `Table.Container`
+3. `Table.Actions` -- required if rendering actions
+4. `Table.ActionsLeft`, `Table.ActionsCenter`, and `Table.ActionsLeft` are required for positioning the actions
+5. `Table.Filter`, `Table.Sort`, `Table.Pagination`, `Table.Refresh`, and `Table.Delete` are optional and if left out, with its respective containers in place, it will maintain the correct positioning.
+6. `Table.Header` and `Table.Body` will render the necessary content
+
+The second method is recommended to render a custom table with some features left out, but keeping the same styling.
 
 ### Modal
 
