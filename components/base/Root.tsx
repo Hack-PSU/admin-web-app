@@ -4,7 +4,7 @@ import { useFirebase } from "components/context";
 import Spinner from "assets/lottie/spinner.json";
 
 import Lottie from "lottie-react";
-import { Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 
 const Loading: FC = () => {
@@ -42,7 +42,11 @@ const Root: FC<WithChildren> = ({ children }) => {
 
   const isLogin = router.pathname.startsWith("/login");
 
-  return <>{isAuthenticated || isLogin ? children : <Loading />}</>;
+  return (
+    <Box sx={{ backgroundColor: "background.light" }}>
+      {isAuthenticated || isLogin ? children : <Loading />}
+    </Box>
+  );
 };
 
 export default Root;

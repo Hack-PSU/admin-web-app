@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Grid, useTheme } from "@mui/material";
 import { WithChildren } from "types/common";
-import { SideMenu } from "components/SideMenu";
+import Menu from "components/SideMenu/Menu";
 
 const DefaultLayout: FC<WithChildren> = ({ children }) => {
   const theme = useTheme();
@@ -14,8 +14,8 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
         height: "100vh",
       }}
     >
-      <Grid item sx={{ overflow: "hidden", width: "20%", height: "100vh" }}>
-        <SideMenu />
+      <Grid item sx={{ overflow: "auto", width: "20%", height: "100vh" }}>
+        <Menu />
       </Grid>
       <Grid
         item
@@ -24,7 +24,7 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
           flexGrow: 1,
           overflow: "auto",
           height: "100vh",
-          padding: theme.spacing(3, 5),
+          padding: theme.spacing(3, 4),
         }}
       >
         {children}

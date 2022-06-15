@@ -18,18 +18,22 @@ interface IPaginationActionProps {
   gotoPage: UsePaginationInstanceProps<object>["gotoPage"];
   pageCount: number;
   pageIndex: number;
+  canNextPage: boolean;
+  canPreviousPage: boolean;
 }
 
 interface IPaginationButtonProps {
   onClick(): void;
   icon: string;
   sx: SxProps<Theme>;
+  active: boolean;
 }
 
 const PaginationButton: FC<IPaginationButtonProps> = ({
   onClick,
   icon,
   sx,
+  active,
 }) => {
   const theme = useTheme();
 
@@ -38,7 +42,9 @@ const PaginationButton: FC<IPaginationButtonProps> = ({
       disableRipple
       onClick={onClick}
       sx={{
-        backgroundColor: "button.grey",
+        background: active
+          ? theme.palette.gradient.angled.main
+          : theme.palette.border.light,
         // height: "100%",
         // width: "100%",
         borderRadius: "5px",
@@ -56,7 +62,9 @@ const PaginationButton: FC<IPaginationButtonProps> = ({
       <Box mt={0.5}>
         <EvaIcon
           name={icon}
-          fill={theme.palette.common.black}
+          fill={
+            active ? theme.palette.common.white : theme.palette.common.black
+          }
           size="xlarge"
           style={{ height: "auto" }}
         />
@@ -71,6 +79,8 @@ const PaginationAction: FC<IPaginationActionProps> = ({
   gotoPage,
   pageCount,
   pageIndex,
+  canNextPage,
+  canPreviousPage,
 }) => {
   const [page, setPage] = useState<string>(String(pageIndex + 1));
 
@@ -106,6 +116,7 @@ const PaginationAction: FC<IPaginationActionProps> = ({
     <Grid container item justifyContent="center" xs={5.5} alignItems="center">
       <Grid item xs={2}>
         <PaginationButton
+          active={canPreviousPage}
           sx={{ ml: "auto" }}
           onClick={onClickPrev}
           icon={"chevron-left-outline"}
@@ -162,6 +173,7 @@ const PaginationAction: FC<IPaginationActionProps> = ({
       </Grid>
       <Grid item xs={2}>
         <PaginationButton
+          active={canNextPage}
           sx={{ mr: "auto" }}
           onClick={onClickNext}
           icon={"chevron-right-outline"}

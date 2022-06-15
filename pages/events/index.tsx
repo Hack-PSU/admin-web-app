@@ -14,6 +14,8 @@ import { useQuery } from "react-query";
 import { Cell } from "react-table";
 import dynamic from "next/dynamic";
 import { PaginatedTable } from "components/Table";
+import { GradientButton } from "components/base/Button";
+import { useRouter } from "next/router";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
@@ -71,6 +73,7 @@ const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
 
 const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { register } = useForm();
 
   const { columns, names } = useColumnBuilder((builder) =>
@@ -156,27 +159,28 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
-          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800 }}>
             Events
           </Typography>
         </Grid>
         <Grid item xs={2}>
-          <Link href={"/events/tabs"} passHref>
-            <Button
-              variant="text"
-              sx={{
-                width: "100%",
-                padding: theme.spacing(1, 3.5),
-              }}
-              textProps={{
-                sx: {
-                  lineHeight: "1.8rem",
-                },
-              }}
-            >
-              Add an Event
-            </Button>
-          </Link>
+          <GradientButton
+            variant="text"
+            sx={{
+              width: "100%",
+              padding: theme.spacing(1, 3.5),
+              // background: theme.palette.gradient.angled.accent,
+            }}
+            textProps={{
+              sx: {
+                lineHeight: "1.8rem",
+                color: "common.white",
+              },
+            }}
+            onClick={() => router.push("/events/new")}
+          >
+            Add an Event
+          </GradientButton>
         </Grid>
       </Grid>
       <Grid item>

@@ -9,12 +9,13 @@ import {
 import { useColumnBuilder, useQueryResolver } from "common/hooks";
 import { getAllHackers } from "query";
 import { IGetAllHackersResponse } from "types/api";
-import { PaginatedTable, Table } from "components/Table";
+import { Table } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
-import { Button } from "components/base";
 import Link from "next/link";
 import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
+import { GradientButton } from "components/base/Button";
+import { useRouter } from "next/router";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
@@ -22,6 +23,7 @@ interface IHackersPageProps {
 
 const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
+  const router = useRouter();
 
   const { columns, names } = useColumnBuilder((builder) =>
     builder
@@ -85,22 +87,22 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           </Typography>
         </Grid>
         <Grid item xs={2}>
-          <Link href={"/hackers/new"} passHref>
-            <Button
-              variant="text"
-              sx={{
-                width: "100%",
-                padding: theme.spacing(1, 3.5),
-              }}
-              textProps={{
-                sx: {
-                  lineHeight: "1.8rem",
-                },
-              }}
-            >
-              Add a Hacker
-            </Button>
-          </Link>
+          <GradientButton
+            variant="text"
+            sx={{
+              width: "100%",
+              padding: theme.spacing(1, 3.5),
+            }}
+            textProps={{
+              sx: {
+                lineHeight: "1.8rem",
+                color: "common.white",
+              },
+            }}
+            onClick={() => router.push("/hackers/new")}
+          >
+            Add a Hacker
+          </GradientButton>
         </Grid>
       </Grid>
       <Grid item>

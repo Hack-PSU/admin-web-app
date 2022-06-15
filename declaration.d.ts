@@ -48,6 +48,7 @@ import {
   UseSortByOptions,
   UseSortByState,
 } from "react-table";
+import { TypeBackground as MuiTypeBackground } from "@mui/material";
 
 declare module "@mui/material/styles" {
   /* eslint-disable-next-line */ // Palette is an interface from @mui
@@ -56,6 +57,20 @@ declare module "@mui/material/styles" {
       main: string;
       accent: string;
       line: string;
+    };
+    gradient: {
+      angled: {
+        main: string;
+        accent: string;
+      };
+    };
+    sunset: {
+      light: string;
+      dark: string;
+    };
+    border: {
+      light: string;
+      dark: string;
     };
     select: {
       main: string;
@@ -81,6 +96,20 @@ declare module "@mui/material/styles" {
       accent?: string;
       line?: string;
     };
+    gradient?: {
+      angled?: {
+        main?: string;
+        accent?: string;
+      };
+    };
+    sunset?: {
+      light?: string;
+      dark?: string;
+    };
+    border?: {
+      light?: string;
+      dark?: string;
+    };
     select?: {
       main?: string;
       placeholder?: string;
@@ -96,6 +125,12 @@ declare module "@mui/material/styles" {
       divider?: string;
       border?: string;
     };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  interface TypeBackground extends MuiTypeBackground {
+    light: string;
+    dark: string;
   }
 }
 

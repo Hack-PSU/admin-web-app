@@ -5,6 +5,9 @@ import {
   ColumnInstance,
   TableState,
   useFilters,
+  UseFiltersColumnOptions,
+  UseFiltersInstanceProps,
+  UseFiltersState,
   useFlexLayout,
   useGlobalFilter,
   UseGlobalFiltersInstanceProps,
@@ -49,7 +52,13 @@ type TableContextHooks = Pick<
 > &
   Pick<
     UsePaginationInstanceProps<object>,
-    "page" | "gotoPage" | "nextPage" | "previousPage" | "pageCount"
+    | "page"
+    | "gotoPage"
+    | "nextPage"
+    | "previousPage"
+    | "pageCount"
+    | "canPreviousPage"
+    | "canNextPage"
   > &
   Pick<UseGlobalFiltersState<object>, "globalFilter"> &
   Pick<TableState, "pageIndex"> &
@@ -123,6 +132,8 @@ const Table: TableComponent = ({
     previousPage,
     pageCount,
     state: { pageIndex, globalFilter },
+    canNextPage,
+    canPreviousPage,
   } = useTable(
     {
       columns,
@@ -188,9 +199,30 @@ const Table: TableComponent = ({
       headerMap,
       onRefresh,
       onDelete,
+      canNextPage,
+      canPreviousPage,
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }),
-    [page, pageIndex, pageCount, globalFilter]
+    [
+      getTableProps,
+      headerGroups,
+      prepareRow,
+      headers,
+      page,
+      gotoPage,
+      nextPage,
+      setGlobalFilter,
+      previousPage,
+      pageCount,
+      pageIndex,
+      globalFilter,
+      names,
+      headerMap,
+      onRefresh,
+      onDelete,
+      canNextPage,
+      canPreviousPage,
+    ]
   );
 
   return (
@@ -285,8 +317,15 @@ const TableActionsCenter: FC<WithChildren> = ({ children }) => {
 };
 
 const TablePaginationAction: FC = () => {
-  const { nextPage, previousPage, gotoPage, pageCount, pageIndex } =
-    useTableContext();
+  const {
+    nextPage,
+    previousPage,
+    gotoPage,
+    pageCount,
+    pageIndex,
+    canPreviousPage,
+    canNextPage,
+  } = useTableContext();
 
   return (
     <PaginationAction
@@ -295,6 +334,8 @@ const TablePaginationAction: FC = () => {
       gotoPage={gotoPage}
       pageCount={pageCount}
       pageIndex={pageIndex}
+      canNextPage={canNextPage}
+      canPreviousPage={canPreviousPage}
     />
   );
 };
