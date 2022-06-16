@@ -1,13 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import {
-  Drawer,
-  Grid,
-  List,
-  styled,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Drawer, Grid, List, styled, Typography } from "@mui/material";
 import MenuItem from "components/SideMenu/MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
@@ -18,27 +10,18 @@ const DrawerHeader = styled(Grid)(({ theme }) => ({
   padding: theme.spacing(3.5, 3, 1),
 }));
 
-const Menu: FC = () => {
-  const theme = useTheme();
-  const shouldClose = useMediaQuery(theme.breakpoints.down("md"));
+interface IMenuProps {
+  open: boolean;
+  shouldClose: boolean;
+  handleClose(): void;
+}
 
-  const [open, setOpen] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (shouldClose) {
-      setOpen(false);
-    }
-  }, [shouldClose]);
-
-  const toggleDrawer = () => {
-    setOpen((open) => !open);
-  };
-
+const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
   return (
     <Drawer
-      variant="permanent"
+      variant="persistent"
       open={open}
-      onClose={toggleDrawer}
+      onClose={handleClose}
       ModalProps={{
         keepMounted: shouldClose,
       }}

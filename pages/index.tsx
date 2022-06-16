@@ -22,16 +22,15 @@ const Home: NextPage = () => {
 
   return (
     <Grid container justifyContent="center" alignItems="center">
-      <Grid item xs={10}></Grid>
-      {/*<ControlledSelect*/}
-      {/*  name={"cselect"}*/}
-      {/*  placeholder={"Select Here"}*/}
-      {/*  items={[*/}
-      {/*    { value: "1", display: "1" },*/}
-      {/*    { value: "2", display: "2" },*/}
-      {/*  ]}*/}
-      {/*  menuWidth="74.5%"*/}
-      {/*/>*/}
+      <Grid item xs={10}>
+        <Select
+          options={[
+            { value: "Option1", label: "Option 1" },
+            { value: "Option3", label: "Option 1" },
+            { value: "Option2", label: "Option 2" },
+          ]}
+        />
+      </Grid>
       <button onClick={onClickButton}>Click</button>
       {/*<Select placeholder={"Select here"} items={[{ value: "1", display: "1" }, { value: "2", display: "2" }]} />*/}
     </Grid>

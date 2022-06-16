@@ -119,13 +119,11 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
             <Table.Actions>
               <Table.ActionsLeft>
                 <Table.Filter />
-                <Table.Sort />
               </Table.ActionsLeft>
               <Table.ActionsCenter>
                 <Table.Pagination />
               </Table.ActionsCenter>
               <Table.ActionsRight>
-                <Table.Refresh />
                 <Table.Delete />
               </Table.ActionsRight>
             </Table.Actions>

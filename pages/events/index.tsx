@@ -154,7 +154,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     return undefined;
   };
 
-  // @ts-ignore
   return (
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
@@ -169,7 +168,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
             sx={{
               width: "100%",
               padding: theme.spacing(1, 3.5),
-              // background: theme.palette.gradient.angled.accent,
             }}
             textProps={{
               sx: {

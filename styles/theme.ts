@@ -35,6 +35,9 @@ export const theme = responsiveFontSizes(
         light: "#e4e4e4",
         dark: "#a5a5a5",
       },
+      header: {
+        light: "#969696",
+      },
       button: {
         grey: "#f0f0f0",
       },

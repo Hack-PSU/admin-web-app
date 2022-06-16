@@ -30,14 +30,12 @@ const GlobalActions: FC<IGlobalActionsProps> = ({
   }, []);
 
   return (
-    <Grid container item>
-      <Grid item xs={5}>
-        <GlobalFilter
-          setGlobalFilter={setGlobalFilter}
-          globalFilter={globalFilter}
-          placeholder={globalSearchPlaceholder}
-        />
-      </Grid>
+    <Grid item xs={5}>
+      <GlobalFilter
+        setGlobalFilter={setGlobalFilter}
+        globalFilter={globalFilter}
+        placeholder={globalSearchPlaceholder}
+      />
     </Grid>
   );
 };

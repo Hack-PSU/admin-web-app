@@ -19,7 +19,7 @@ import {
   useTable,
   UseTableInstanceProps,
 } from "react-table";
-import TableCell from "components/Table/TableCell";
+import TableCell, { DefaultCell } from "components/Table/TableCell";
 import {
   Checkbox as MuiCheckbox,
   Grid,
@@ -38,6 +38,7 @@ import {
   RefreshAction,
   SortAction,
 } from "components/Table/actions";
+import SortColumn from "components/Table/actions/SortColumn";
 
 interface ITableProps extends TableProps<object> {
   limit: number;
@@ -236,13 +237,20 @@ const Table: TableComponent = ({
 };
 
 const TableGlobalActions: FC = () => {
-  const { setGlobalFilter, globalFilter, names } = useTableContext();
+  const { setGlobalFilter, globalFilter, names, onRefresh } = useTableContext();
   return (
-    <GlobalActions
-      setGlobalFilter={setGlobalFilter}
-      globalFilter={globalFilter}
-      names={names}
-    />
+    <Grid container item justifyContent="space-between">
+      <GlobalActions
+        setGlobalFilter={setGlobalFilter}
+        globalFilter={globalFilter}
+        names={names}
+      />
+      <Grid container item xs={7} justifyContent="flex-end">
+        <Grid item xs={3}>
+          <RefreshAction onClick={onRefresh} />
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
@@ -256,6 +264,7 @@ const TableContainer: FC<Required<WithChildren>> = ({ children }) => {
       sx={{
         border: `1px solid ${theme.palette.table.border}`,
         borderRadius: "10px",
+        boxShadow: 1,
       }}
       {...getTableProps()}
     >
@@ -390,15 +399,33 @@ const TableHeader: FC = () => {
             } else {
               return (
                 <TableCell
+                  container
                   header
-                  {...header.getHeaderProps()}
+                  empty
+                  alignItems="center"
+                  {...header.getHeaderProps(header.getSortByToggleProps())}
                   textProps={{
                     sx: {
                       fontSize: theme.typography.pxToRem(15),
                     },
                   }}
+                  columnSpacing={1.5}
                 >
-                  {header.render("Header")}
+                  <Grid item>
+                    <DefaultCell
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "header.light",
+                        fontSize: theme.typography.pxToRem(15),
+                      }}
+                    >
+                      {header.render("Header")}
+                    </DefaultCell>
+                  </Grid>
+                  <Grid item>
+                    <SortColumn header={header} />
+                  </Grid>
                 </TableCell>
               );
             }

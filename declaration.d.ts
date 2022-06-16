@@ -76,6 +76,10 @@ declare module "@mui/material/styles" {
       main: string;
       placeholder: string;
     };
+    header: {
+      light: string;
+      dark: string;
+    };
     input: {
       border: string;
     };
@@ -107,6 +111,10 @@ declare module "@mui/material/styles" {
       dark?: string;
     };
     border?: {
+      light?: string;
+      dark?: string;
+    };
+    header?: {
       light?: string;
       dark?: string;
     };

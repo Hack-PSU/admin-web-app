@@ -26,6 +26,8 @@ const RefreshAction: FC<IRefreshActionProps> = ({ onClick }) => {
         borderRadius: "10px",
         alignItems: "center",
         width: "90%",
+        backgroundColor: "common.white",
+        boxShadow: 1,
       }}
       textProps={{
         sx: {
