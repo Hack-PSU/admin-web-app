@@ -3,7 +3,7 @@ import {
   InputProps,
   SxProps,
   Theme,
-  SelectProps,
+  // SelectProps,
   CheckboxProps,
   TypographyProps,
   RadioProps,
@@ -12,6 +12,7 @@ import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
 import { UseTableOptions } from "react-table";
+import { GroupBase, Props } from "react-select";
 
 type RenderItemData<T> = {
   item: T;
@@ -52,22 +53,36 @@ export interface ISelectItem<T = any> {
   display: string;
 }
 
-export interface ISelectProps
-  extends Omit<SelectProps, "placeholder" | "onChange"> {
-  placeholder: string;
-  items: ISelectItem[];
-  renderItem?: RenderItem;
-  placeholderStyles?: SxProps<Theme>;
-  menuStyle?: SxProps<Theme>;
-  menuWidth?: string;
-  onChange?: UseControllerReturn["field"]["onChange"];
-  selectInputStyle?: React.CSSProperties;
-}
+// export interface ISelectProps
+//   extends Omit<SelectProps, "placeholder" | "onChange"> {
+//   placeholder: string;
+//   items: ISelectItem[];
+//   renderItem?: RenderItem;
+//   placeholderStyles?: SxProps<Theme>;
+//   menuStyle?: SxProps<Theme>;
+//   menuWidth?: string;
+//   onChange?: UseControllerReturn["field"]["onChange"];
+//   selectInputStyle?: React.CSSProperties;
+// }
 
-export type LabelledSelectProps = WithLabelledProps<ISelectProps>;
+export type SelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<Props<TOption, TIsMulti, TGroup>, "styles">;
 
-export type ControlledSelectProps = WithControllerProps<
-  ISelectProps & Partial<InputLabelProps>
+export type LabelledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<SelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  SelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
 >;
 
 export type TableProps<T extends object = {}> = UseTableOptions<T>;
