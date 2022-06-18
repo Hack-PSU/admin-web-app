@@ -13,6 +13,7 @@ import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
 import { UseTableOptions } from "react-table";
 import { GroupBase, Props } from "react-select";
+import { CreatableProps } from "react-select/creatable";
 
 type RenderItemData<T> = {
   item: T;
@@ -83,6 +84,26 @@ export type ControlledSelectProps<
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
 > = WithControllerProps<
   SelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
+>;
+
+export type CreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<CreatableProps<TOption, TIsMulti, TGroup>, "styles">;
+
+export type LabelledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<CreatableSelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  CreatableSelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
 >;
 
 export type TableProps<T extends object = {}> = UseTableOptions<T>;

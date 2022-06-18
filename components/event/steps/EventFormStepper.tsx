@@ -1,28 +1,17 @@
 import React, { FC } from "react";
-import StepperProvider, {
-  useStepper,
-} from "components/base/Stepper/StepperProvider";
-import Stepper from "components/base/Stepper/Stepper";
+import { StepperProvider, Stepper } from "components/base";
+import EventTypeStep from "./EventTypeStep";
 import { Grid } from "@mui/material";
-
-const Inside: FC = () => {
-  const {} = useStepper({ step: 0, label: "Number 1" });
-
-  return <Grid container item sx={{ backgroundColor: "black" }}></Grid>;
-};
-
-const Inside2: FC = () => {
-  const {} = useStepper({ step: 1, label: "Number 2", optional: true });
-
-  return <Grid container item sx={{ backgroundColor: "black" }}></Grid>;
-};
+import EventDetailsStep from "./EventDetailsStep";
 
 const EventFormStepper: FC = () => {
   return (
     <StepperProvider>
       <Stepper />
-      <Inside />
-      <Inside2 />
+      <Grid container alignItems="center" gap={10} flexDirection="column">
+        <EventTypeStep />
+        <EventDetailsStep />
+      </Grid>
     </StepperProvider>
   );
 };

@@ -4,18 +4,25 @@ import {
   IInputProps,
   LabelledInputProps,
 } from "types/components";
-import { alpha, InputBase, styled } from "@mui/material";
+import { alpha, Box, InputBase, styled } from "@mui/material";
 import InputLabel from "components/base/Input/InputLabel";
 import { useController } from "react-hook-form";
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: theme.spacing(1, 2),
-  border: `2px solid ${theme.palette.input.border}`,
+  padding: theme.spacing(0.8, 1.8),
+  border: `2px solid ${theme.palette.border.light}`,
   borderRadius: "15px",
   color: theme.palette.common.black,
-  fontSize: "0.8rem",
   "&::placeholder": {
-    color: alpha(theme.palette.common.black, 0.8),
+    color: alpha(theme.palette.border.dark, 0.8),
+  },
+  "&.Mui-focused": {
+    boxShadow: `0 0 0 0.125rem ${alpha(theme.palette.sunset.dark, 0.3)}`,
+    borderColor: theme.palette.sunset.light,
+  },
+  boxShadow: undefined,
+  ":hover": {
+    borderColor: theme.palette.sunset.light,
   },
 }));
 
@@ -42,7 +49,9 @@ export const LabelledInput: FC<LabelledInputProps> = ({
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
-      <Input placeholder={placeholder} {...props} />
+      <Box mt={0.6}>
+        <Input placeholder={placeholder} {...props} />
+      </Box>
     </>
   );
 };

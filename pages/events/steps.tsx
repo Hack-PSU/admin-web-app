@@ -9,9 +9,11 @@ const EventSteps: FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <Grid container flexDirection="column">
+      <Grid container flexDirection="column" sx={{ paddingBottom: 2 }}>
         <Grid item>
-          <Typography variant="h3">New Events</Typography>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            New Events
+          </Typography>
         </Grid>
         <Grid item>
           <EventFormStepper />

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback } from "react";
 import {
   Stepper as MuiStepper,
   StepConnector,
@@ -10,11 +10,12 @@ import {
   Box,
   useTheme,
 } from "@mui/material";
-import { WithControllerProps } from "types/components";
-import { WithChildren } from "types/common";
-import { IStepItem } from "./types";
 import { useStepperContext } from "components/base/Stepper/StepperProvider";
 import _ from "lodash";
+
+type StepIconRootProps = StepIconProps & {
+  skipped: boolean;
+};
 
 const StyledConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -31,25 +32,45 @@ const StyledConnector = styled(StepConnector)(({ theme }) => ({
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    height: 3,
+    height: 4,
     border: 0,
     backgroundColor: theme.palette.border.dark,
-    borderRadius: 1,
+    borderRadius: 2,
   },
 }));
 
-const StyledStepIcon = styled("div")(({ theme }) => ({
+const StyledStepIcon = styled("div")({
   display: "flex",
-  // width: 20,
-  // height: 20,
   alignItems: "center",
   justifyContent: "center",
-  // backgroundColor: theme.palette.border.dark,
-  // borderRadius: "50%"
+});
+
+const StyledStepper = styled(MuiStepper)(({ theme }) => ({
+  margin: theme.spacing(5, 0),
 }));
 
-const StepIconRoot: FC<StepIconProps> = ({ active, completed }) => {
+const StepIconRoot: FC<StepIconRootProps> = ({
+  active,
+  completed,
+  skipped,
+}) => {
   const theme = useTheme();
+
+  const getIconStyle = () => {
+    if (skipped) {
+      return {
+        border: `2px solid ${theme.palette.sunset.dark}`,
+        background: theme.palette.border.dark,
+      };
+    } else if (active || completed) {
+      return {
+        background: theme.palette.gradient.angled.accent,
+      };
+    }
+    return {
+      background: theme.palette.border.dark,
+    };
+  };
 
   return (
     <StyledStepIcon>
@@ -58,10 +79,7 @@ const StepIconRoot: FC<StepIconProps> = ({ active, completed }) => {
           width: 20,
           height: 20,
           borderRadius: "50%",
-          background:
-            active || completed
-              ? theme.palette.gradient.angled.accent
-              : theme.palette.border.dark,
+          ...getIconStyle(),
         }}
       />
     </StyledStepIcon>
@@ -73,32 +91,36 @@ const Stepper: FC = () => {
 
   const isStepSkipped = (step: number) => skipped[String(step)];
 
-  const getOrderedSteps = useCallback(() => {
-    return _.chain(steps)
-      .entries()
-      .sortBy((entry) => entry[0])
-      .map((value) => value[1])
-      .value();
-  }, [steps]);
+  const getOrderedSteps = useCallback(
+    () =>
+      _.chain(steps)
+        .entries()
+        .sortBy((entry) => entry[0])
+        .map((value) => value[1])
+        .value(),
+    [steps]
+  );
 
   return (
-    <MuiStepper activeStep={1} connector={<StyledConnector />} alternativeLabel>
+    <StyledStepper
+      activeStep={activeStep}
+      connector={<StyledConnector />}
+      alternativeLabel
+    >
       {getOrderedSteps().map((step, index) => {
-        const stepProps: { completed?: boolean } = {};
-
-        if (isStepSkipped(index)) {
-          stepProps.completed = false;
-        } else {
-          stepProps.completed = activeStep >= index;
-        }
-
         return (
-          <Step key={step.label} {...stepProps}>
-            <StepLabel StepIconComponent={StepIconRoot}>{step.label}</StepLabel>
+          <Step key={step.label} completed={activeStep >= index}>
+            <StepLabel
+              StepIconComponent={(props) => (
+                <StepIconRoot {...props} skipped={isStepSkipped(index)} />
+              )}
+            >
+              {step.label}
+            </StepLabel>
           </Step>
         );
       })}
-    </MuiStepper>
+    </StyledStepper>
   );
 };
 

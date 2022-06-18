@@ -109,15 +109,11 @@ const StepperProvider: FC<WithChildren> = ({ children }) => {
 
 export const useStepperContext = () => useContext(StepperContext);
 
-export function useStepper({
-  step,
-  label,
-  optional,
-}: {
-  step: number;
-  label: string;
-  optional?: boolean;
-}) {
+export function useStepper(
+  step: number,
+  label: string,
+  options?: { optional?: boolean }
+) {
   const {
     register,
     getState,
@@ -126,6 +122,8 @@ export function useStepper({
     onClickNext,
     activeStep,
   } = useStepperContext();
+
+  const optional = options?.optional ?? false;
 
   useEffect(() => {
     register(step, label, optional);
@@ -136,6 +134,7 @@ export function useStepper({
     previousStep: onClickPrevious,
     gotoStep: onClickGoto,
     activeStep,
+    active: activeStep === step,
   };
 }
 

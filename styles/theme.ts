@@ -119,7 +119,8 @@ export const theme = responsiveFontSizes(
           style: {
             fontFamily: "Poppins",
             fontWeight: "normal",
-            fontSize: "1rem",
+            fontSize: "0.85rem",
+            borderWidth: "2px",
           },
         },
       },

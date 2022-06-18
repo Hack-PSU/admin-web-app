@@ -1,29 +1,29 @@
 import React, { useMemo } from "react";
-import SingleSelect, { GroupBase, StylesConfig } from "react-select";
-import { alpha, Box, useTheme } from "@mui/material";
+import CreatableSelect from "react-select/creatable";
+import { GroupBase, StylesConfig } from "react-select";
 import {
-  ControlledSelectProps,
-  LabelledSelectProps,
-  SelectProps,
+  ControlledCreatableSelectProps,
+  CreatableSelectProps,
+  LabelledCreatableSelectProps,
 } from "types/components";
-import { InputLabel } from "components/base/Input";
-import { useController } from "react-hook-form";
 import { selectStyles } from "components/base/Select/styles";
+import { Box, useTheme } from "@mui/material";
+import { InputLabel } from "components/base";
+import { useController } from "react-hook-form";
 
-function Select<
+function Creatable<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
->(props: SelectProps<TOption, TIsMulti, TGroup>) {
+>(props: CreatableSelectProps<TOption, TIsMulti, TGroup>) {
   const theme = useTheme();
-
   const customStyles: StylesConfig<TOption, TIsMulti, TGroup> = useMemo(
     () => selectStyles(theme),
     [theme]
   );
 
   return (
-    <SingleSelect
+    <CreatableSelect
       styles={customStyles}
       components={{
         IndicatorSeparator: () => null,
@@ -33,7 +33,7 @@ function Select<
   );
 }
 
-export function LabelledSelect<
+export function LabelledCreatable<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
@@ -43,18 +43,18 @@ export function LabelledSelect<
   showError,
   error,
   ...props
-}: LabelledSelectProps<TOption, TIsMulti, TGroup>) {
+}: LabelledCreatableSelectProps<TOption, TIsMulti, TGroup>) {
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
       <Box mt={0.6}>
-        <Select {...props} />
+        <Creatable {...props} />
       </Box>
     </>
   );
 }
 
-export function ControlledSelect<
+export function ControlledCreatable<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
@@ -64,7 +64,7 @@ export function ControlledSelect<
   defaultValue,
   as: Component,
   ...props
-}: ControlledSelectProps<TOption, TIsMulti, TGroup>) {
+}: ControlledCreatableSelectProps<TOption, TIsMulti, TGroup>) {
   const {
     field: { onChange, onBlur, value },
   } = useController({ name, rules, defaultValue });
@@ -76,8 +76,8 @@ export function ControlledSelect<
   }
 
   return (
-    <Select onChange={onChange} onBlur={onBlur} value={value} {...props} />
+    <Creatable onChange={onChange} onBlur={onBlur} value={value} {...props} />
   );
 }
 
-export default Select;
+export default Creatable;
