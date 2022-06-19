@@ -8,7 +8,7 @@ export const selectStyles: <
 >(
   theme: Theme
 ) => StylesConfig<TOption, TIsMulti, TGroup> = (theme) => ({
-  placeholder: (provided, state) => ({
+  placeholder: (provided) => ({
     ...provided,
     color: alpha(theme.palette.border.dark, 0.8),
     fontSize: "0.85rem",
@@ -17,7 +17,7 @@ export const selectStyles: <
   }),
   control: (provided, state) => ({
     ...provided,
-    cursor: "pointer",
+    cursor: "text",
     borderColor: state.isFocused
       ? theme.palette.sunset.light
       : theme.palette.border.light,

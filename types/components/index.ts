@@ -54,6 +54,11 @@ export interface ISelectItem<T = any> {
   display: string;
 }
 
+export interface IOption {
+  readonly label: string;
+  readonly value: string;
+}
+
 // export interface ISelectProps
 //   extends Omit<SelectProps, "placeholder" | "onChange"> {
 //   placeholder: string;
@@ -106,6 +111,20 @@ export type ControlledCreatableSelectProps<
   CreatableSelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
 >;
 
+export type CreateOnlyInputProps = Omit<
+  CreatableSelectProps<IOption, true, GroupBase<IOption>>,
+  "onChange" | "onInputChange" | "onKeyDown" | "value"
+> & {
+  onChange?: UseControllerReturn["field"]["onChange"];
+};
+
+export type LabelledCreateOnlyInputProps =
+  WithLabelledProps<CreateOnlyInputProps>;
+
+export type ControlledCreateOnlyInputProps = WithControllerProps<
+  Omit<CreateOnlyInputProps, "onChange"> & Partial<LabelledCreateOnlyInputProps>
+>;
+
 export type TableProps<T extends object = {}> = UseTableOptions<T>;
 
 export interface IBaseErrorProps {
@@ -150,6 +169,9 @@ export type ControlledTimePickerProps = WithControllerProps<
 
 export interface IDropzoneProps extends DropzoneOptions {
   containerStyle?: SxProps<Theme>;
+  custom?: boolean;
+  children?: React.ReactNode;
+  replace?: boolean;
 }
 
 export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;

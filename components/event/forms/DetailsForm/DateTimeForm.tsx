@@ -71,6 +71,7 @@ const DateTimeForm: FC = () => {
         <Grid container item spacing={2}>
           <Grid item xs={6}>
             <LabelledTimePicker
+              menuWidth="200px"
               id="start-time"
               label="Start Time"
               {...register("startTime")}
@@ -82,6 +83,7 @@ const DateTimeForm: FC = () => {
           </Grid>
           <Grid item xs={6}>
             <LabelledTimePicker
+              menuWidth="200px"
               id="end-time"
               label="End Time"
               {...register("endTime")}

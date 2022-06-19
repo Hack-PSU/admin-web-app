@@ -1,16 +1,19 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import EventStep from "components/event/steps/EventStep";
 import {
-  ControlledCreatable,
+  ControlledCreatableSelect,
   ControlledInput,
   InputLabel,
-  LabelledCreatable,
+  LabelledCreatableSelect,
   LabelledInput,
   useStepper,
 } from "components/base";
 import { Box, Grid } from "@mui/material";
 import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
+import { useFormContext } from "react-hook-form";
+import { EditorState } from "draft-js";
+import { EventType } from "types/api";
 
 const locationOptions = [
   { value: "Location1", label: "Location 1" },
@@ -18,12 +21,26 @@ const locationOptions = [
 ];
 
 const EventDetailsStep: FC = () => {
-  const { nextStep, active, previousStep } = useStepper(1, "2. Event Details");
+  const { getValues } = useFormContext();
+  const { nextStep, active, previousStep, gotoStep } = useStepper(
+    1,
+    "2. Event Details"
+  );
+
+  const handleNext = useCallback(() => {
+    const eventType = getValues("type");
+
+    if (eventType && eventType.value !== EventType.WORKSHOP) {
+      gotoStep(3, 2);
+    } else {
+      nextStep();
+    }
+  }, [getValues, gotoStep, nextStep]);
 
   return (
     <EventStep
       title="Event Details"
-      handleNext={nextStep}
+      handleNext={handleNext}
       active={active}
       handlePrevious={previousStep}
     >
@@ -41,13 +58,13 @@ const EventDetailsStep: FC = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <ControlledCreatable
+          <ControlledCreatableSelect
             name={"location"}
             options={locationOptions}
-            as={LabelledCreatable}
+            as={LabelledCreatableSelect}
             id="location"
             label="Location"
-            placeholder={"Select or type to create"}
+            placeholder={"Select a location or type to create one"}
           />
         </Grid>
         <Grid item xs={12}>

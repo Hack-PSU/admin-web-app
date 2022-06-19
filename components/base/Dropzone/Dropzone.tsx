@@ -1,8 +1,7 @@
 import { FC, useCallback } from "react";
-import { Grid, styled, Typography, useTheme } from "@mui/material";
+import { Grid, styled, useTheme } from "@mui/material";
 import { DropzoneOptions, useDropzone } from "react-dropzone";
 import { blue } from "@mui/material/colors";
-import EvaIcon from "components/base/EvaIcon";
 import { InputLabel } from "components/base/Input";
 import {
   ControlledDropzoneProps,
@@ -10,6 +9,7 @@ import {
   LabelledDropzoneProps,
 } from "types/components";
 import { useController } from "react-hook-form";
+import DropzonePlaceholder from "./DropzonePlaceholder";
 
 const Container = styled(Grid)(({ theme }) => ({
   flexDirection: "column",
@@ -28,6 +28,8 @@ const extractColorHex = (color: string) => color.split("#")[1];
 const Dropzone: FC<IDropzoneProps> = ({
   containerStyle,
   accept,
+  custom,
+  children,
   ...dropzoneOptions
 }) => {
   const { getRootProps, getInputProps, isFocused, isDragReject, isDragAccept } =
@@ -71,22 +73,7 @@ const Dropzone: FC<IDropzoneProps> = ({
       gap={1.5}
     >
       <input {...getInputProps()} />
-      <Grid item>
-        <EvaIcon
-          name={"cloud-upload-outline"}
-          size="xlarge"
-          fill="#1a1a1a"
-          style={{ transform: "scale(1.6)" }}
-        />
-      </Grid>
-      <Grid item>
-        <Typography
-          variant="h6"
-          sx={{ color: "common.black", fontWeight: 700 }}
-        >
-          Drag &amp; Drop Images Here
-        </Typography>
-      </Grid>
+      {!custom ? <DropzonePlaceholder /> : children}
     </Container>
   );
 };
@@ -111,6 +98,7 @@ export const ControlledDropzone: FC<ControlledDropzoneProps> = ({
   name,
   rules,
   defaultValue,
+  replace,
   ...props
 }) => {
   const {
@@ -118,7 +106,11 @@ export const ControlledDropzone: FC<ControlledDropzoneProps> = ({
   } = useController({ name, rules, defaultValue });
 
   const onDropFile: DropzoneOptions["onDrop"] = (acceptedFiles) => {
-    onChange([...(value ?? []), ...acceptedFiles]);
+    if (replace) {
+      onChange([...acceptedFiles]);
+    } else {
+      onChange([...(value ?? []), ...acceptedFiles]);
+    }
   };
 
   if (Component) {

@@ -12,6 +12,7 @@ import {
   IconButton,
   Typography,
   useTheme,
+  colors,
 } from "@mui/material";
 import { EvaIcon, Input, Button } from "components/base";
 
@@ -60,11 +61,11 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
     <Grid
       container
       item
-      gap={1}
+      columnSpacing={1}
       alignItems="center"
       justifyContent="space-between"
     >
-      <Grid item sx={{ flexGrow: 1 }}>
+      <Grid item sx={{ flexGrow: 1 }} xs={10.5}>
         <Input
           {...register("link")}
           placeholder={"Enter a download link"}
@@ -72,14 +73,20 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
             border: "none",
             width: "100%",
             padding: theme.spacing(1, 1, 1, 0),
+            ":hover": {
+              border: "none",
+            },
+            "&.Mui-focused": {
+              boxShadow: 0,
+            },
           }}
           type="url"
           autoComplete="url"
           autoCorrect="url"
         />
       </Grid>
-      <Grid container item justifyContent="flex-end" sx={{ width: "10%" }}>
-        <Grid item>
+      <Grid container item justifyContent="flex-end" xs={1.5}>
+        <Grid item xs={6}>
           <IconButton sx={{ height: "40px" }} onClick={onClickSubmit}>
             <Box mt={0.5}>
               <EvaIcon
@@ -94,7 +101,7 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
             </Box>
           </IconButton>
         </Grid>
-        <Grid item>
+        <Grid item xs={6}>
           <IconButton sx={{ height: "40px" }} onClick={() => remove(index)}>
             <Box mt={0.5}>
               <EvaIcon name="trash-outline" fill="#F37A7A" size="large" />
@@ -113,7 +120,7 @@ const DownloadLinks: FC = () => {
   const theme = useTheme();
 
   return (
-    <Grid container item gap={2} flexDirection="column">
+    <Grid container item gap={0.5} flexDirection="column">
       <Grid container item alignItems="center" sx={{ height: "fit-content" }}>
         <Grid item xs={4}>
           <Typography
@@ -140,7 +147,11 @@ const DownloadLinks: FC = () => {
         <Button
           startIcon={
             <Box pt={0.5}>
-              <EvaIcon name={"plus-outline"} size="medium" fill="#2878DA" />
+              <EvaIcon
+                name={"plus-outline"}
+                size="medium"
+                fill={colors.blue["700"]}
+              />
             </Box>
           }
           sx={{
@@ -154,9 +165,9 @@ const DownloadLinks: FC = () => {
           onClick={() => append({ link: "" })}
           textProps={{
             sx: {
-              color: "#2878DA",
+              color: colors.blue["700"],
               ":hover": {
-                color: darken("#2878DA", 0.3),
+                color: darken(colors.blue["700"], 0.3),
               },
             },
           }}

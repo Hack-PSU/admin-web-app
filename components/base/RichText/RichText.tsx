@@ -1,17 +1,30 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import {
+import Draft, {
   Editor,
   EditorState,
   RichUtils,
   DraftHandleValue,
   DraftEditorCommand,
   Modifier,
+  ContentState,
+  SelectionState,
 } from "draft-js";
 import { useFormContext } from "react-hook-form";
-import { Grid, lighten, styled, IconButton, useTheme } from "@mui/material";
+import {
+  Grid,
+  lighten,
+  styled,
+  IconButton,
+  useTheme,
+  alpha,
+} from "@mui/material";
 import { Button, EvaIcon } from "components/base";
-import { decorators } from "./decorators";
-import RichTextStyles from "components/base/RichText/RichTextStyles";
+import { decorator } from "./decorators";
+import RichTextStyles from "./RichTextStyles";
+import { prepareContent } from "components/base/RichText/utils";
+import { convertToRaw } from "draft-js";
+import produce from "immer";
+import jsonBeautify from "json-beautify";
 
 interface IRichTextProps {
   placeholder: string;
@@ -30,85 +43,119 @@ const EditorInputContainer = styled(Grid)(({ theme }) => ({
     borderRadius: "15px",
     padding: theme.spacing(1, 2),
   },
+  "& .public-DraftEditor-content": {
+    fontSize: "0.85rem",
+    fontFamily: "Poppins",
+  },
+  "& .public-DraftEditorPlaceholder-inner": {
+    fontSize: "0.85rem",
+    fontFamily: "Poppins",
+    color: alpha(theme.palette.border.dark, 0.8),
+  },
 }));
 
 const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
+  const { setValue, register, getValues } = useFormContext();
   const [editorState, setEditorState] = useState<EditorState>(
-    EditorState.createEmpty(decorators)
+    EditorState.createEmpty(decorator)
   );
-  const { setValue, register } = useFormContext();
-
   const [selectedUrl, setSelectedUrl] = useState<string>("");
+  const [selectedText, setSelectedText] = useState<string>("");
 
-  const onChangeState = useCallback((editorState: EditorState) => {
-    setValue(name, editorState);
-    setEditorState(editorState);
-  }, []);
+  console.dir(convertToRaw(editorState.getCurrentContent()));
+
+  const onChangeState = useCallback(
+    (editorState: EditorState) => {
+      console.log(editorState.getCurrentContent().getAllEntities());
+      setValue(name, editorState.getCurrentContent());
+      setEditorState(editorState);
+    },
+    [name, setValue]
+  );
 
   useEffect(() => {
     register(name);
   }, []);
 
-  const onClickBold = useCallback(() => {
+  const onClickBold: () => void = useCallback(() => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, "BOLD"));
   }, [editorState]);
 
-  const onClickItalic = useCallback(() => {
+  const onClickItalic: () => void = useCallback(() => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, "ITALIC"));
   }, [editorState]);
 
-  const onClickUnderline = useCallback(() => {
+  const onClickUnderline: () => void = useCallback(() => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, "UNDERLINE"));
   }, [editorState]);
 
-  const onOpenLinkPrompt = useCallback(() => {
-    const contentState = editorState.getCurrentContent();
-    const selectionState = editorState.getSelection();
-
-    if (!selectionState.isCollapsed()) {
-      // a selection is made
-
-      // find current selection
-      const startKey = selectionState.getStartKey();
-      const startOffset = selectionState.getStartOffset();
-
-      // find if current selection has an entity
-      const startKeyBlock = contentState.getBlockForKey(startKey);
-      const entityAtOffset = startKeyBlock.getEntityAt(startOffset);
-
-      if (entityAtOffset) {
-        const linkEntity = contentState.getEntity(entityAtOffset);
-        setSelectedUrl(linkEntity.getData().url);
-      }
-    }
-  }, [editorState]);
-
-  const onCreateLink = useCallback(
-    (url: string) => {
+  const onOpenLinkPrompt: () => { show: boolean; url: string } =
+    useCallback(() => {
       const contentState = editorState.getCurrentContent();
       const selectionState = editorState.getSelection();
 
+      if (!selectionState.isCollapsed()) {
+        // a selection is made
+
+        // find current selection
+        const startKey = selectionState.getStartKey();
+        const startOffset = selectionState.getStartOffset();
+
+        // find if current selection has an entity
+        const startKeyBlock = contentState.getBlockForKey(startKey);
+        const entityAtOffset = startKeyBlock.getEntityAt(startOffset);
+
+        if (entityAtOffset) {
+          const linkEntity = contentState.getEntity(entityAtOffset);
+          console.log(linkEntity.getData().url);
+          // setSelectedUrl(linkEntity.getData().url);
+          return { url: linkEntity.getData().url, show: true };
+        }
+        return { show: true, url: "" };
+      }
+      return { show: false, url: "" };
+    }, [editorState]);
+
+  const onCreateLink: (url: string) => void = useCallback(
+    (url) => {
+      let link = url;
+
+      if (!link.includes("http://")) {
+        if (!link.includes("https://")) {
+          link = `https://${url}`;
+        }
+      }
+
+      const contentState = editorState.getCurrentContent();
       const contentStateWithEntity = contentState.createEntity(
         "LINK",
-        "MUTABLE",
-        { url }
+        "IMMUTABLE",
+        { url: link }
       );
-
       const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-      const contentStateWithLink = Modifier.applyEntity(
-        contentState,
-        selectionState,
+
+      const editorStateWithLink = EditorState.set(editorState, {
+        currentContent: contentStateWithEntity,
+      });
+
+      const linkEnabledEditorState = RichUtils.toggleLink(
+        editorStateWithLink,
+        editorStateWithLink.getSelection(),
         entityKey
       );
 
-      const newEditorState = EditorState.set(editorState, {
-        currentContent: contentStateWithLink,
-      });
-
-      setEditorState(newEditorState);
+      onChangeState(linkEnabledEditorState);
     },
-    [editorState]
+    [editorState, onChangeState]
   );
+
+  const onRemoveLink = useCallback(() => {
+    const selectionState = editorState.getSelection();
+
+    if (!selectionState.isCollapsed()) {
+      onChangeState(RichUtils.toggleLink(editorState, selectionState, null));
+    }
+  }, [editorState, onChangeState]);
 
   const handleKeyCommand: (
     command: DraftEditorCommand,
@@ -133,6 +180,7 @@ const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
         onClickOpenLinkPrompt={onOpenLinkPrompt}
         onClickCreateLink={onCreateLink}
         urlData={selectedUrl}
+        onRemoveLink={onRemoveLink}
       />
       <EditorInputContainer item>
         <Editor

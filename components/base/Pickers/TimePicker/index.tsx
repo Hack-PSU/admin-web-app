@@ -91,8 +91,8 @@ const TimePicker: FC<ITimePickerProps> = ({
         open={isOpen}
         anchorEl={anchorEl}
         onClose={toggleMenu}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+        transformOrigin={{ vertical: "bottom", horizontal: "left" }}
         PaperProps={{
           style: {
             width: menuWidth ?? "15%",

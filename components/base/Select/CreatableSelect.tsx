@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import CreatableSelect from "react-select/creatable";
+import Creatable from "react-select/creatable";
 import { GroupBase, StylesConfig } from "react-select";
 import {
   ControlledCreatableSelectProps,
@@ -11,7 +11,7 @@ import { Box, useTheme } from "@mui/material";
 import { InputLabel } from "components/base";
 import { useController } from "react-hook-form";
 
-function Creatable<
+function CreatableSelect<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
@@ -23,7 +23,7 @@ function Creatable<
   );
 
   return (
-    <CreatableSelect
+    <Creatable
       styles={customStyles}
       components={{
         IndicatorSeparator: () => null,
@@ -33,7 +33,7 @@ function Creatable<
   );
 }
 
-export function LabelledCreatable<
+export function LabelledCreatableSelect<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
@@ -48,13 +48,13 @@ export function LabelledCreatable<
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
       <Box mt={0.6}>
-        <Creatable {...props} />
+        <CreatableSelect {...props} />
       </Box>
     </>
   );
 }
 
-export function ControlledCreatable<
+export function ControlledCreatableSelect<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
@@ -76,8 +76,13 @@ export function ControlledCreatable<
   }
 
   return (
-    <Creatable onChange={onChange} onBlur={onBlur} value={value} {...props} />
+    <CreatableSelect
+      onChange={onChange}
+      onBlur={onBlur}
+      value={value}
+      {...props}
+    />
   );
 }
 
-export default Creatable;
+export default CreatableSelect;

@@ -1718,6 +1718,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.26.0
     axios: ^0.27.2
     draft-js: ^0.11.7
+    draft-js-export-html: ^1.4.1
     eslint: 8.16.0
     eslint-config-next: ^12.1.6
     eslint-config-prettier: ^8.5.0
@@ -1725,6 +1726,7 @@ __metadata:
     framer-motion: ^6.3.11
     husky: ">=6"
     immer: ^9.0.14
+    json-beautify: ^1.1.1
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
     lottie-react: ^2.2.1
@@ -2411,7 +2413,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"draft-js@npm:^0.11.7":
+"draft-js-export-html@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "draft-js-export-html@npm:1.4.1"
+  dependencies:
+    draft-js-utils: ^1.4.0
+  peerDependencies:
+    draft-js: ">=0.10.0"
+    immutable: 3.x.x
+  checksum: 41a95522abcd3f12933ef2656fc25356f6d7e5e67689dc3ae50a3927cc129e17d45ac648fc20723f335a08f6e696de04a73db61013920692486a5f99398e3af1
+  languageName: node
+  linkType: hard
+
+"draft-js-utils@npm:^1.4.0":
+  version: 1.4.1
+  resolution: "draft-js-utils@npm:1.4.1"
+  peerDependencies:
+    draft-js: ">=0.10.0"
+    immutable: 3.x.x
+  checksum: 0b261e8bf9267089ca31962a288ffa755c14c22436f4962b6fea2261555c12a5fe8df91982e0f96fd9b8d8c7c0514c69cf6299dbcdea41c6e8d53e2b74f411de
+  languageName: node
+  linkType: hard
+
+"draft-js@npm:0.11.7":
   version: 0.11.7
   resolution: "draft-js@npm:0.11.7"
   dependencies:
@@ -3593,6 +3617,15 @@ __metadata:
   bin:
     jsesc: bin/jsesc
   checksum: 4dc190771129e12023f729ce20e1e0bfceac84d73a85bc3119f7f938843fe25a4aeccb54b6494dce26fcf263d815f5f31acdefac7cc9329efb8422a4f4d9fa9d
+  languageName: node
+  linkType: hard
+
+"json-beautify@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "json-beautify@npm:1.1.1"
+  bin:
+    json-beautify: ./bin/json-beautify
+  checksum: 4d81bae69b310f789a16690097c7d303207b09e897a46e91dcf2beea1acffe05275248c099b88268e0a0a32ccf3dd12b529974cddc908844c081166117a93cad
   languageName: node
   linkType: hard
 

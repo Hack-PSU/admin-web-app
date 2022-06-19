@@ -6,7 +6,7 @@ import {
 } from "draft-js";
 import RichLink from "components/base/RichText/RichLink";
 
-function findLinkEntities(
+export function findLinkEntities(
   contentBlock: ContentBlock,
   callback: any,
   contentState: ContentState
@@ -20,7 +20,7 @@ function findLinkEntities(
   }, callback);
 }
 
-export const decorators = new CompositeDecorator([
+export const decorator = new CompositeDecorator([
   {
     strategy: findLinkEntities,
     component: RichLink,

@@ -1,5 +1,6 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import {
+  darken,
   Grid,
   IconButton,
   lighten,
@@ -14,7 +15,8 @@ interface IRichTextStylesProps {
   onClickItalic(): void;
   onClickUnderline(): void;
   onClickCreateLink(url: string): void;
-  onClickOpenLinkPrompt(): void;
+  onClickOpenLinkPrompt(): { show: boolean; url: string };
+  onRemoveLink(): void;
   urlData: string;
 }
 
@@ -33,6 +35,7 @@ const EditorStyleButton = styled(Button)(({ theme }) => ({
   ":hover": {
     backgroundColor: lighten(theme.palette.common.black, 0.95),
   },
+  userSelect: "none",
 }));
 
 const EditorStyleIconButton = styled(IconButton)(({ theme }) => ({
@@ -54,23 +57,33 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
   onClickUnderline,
   onClickItalic,
   onClickCreateLink,
+  onRemoveLink,
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-  const [url, setUrl] = useState<string>(urlData);
+  const [url, setUrl] = useState<string>("");
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    onClickOpenLinkPrompt();
+    event.preventDefault();
+    const shouldOpen = onClickOpenLinkPrompt();
+    if (shouldOpen.show) {
+      setUrl(shouldOpen.url);
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    setUrl("");
   };
 
   const onClickConfirmLink = () => {
     onClickCreateLink(url);
+    handleClose();
+  };
+
+  const onClickRemoveLink = () => {
+    onRemoveLink();
     handleClose();
   };
 
@@ -80,10 +93,16 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
   return (
     <EditorStyles container item gap={2}>
       <Grid item>
-        <EditorStyleButton onClick={onClickBold}>B</EditorStyleButton>
+        <EditorStyleButton
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onClickBold}
+        >
+          B
+        </EditorStyleButton>
       </Grid>
       <Grid item>
         <EditorStyleButton
+          onMouseDown={(e) => e.preventDefault()}
           textProps={{
             sx: {
               fontStyle: "italic",
@@ -96,6 +115,7 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
       </Grid>
       <Grid item>
         <EditorStyleButton
+          onMouseDown={(e) => e.preventDefault()}
           textProps={{
             sx: {
               textDecoration: "underline",
@@ -108,7 +128,11 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
         </EditorStyleButton>
       </Grid>
       <Grid item>
-        <EditorStyleIconButton onClick={handleClick} aria-describedby={id}>
+        <EditorStyleIconButton
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={handleClick}
+          aria-describedby={id}
+        >
           <EvaIcon
             name={"link-2"}
             size="medium"
@@ -133,7 +157,7 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
             sx: {
               boxShadow: 2,
               borderRadius: "15px",
-              width: "20%",
+              width: "30%",
             },
           }}
         >
@@ -160,8 +184,28 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
                 }}
               />
             </Grid>
-            <Grid item>
-              <Button onClick={onClickConfirmLink}>Confirm</Button>
+            <Grid container item justifyContent="center">
+              <Grid item>
+                <Button
+                  onClick={onClickRemoveLink}
+                  sx={{
+                    backgroundColor: "error.main",
+                    ":hover": {
+                      backgroundColor: darken(theme.palette.error.main, 0.1),
+                    },
+                  }}
+                  textProps={{
+                    sx: {
+                      color: "common.white",
+                    },
+                  }}
+                >
+                  Remove
+                </Button>
+              </Grid>
+              <Grid item sx={{ ml: 2 }}>
+                <Button onClick={onClickConfirmLink}>Confirm</Button>
+              </Grid>
             </Grid>
           </Grid>
         </Popover>
