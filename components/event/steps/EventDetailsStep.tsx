@@ -12,7 +12,6 @@ import { Box, Grid } from "@mui/material";
 import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
 import { useFormContext } from "react-hook-form";
-import { EditorState } from "draft-js";
 import { EventType } from "types/api";
 
 const locationOptions = [

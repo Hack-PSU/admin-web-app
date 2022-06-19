@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import { useStepper } from "components/base";
 import { useFormContext } from "react-hook-form";
-import { prepareContent } from "components/base/RichText";
 import { Grid, Typography } from "@mui/material";
 import {
   EventDetailsReview,

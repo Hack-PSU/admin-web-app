@@ -1,30 +1,15 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import Draft, {
+import {
   Editor,
   EditorState,
   RichUtils,
   DraftHandleValue,
   DraftEditorCommand,
-  Modifier,
-  ContentState,
-  SelectionState,
 } from "draft-js";
 import { useFormContext } from "react-hook-form";
-import {
-  Grid,
-  lighten,
-  styled,
-  IconButton,
-  useTheme,
-  alpha,
-} from "@mui/material";
-import { Button, EvaIcon } from "components/base";
+import { Grid, styled, alpha } from "@mui/material";
 import { decorator } from "./decorators";
 import RichTextStyles from "./RichTextStyles";
-import { prepareContent } from "components/base/RichText/utils";
-import { convertToRaw } from "draft-js";
-import produce from "immer";
-import jsonBeautify from "json-beautify";
 
 interface IRichTextProps {
   placeholder: string;
@@ -55,14 +40,10 @@ const EditorInputContainer = styled(Grid)(({ theme }) => ({
 }));
 
 const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
-  const { setValue, register, getValues } = useFormContext();
+  const { setValue, register } = useFormContext();
   const [editorState, setEditorState] = useState<EditorState>(
     EditorState.createEmpty(decorator)
   );
-  const [selectedUrl, setSelectedUrl] = useState<string>("");
-  const [selectedText, setSelectedText] = useState<string>("");
-
-  console.dir(convertToRaw(editorState.getCurrentContent()));
 
   const onChangeState = useCallback(
     (editorState: EditorState) => {
@@ -107,8 +88,6 @@ const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
 
         if (entityAtOffset) {
           const linkEntity = contentState.getEntity(entityAtOffset);
-          console.log(linkEntity.getData().url);
-          // setSelectedUrl(linkEntity.getData().url);
           return { url: linkEntity.getData().url, show: true };
         }
         return { show: true, url: "" };
@@ -179,7 +158,6 @@ const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
         onClickUnderline={onClickUnderline}
         onClickOpenLinkPrompt={onOpenLinkPrompt}
         onClickCreateLink={onCreateLink}
-        urlData={selectedUrl}
         onRemoveLink={onRemoveLink}
       />
       <EditorInputContainer item>

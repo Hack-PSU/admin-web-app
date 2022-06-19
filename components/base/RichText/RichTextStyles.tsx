@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useState } from "react";
 import {
   darken,
   Grid,
@@ -17,7 +17,6 @@ interface IRichTextStylesProps {
   onClickCreateLink(url: string): void;
   onClickOpenLinkPrompt(): { show: boolean; url: string };
   onRemoveLink(): void;
-  urlData: string;
 }
 
 const EditorStyles = styled(Grid)(({ theme }) => ({
@@ -51,7 +50,6 @@ const EditorStyleIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const RichTextStyles: FC<IRichTextStylesProps> = ({
-  urlData,
   onClickOpenLinkPrompt,
   onClickBold,
   onClickUnderline,
@@ -65,9 +63,9 @@ const RichTextStyles: FC<IRichTextStylesProps> = ({
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const shouldOpen = onClickOpenLinkPrompt();
-    if (shouldOpen.show) {
-      setUrl(shouldOpen.url);
+    const { show, url } = onClickOpenLinkPrompt();
+    if (show) {
+      setUrl(url);
       setAnchorEl(event.currentTarget);
     }
   };
