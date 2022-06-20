@@ -16,7 +16,7 @@ import {
   UsePaginatedQuery,
   UsePaginatedQueryOptions,
 } from "types/hooks";
-import { useFormContext, UseFormReturn } from "react-hook-form";
+import { useController, useFormContext, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
 import { nanoid } from "nanoid";
 import produce from "immer";
@@ -128,14 +128,16 @@ export function useDateTimeRange(
   // startDateName: string,
   // endDateName: string,
 ): UseDateTimeRange {
-  const { setValue, register } = useFormContext();
+  const {
+    field: { onChange, value },
+  } = useController({ name });
 
-  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date>(value?.start ?? new Date());
   const [startTime, setStartTime] = useState<Date>(
     DateTime.fromFormat("01:00 AM", "hh:mm a").toJSDate()
   );
 
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(value?.end ?? new Date());
   const [endTime, setEndTime] = useState<Date>(
     DateTime.fromFormat("01:00 AM", "hh:mm a").toJSDate()
   );
@@ -161,19 +163,24 @@ export function useDateTimeRange(
   }, [isMultipleDays, formatDate, startDate, startTime, endDate, endTime]);
 
   useEffect(() => {
-    register(`${name}.start`);
-    register(`${name}.end`);
-  }, [register, name]);
+    const [start, end] = getValue();
+    onChange({ start, end });
+  }, [name, getValue, onChange]);
 
-  useEffect(() => {
-    const startDateTime = getValue()[0];
-    setValue(`${name}.start`, startDateTime);
-  }, [name, getValue, setValue, startDate, startTime]);
-
-  useEffect(() => {
-    const endDateTime = getValue()[1];
-    setValue(`${name}.end`, endDateTime);
-  }, [name, getValue, endDate, endTime, setValue]);
+  // useEffect(() => {
+  //   register(`${name}.start`);
+  //   register(`${name}.end`);
+  // }, [register, name]);
+  //
+  // useEffect(() => {
+  //   const startDateTime = getValue()[0];
+  //   setValue(`${name}.start`, startDateTime);
+  // }, [name, getValue, setValue, startDate, startTime]);
+  //
+  // useEffect(() => {
+  //   const endDateTime = getValue()[1];
+  //   setValue(`${name}.end`, endDateTime);
+  // }, [name, getValue, endDate, endTime, setValue]);
 
   const toggleMultiple = useCallback(() => {
     setIsMultipleDays((multiple) => !multiple);

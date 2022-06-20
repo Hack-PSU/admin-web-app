@@ -8,29 +8,16 @@ import { EventType, IGetAllEventsResponse } from "types/api";
 import { DateTime } from "luxon";
 import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { Button, EvaIcon, Input } from "components/base";
-import Link from "next/link";
+import { EvaIcon } from "components/base";
 import { useQuery } from "react-query";
 import { Cell } from "react-table";
-import dynamic from "next/dynamic";
 import { PaginatedTable } from "components/Table";
+import { GradientButton } from "components/base/Button";
+import { useRouter } from "next/router";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
-
-// const PaginatedTable = dynamic<IPaginatedTableProps>(
-//   () => import("components/Table/PaginatedTable"),
-//   { ssr: false }
-// );
-
-const SearchAdornment: FC = () => (
-  <InputAdornment position={"start"}>
-    <Box mt={0.5}>
-      <EvaIcon name={"search-outline"} size="medium" fill="#1a1a1a" />
-    </Box>
-  </InputAdornment>
-);
 
 const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
   const theme = useTheme();
@@ -71,7 +58,7 @@ const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
 
 const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
-  const { register } = useForm();
+  const router = useRouter();
 
   const { columns, names } = useColumnBuilder((builder) =>
     builder
@@ -151,32 +138,31 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     return undefined;
   };
 
-  // @ts-ignore
   return (
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
-          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800 }}>
             Events
           </Typography>
         </Grid>
         <Grid item xs={2}>
-          <Link href={"/events/tabs"} passHref>
-            <Button
-              variant="text"
-              sx={{
-                width: "100%",
-                padding: theme.spacing(1, 3.5),
-              }}
-              textProps={{
-                sx: {
-                  lineHeight: "1.8rem",
-                },
-              }}
-            >
-              Add an Event
-            </Button>
-          </Link>
+          <GradientButton
+            variant="text"
+            sx={{
+              width: "100%",
+              padding: theme.spacing(1, 3.5),
+            }}
+            textProps={{
+              sx: {
+                lineHeight: "1.8rem",
+                color: "common.white",
+              },
+            }}
+            onClick={() => router.push("/events/steps")}
+          >
+            Add an Event
+          </GradientButton>
         </Grid>
       </Grid>
       <Grid item>

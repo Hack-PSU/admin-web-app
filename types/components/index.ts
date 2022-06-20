@@ -3,7 +3,7 @@ import {
   InputProps,
   SxProps,
   Theme,
-  SelectProps,
+  // SelectProps,
   CheckboxProps,
   TypographyProps,
   RadioProps,
@@ -12,6 +12,8 @@ import { UseControllerProps, UseControllerReturn } from "react-hook-form";
 import { ReactDatePickerProps } from "react-datepicker";
 import { DropzoneOptions } from "react-dropzone";
 import { UseTableOptions } from "react-table";
+import { GroupBase, Props } from "react-select";
+import { CreatableProps } from "react-select/creatable";
 
 type RenderItemData<T> = {
   item: T;
@@ -52,22 +54,79 @@ export interface ISelectItem<T = any> {
   display: string;
 }
 
-export interface ISelectProps
-  extends Omit<SelectProps, "placeholder" | "onChange"> {
-  placeholder: string;
-  items: ISelectItem[];
-  renderItem?: RenderItem;
-  placeholderStyles?: SxProps<Theme>;
-  menuStyle?: SxProps<Theme>;
-  menuWidth?: string;
-  onChange?: UseControllerReturn["field"]["onChange"];
-  selectInputStyle?: React.CSSProperties;
+export interface IOption {
+  readonly label: string;
+  readonly value: string;
+  readonly isNew?: boolean;
 }
 
-export type LabelledSelectProps = WithLabelledProps<ISelectProps>;
+// export interface ISelectProps
+//   extends Omit<SelectProps, "placeholder" | "onChange"> {
+//   placeholder: string;
+//   items: ISelectItem[];
+//   renderItem?: RenderItem;
+//   placeholderStyles?: SxProps<Theme>;
+//   menuStyle?: SxProps<Theme>;
+//   menuWidth?: string;
+//   onChange?: UseControllerReturn["field"]["onChange"];
+//   selectInputStyle?: React.CSSProperties;
+// }
 
-export type ControlledSelectProps = WithControllerProps<
-  ISelectProps & Partial<InputLabelProps>
+export type SelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<Props<TOption, TIsMulti, TGroup>, "styles">;
+
+export type LabelledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<SelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  SelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
+>;
+
+export type CreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<CreatableProps<TOption, TIsMulti, TGroup>, "styles"> & {
+  error?: boolean;
+};
+
+export type LabelledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<CreatableSelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  CreatableSelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
+>;
+
+export type CreateOnlyInputProps = Omit<
+  CreatableSelectProps<IOption, true, GroupBase<IOption>>,
+  "onChange" | "onInputChange" | "onKeyDown" | "value"
+> & {
+  onChange?: UseControllerReturn["field"]["onChange"];
+  initialValue?: IOption[];
+};
+
+export type LabelledCreateOnlyInputProps =
+  WithLabelledProps<CreateOnlyInputProps>;
+
+export type ControlledCreateOnlyInputProps = WithControllerProps<
+  Omit<CreateOnlyInputProps, "onChange"> & Partial<LabelledCreateOnlyInputProps>
 >;
 
 export type TableProps<T extends object = {}> = UseTableOptions<T>;
@@ -114,6 +173,9 @@ export type ControlledTimePickerProps = WithControllerProps<
 
 export interface IDropzoneProps extends DropzoneOptions {
   containerStyle?: SxProps<Theme>;
+  custom?: boolean;
+  children?: React.ReactNode;
+  replace?: boolean;
 }
 
 export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;

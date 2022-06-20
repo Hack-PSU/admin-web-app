@@ -6,6 +6,7 @@ export const theme = responsiveFontSizes(
     shadows: [
       "none",
       "0px 3px 15px rgba(0, 0, 0, 0.18)",
+      "0px 4px 10px 2px rgba(0, 0, 0, 0.1)",
       "0px 5px 6px rgba(0, 0, 0, 0.25)",
       "0px 8px 10px rgba(0, 0, 0, 0.25)",
       "0px 8px 8px rgba(0, 0, 0, 0.25)",
@@ -15,6 +16,27 @@ export const theme = responsiveFontSizes(
       common: {
         black: "#1a1a1a",
         white: "#ffffff",
+      },
+      background: {
+        light: "#fbfbfb",
+        dark: "#111B24",
+      },
+      sunset: {
+        light: "#EF9771",
+        dark: "#FC466B",
+      },
+      gradient: {
+        angled: {
+          main: "linear-gradient(126deg, #FC466B -34.25%, #EF9771 103.59%)",
+          accent: "linear-gradient(92.78deg, #FC466B -4.19%, #EF9771 99.68%)",
+        },
+      },
+      border: {
+        light: "#e4e4e4",
+        dark: "#a5a5a5",
+      },
+      header: {
+        light: "#969696",
       },
       button: {
         grey: "#f0f0f0",
@@ -97,7 +119,8 @@ export const theme = responsiveFontSizes(
           style: {
             fontFamily: "Poppins",
             fontWeight: "normal",
-            fontSize: "1rem",
+            fontSize: "0.85rem",
+            borderWidth: "2px",
           },
         },
       },

@@ -75,7 +75,12 @@ const FilterAction: FC<ITableActionProps> = ({ headers, names }) => {
         const id = state.columnId;
         const header = headers[id];
 
-        if (header && header.canFilter && header.Filter) {
+        if (
+          header &&
+          header.canFilter &&
+          state.type !== "text" &&
+          header.Filter
+        ) {
           return (
             <Accordion title={state.name} key={`${id}-filter`}>
               {header.render("Filter")}

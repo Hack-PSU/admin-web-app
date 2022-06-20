@@ -47,16 +47,8 @@ const GlobalFilter: FC<IGlobalFilterProps> = ({
       }}
       sx={{
         width: "100%",
-        borderRadius: "15px",
-        backgroundColor: "common.white",
-        lineHeight: "1.5rem",
-        padding: theme.spacing(0.5, 1.3),
+        py: theme.spacing(0.8),
         ...props.sx,
-      }}
-      inputProps={{
-        sx: {
-          fontSize: theme.typography.pxToRem(14),
-        },
       }}
     />
   );

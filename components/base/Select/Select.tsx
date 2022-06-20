@@ -1,206 +1,83 @@
-import React, { FC, forwardRef, useState } from "react";
+import React, { useMemo } from "react";
+import SingleSelect, { GroupBase, StylesConfig } from "react-select";
+import { alpha, Box, useTheme } from "@mui/material";
 import {
   ControlledSelectProps,
-  ISelectItem,
-  ISelectProps,
   LabelledSelectProps,
+  SelectProps,
 } from "types/components";
-import { EvaIcon } from "components/base";
-import { Input, InputLabel } from "components/base/Input";
-import { Box, InputAdornment, Menu } from "@mui/material";
-import { useTheme } from "@mui/system";
+import { InputLabel } from "components/base/Input";
 import { useController } from "react-hook-form";
-import BaseMenuItem from "./BaseMenuItem";
+import { selectStyles } from "components/base/Select/styles";
 
-const ChevronDown: FC = () => (
-  <EvaIcon name={"chevron-down-outline"} size="large" fill="#000" />
-);
+function Select<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+>(props: SelectProps<TOption, TIsMulti, TGroup>) {
+  const theme = useTheme();
 
-const ChevronUp: FC = () => (
-  <EvaIcon name={"chevron-up-outline"} size="large" fill="#000" />
-);
+  const customStyles: StylesConfig<TOption, TIsMulti, TGroup> = useMemo(
+    () => selectStyles(theme),
+    [theme]
+  );
 
-const SelectAdornment: FC<{ open: boolean }> = ({ open }) => (
-  <InputAdornment position={"end"} style={{ cursor: "pointer" }}>
-    <Box mt={0.5}>{open ? <ChevronUp /> : <ChevronDown />}</Box>
-  </InputAdornment>
-);
+  return (
+    <SingleSelect
+      styles={customStyles}
+      components={{
+        IndicatorSeparator: () => null,
+      }}
+      {...props}
+    />
+  );
+}
 
-const Select = forwardRef<any, ISelectProps>(
-  (
-    {
-      placeholder,
-      items,
-      renderItem,
-      menuStyle,
-      menuWidth,
-      value,
-      onChange,
-      onBlur,
-      selectInputStyle,
-      sx,
-      ...props
-    },
-    ref
-  ) => {
-    console.log(sx);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const toggleMenu = () => {
-      setIsOpen((open) => !open);
-    };
-
-    const onClickInput = (event: any) => {
-      setAnchorEl(event.currentTarget);
-      toggleMenu();
-    };
-
-    const onChangeItem = (event: any, item: ISelectItem) => {
-      toggleMenu();
-      if (onChange) {
-        onChange(item);
-      }
-    };
-
-    const theme = useTheme();
-
-    const selectColor = value
-      ? theme.palette.select.main
-      : theme.palette.select.placeholder;
-
-    return (
-      <>
-        <Input
-          placeholder={placeholder}
-          disabled
-          endAdornment={<SelectAdornment open={isOpen} />}
-          onClick={onClickInput}
-          ref={ref}
-          onBlur={onBlur}
-          inputProps={{
-            style: {
-              WebkitTextFillColor: selectColor,
-              cursor: "pointer",
-              ...selectInputStyle,
-            },
-          }}
-          sx={{
-            width: "100%",
-            borderRadius: "15px",
-            "&& > input.MuiInputBase-input.Mui-disabled": {
-              color: selectColor,
-              WebkitTextFillColor: selectColor,
-            },
-            ...sx,
-          }}
-          // @ts-ignore
-          value={value ? value.display : placeholder}
-          defaultValue=""
-          {...props}
-        />
-        <Menu
-          anchorEl={anchorEl}
-          open={isOpen}
-          keepMounted
-          onClose={toggleMenu}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          transformOrigin={{ vertical: "top", horizontal: "center" }}
-          sx={menuStyle}
-          PaperProps={{
-            style: { width: menuWidth ?? "100%" },
-            sx: { boxShadow: 1 },
-          }}
-        >
-          {items.map((item, index) => {
-            if (renderItem) {
-              return renderItem({ item, index, onChange: onChangeItem });
-            } else {
-              return (
-                <BaseMenuItem
-                  key={`${item.value}-${item.display}-${index}`}
-                  item={item}
-                  onChangeItem={onChangeItem}
-                >
-                  {item.display}
-                </BaseMenuItem>
-              );
-            }
-          })}
-        </Menu>
-      </>
-    );
-  }
-);
-Select.displayName = "Select";
-
-export const LabelledSelect: FC<LabelledSelectProps> = ({
+export function LabelledSelect<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+>({
   id,
   label,
   showError,
   error,
-  placeholder,
-  items,
-  renderItem,
   ...props
-}) => {
-  console.log(props.sx);
+}: LabelledSelectProps<TOption, TIsMulti, TGroup>) {
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
-      <Select
-        placeholder={placeholder}
-        items={items}
-        renderItem={renderItem}
-        {...props}
-      />
+      <Box mt={0.6}>
+        <Select {...props} />
+      </Box>
     </>
   );
-};
+}
 
-export const ControlledSelect: FC<ControlledSelectProps> = ({
-  as: Component,
-  placeholder,
+export function ControlledSelect<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+>({
   name,
   rules,
   defaultValue,
-  items,
+  as: Component,
   ...props
-}) => {
+}: ControlledSelectProps<TOption, TIsMulti, TGroup>) {
   const {
-    field: { onChange, onBlur, value, ref },
-  } = useController({
-    name,
-    rules,
-    defaultValue: defaultValue ?? undefined,
-  });
+    field: { onChange, onBlur, value },
+  } = useController({ name, rules, defaultValue });
 
   if (Component) {
     return (
-      <Component
-        placeholder={placeholder}
-        items={items}
-        onChange={onChange}
-        onBlur={onBlur}
-        value={value}
-        defaultValue={defaultValue}
-        {...props}
-      />
+      <Component onChange={onChange} onBlur={onBlur} value={value} {...props} />
     );
   }
 
   return (
-    <Select
-      placeholder={placeholder}
-      items={items}
-      onChange={onChange}
-      onBlur={onBlur}
-      ref={ref}
-      value={value}
-      defaultValue={placeholder}
-      {...props}
-    />
+    <Select onChange={onChange} onBlur={onBlur} value={value} {...props} />
   );
-};
+}
 
 export default Select;

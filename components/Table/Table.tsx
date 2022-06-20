@@ -1,4 +1,10 @@
-import React, { createContext, FC, useContext, useMemo } from "react";
+import React, {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { WithChildren } from "types/common";
 import {
   Cell,
@@ -16,7 +22,7 @@ import {
   useTable,
   UseTableInstanceProps,
 } from "react-table";
-import TableCell from "components/Table/TableCell";
+import TableCell, { DefaultCell } from "components/Table/TableCell";
 import {
   Checkbox as MuiCheckbox,
   Grid,
@@ -35,8 +41,11 @@ import {
   RefreshAction,
   SortAction,
 } from "components/Table/actions";
+import SortColumn from "components/Table/actions/SortColumn";
+import { useForm, FormProvider } from "react-hook-form";
+import { ControlledSelect } from "components/base";
 
-interface ITableProps extends TableProps<object> {
+export interface ITableProps extends TableProps<object> {
   limit: number;
   names: NamesState[];
   onRefresh(): void;
@@ -49,7 +58,13 @@ type TableContextHooks = Pick<
 > &
   Pick<
     UsePaginationInstanceProps<object>,
-    "page" | "gotoPage" | "nextPage" | "previousPage" | "pageCount"
+    | "page"
+    | "gotoPage"
+    | "nextPage"
+    | "previousPage"
+    | "pageCount"
+    | "canPreviousPage"
+    | "canNextPage"
   > &
   Pick<UseGlobalFiltersState<object>, "globalFilter"> &
   Pick<TableState, "pageIndex"> &
@@ -90,6 +105,7 @@ const Table: TableComponent = ({
   ...props
 }) => {
   const theme = useTheme();
+  const methods = useForm();
 
   const defaultColumn = useMemo(
     () => ({
@@ -123,6 +139,9 @@ const Table: TableComponent = ({
     previousPage,
     pageCount,
     state: { pageIndex, globalFilter },
+    canNextPage,
+    canPreviousPage,
+    setPageSize,
   } = useTable(
     {
       columns,
@@ -170,6 +189,17 @@ const Table: TableComponent = ({
     []
   );
 
+  useEffect(() => {
+    const subscription = methods.watch((data) => {
+      if (data.limit) {
+        setPageSize(Number(data.limit.value));
+      }
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [methods, setPageSize]);
+
   const value = useMemo(
     () => ({
       getTableProps,
@@ -188,29 +218,76 @@ const Table: TableComponent = ({
       headerMap,
       onRefresh,
       onDelete,
-      /* eslint-disable-next-line react-hooks/exhaustive-deps */
+      canNextPage,
+      canPreviousPage,
     }),
-    [page, pageIndex, pageCount, globalFilter]
+    [
+      getTableProps,
+      headerGroups,
+      prepareRow,
+      headers,
+      page,
+      gotoPage,
+      nextPage,
+      setGlobalFilter,
+      previousPage,
+      pageCount,
+      pageIndex,
+      globalFilter,
+      names,
+      headerMap,
+      onRefresh,
+      onDelete,
+      canNextPage,
+      canPreviousPage,
+    ]
   );
 
   return (
-    // @ts-ignore
     <TableContext.Provider value={value}>
-      <Grid container gap={1.5} flexDirection="column">
-        {children}
-      </Grid>
+      <FormProvider {...methods}>
+        <Grid container gap={1.5} flexDirection="column">
+          {children}
+        </Grid>
+      </FormProvider>
     </TableContext.Provider>
   );
 };
 
 const TableGlobalActions: FC = () => {
-  const { setGlobalFilter, globalFilter, names } = useTableContext();
+  const { setGlobalFilter, globalFilter, names, onRefresh } = useTableContext();
   return (
-    <GlobalActions
-      setGlobalFilter={setGlobalFilter}
-      globalFilter={globalFilter}
-      names={names}
-    />
+    <Grid container item justifyContent="space-between">
+      <GlobalActions
+        setGlobalFilter={setGlobalFilter}
+        globalFilter={globalFilter}
+        names={names}
+      />
+      <Grid
+        container
+        item
+        xs={7}
+        justifyContent="flex-end"
+        columnSpacing={1}
+        alignItems="center"
+      >
+        <Grid item xs={3} sx={{ height: "100%" }}>
+          <RefreshAction onClick={onRefresh} />
+        </Grid>
+        <Grid item xs={3}>
+          <ControlledSelect
+            options={[
+              { value: "4", label: "4 entries" },
+              { value: "8", label: "8 entries" },
+              { value: "10", label: "10 entries" },
+              { value: "20", label: "20 entries" },
+            ]}
+            name={"limit"}
+            defaultValue={{ value: "8", label: "8 entries" }}
+          />
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
@@ -224,6 +301,7 @@ const TableContainer: FC<Required<WithChildren>> = ({ children }) => {
       sx={{
         border: `1px solid ${theme.palette.table.border}`,
         borderRadius: "10px",
+        boxShadow: 1,
       }}
       {...getTableProps()}
     >
@@ -285,8 +363,15 @@ const TableActionsCenter: FC<WithChildren> = ({ children }) => {
 };
 
 const TablePaginationAction: FC = () => {
-  const { nextPage, previousPage, gotoPage, pageCount, pageIndex } =
-    useTableContext();
+  const {
+    nextPage,
+    previousPage,
+    gotoPage,
+    pageCount,
+    pageIndex,
+    canPreviousPage,
+    canNextPage,
+  } = useTableContext();
 
   return (
     <PaginationAction
@@ -295,6 +380,8 @@ const TablePaginationAction: FC = () => {
       gotoPage={gotoPage}
       pageCount={pageCount}
       pageIndex={pageIndex}
+      canNextPage={canNextPage}
+      canPreviousPage={canPreviousPage}
     />
   );
 };
@@ -349,15 +436,33 @@ const TableHeader: FC = () => {
             } else {
               return (
                 <TableCell
+                  container
                   header
-                  {...header.getHeaderProps()}
+                  empty
+                  alignItems="center"
+                  {...header.getHeaderProps(header.getSortByToggleProps())}
                   textProps={{
                     sx: {
                       fontSize: theme.typography.pxToRem(15),
                     },
                   }}
+                  columnSpacing={1.5}
                 >
-                  {header.render("Header")}
+                  <Grid item>
+                    <DefaultCell
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "header.light",
+                        fontSize: theme.typography.pxToRem(15),
+                      }}
+                    >
+                      {header.render("Header")}
+                    </DefaultCell>
+                  </Grid>
+                  <Grid item>
+                    <SortColumn header={header} />
+                  </Grid>
                 </TableCell>
               );
             }

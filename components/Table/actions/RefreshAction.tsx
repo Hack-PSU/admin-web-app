@@ -25,7 +25,10 @@ const RefreshAction: FC<IRefreshActionProps> = ({ onClick }) => {
         padding: theme.spacing(0.5, 2),
         borderRadius: "10px",
         alignItems: "center",
-        width: "90%",
+        width: "100%",
+        backgroundColor: "common.white",
+        boxShadow: 1,
+        height: "100%",
       }}
       textProps={{
         sx: {
