@@ -3,7 +3,7 @@ import { Box, Grid, styled } from "@mui/material";
 import { InputLabel } from "components/base";
 import EventDetail from "./EventDetail";
 import { DateTime } from "luxon";
-import { ContentState, Editor, EditorState } from "draft-js";
+import { ContentState, convertFromRaw, Editor, EditorState } from "draft-js";
 import { decorator } from "components/base/RichText/decorators";
 import { useEventStore } from "common/store";
 
@@ -39,7 +39,7 @@ const EventDetailsReview: FC = () => {
           <Editor
             onChange={() => null}
             editorState={EditorState.createWithContent(
-              eventDescription ?? ContentState.createFromText(""),
+              convertFromRaw(eventDescription),
               decorator
             )}
             readOnly={true}

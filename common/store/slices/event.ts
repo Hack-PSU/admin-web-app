@@ -1,5 +1,5 @@
 import { EventType } from "types/api";
-import { ContentState } from "draft-js";
+import { ContentState, EditorState, RawDraftContentState } from "draft-js";
 import {
   ModelSlice,
   State,
@@ -9,12 +9,13 @@ import {
 import { IOption } from "types/components";
 import produce from "immer";
 import { omit } from "lodash";
+import { decorator } from "components/base/RichText";
 
 export interface IEventModel {
   eventType: IOption | null;
   eventName: string;
   eventLocation: IOption | null;
-  eventDescription?: ContentState;
+  eventDescription: RawDraftContentState;
   eventDate: {
     start: Date;
     end: Date;
@@ -43,7 +44,7 @@ export const eventStoreSlice: ModelSlice<IEventModel> = {
     start: new Date(),
     end: new Date(),
   },
-  eventDescription: ContentState.createFromText(""),
+  eventDescription: { blocks: [], entityMap: {} },
   wsPresenterNames: undefined,
   wsSkillLevel: undefined,
   wsUrls: [],

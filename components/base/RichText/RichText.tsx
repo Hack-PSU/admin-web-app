@@ -1,10 +1,13 @@
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   Editor,
   EditorState,
   RichUtils,
   DraftHandleValue,
   DraftEditorCommand,
+  Modifier,
+  convertToRaw,
+  convertFromRaw,
 } from "draft-js";
 import { useController, UseControllerProps } from "react-hook-form";
 import { Grid, styled, alpha } from "@mui/material";
@@ -52,14 +55,18 @@ const RichText: FC<IRichTextProps> = ({
   } = useController({ name, rules, defaultValue });
 
   const [editorState, setEditorState] = useState<EditorState>(
-    value
-      ? EditorState.createWithContent(value, decorator)
-      : EditorState.createEmpty(decorator)
+    EditorState.createEmpty(decorator)
   );
+
+  useEffect(() => {
+    setEditorState(
+      EditorState.createWithContent(convertFromRaw(value), decorator)
+    );
+  }, []);
 
   const onChangeState = useCallback(
     (editorState: EditorState) => {
-      onChange(editorState.getCurrentContent());
+      onChange(convertToRaw(editorState.getCurrentContent()));
       setEditorState(editorState);
     },
     [onChange]
