@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useState } from "react";
 import {
   Editor,
   EditorState,
@@ -6,7 +6,7 @@ import {
   DraftHandleValue,
   DraftEditorCommand,
 } from "draft-js";
-import { useFormContext } from "react-hook-form";
+import { useController, UseControllerProps } from "react-hook-form";
 import { Grid, styled, alpha } from "@mui/material";
 import { decorator } from "./decorators";
 import RichTextStyles from "./RichTextStyles";
@@ -14,6 +14,8 @@ import RichTextStyles from "./RichTextStyles";
 interface IRichTextProps {
   placeholder: string;
   name: string;
+  rules?: UseControllerProps["rules"];
+  defaultValue?: UseControllerProps["defaultValue"];
 }
 
 const EditorContainer = styled(Grid)(({ theme }) => ({
@@ -39,24 +41,29 @@ const EditorInputContainer = styled(Grid)(({ theme }) => ({
   },
 }));
 
-const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
-  const { setValue, register } = useFormContext();
+const RichText: FC<IRichTextProps> = ({
+  name,
+  rules,
+  defaultValue,
+  placeholder,
+}) => {
+  const {
+    field: { onChange, onBlur, value },
+  } = useController({ name, rules, defaultValue });
+
   const [editorState, setEditorState] = useState<EditorState>(
-    EditorState.createEmpty(decorator)
+    value
+      ? EditorState.createWithContent(value, decorator)
+      : EditorState.createEmpty(decorator)
   );
 
   const onChangeState = useCallback(
     (editorState: EditorState) => {
-      console.log(editorState.getCurrentContent().getAllEntities());
-      setValue(name, editorState.getCurrentContent());
+      onChange(editorState.getCurrentContent());
       setEditorState(editorState);
     },
-    [name, setValue]
+    [onChange]
   );
-
-  useEffect(() => {
-    register(name);
-  }, []);
 
   const onClickBold: () => void = useCallback(() => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, "BOLD"));
@@ -162,6 +169,7 @@ const RichText: FC<IRichTextProps> = ({ name, placeholder }) => {
       />
       <EditorInputContainer item>
         <Editor
+          onBlur={onBlur}
           editorState={editorState}
           onChange={onChangeState}
           placeholder={placeholder}

@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Grid, GridProps, lighten, Typography, useTheme } from "@mui/material";
+import { Grid, lighten, Typography, useTheme } from "@mui/material";
 import { WithChildren } from "types/common";
 import { Button } from "components/base";
 

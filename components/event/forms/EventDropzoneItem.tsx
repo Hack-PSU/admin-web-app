@@ -3,15 +3,19 @@ import { useFormContext } from "react-hook-form";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { EvaIcon } from "components/base";
 
-const EventDropzoneItem: FC = () => {
-  const { watch, resetField } = useFormContext();
-  const eventImage: File[] = watch("eventImage", []);
+interface IEventDropzoneItemProps {
+  name: string;
+}
+
+const EventDropzoneItem: FC<IEventDropzoneItemProps> = ({ name }) => {
+  const { watch, setValue } = useFormContext();
+  const images: File[] = watch(name, []);
 
   const theme = useTheme();
 
   const onRemoveImage = (event: React.MouseEvent) => {
     event.stopPropagation();
-    resetField("eventImage");
+    setValue(name, []);
   };
 
   return (
@@ -49,7 +53,7 @@ const EventDropzoneItem: FC = () => {
                 fontSize: "0.85rem",
               }}
             >
-              {eventImage[0].name}
+              {images[0].name}
             </Typography>
           </Grid>
           <Grid item>
@@ -57,7 +61,7 @@ const EventDropzoneItem: FC = () => {
               variant="subtitle1"
               sx={{ color: "border.dark", fontSize: "0.7rem" }}
             >
-              {Math.round(eventImage[0].size / 1000)}KB
+              {Math.round(images[0].size / 1000)}KB
             </Typography>
           </Grid>
         </Grid>

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react";
+import React, { FC } from "react";
 import EventStep from "components/event/steps/EventStep";
 import {
   ControlledDropzone,
@@ -7,49 +7,63 @@ import {
 } from "components/base";
 import { Grid } from "@mui/material";
 import EventDropzoneItem from "components/event/forms/EventDropzoneItem";
-import { useFormContext } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
+import { useEventDispatch, useEventStore } from "common/store";
 
 const EventIconStep: FC = () => {
-  const { watch } = useFormContext();
+  const { eventIcon } = useEventStore();
+  const dispatch = useEventDispatch();
+
   const { nextStep, previousStep, active, gotoStep } = useStepper(
     4,
     "5. Event Icon",
     { optional: true }
   );
 
-  const eventIcon: File[] = watch("eventIcon", []);
+  const methods = useForm({
+    defaultValues: {
+      eventIcon: eventIcon ? [eventIcon] : [],
+    },
+  });
 
-  const handleNext = useCallback(() => {
-    if (!eventIcon) {
-      gotoStep(5, 4);
-    } else {
-      nextStep();
-    }
-  }, [eventIcon, gotoStep, nextStep]);
+  const handleNext = () => {
+    methods.handleSubmit((data, errors) => {
+      if (data.eventIcon.length > 0) {
+        dispatch("UPDATE_ICON", {
+          eventIcon: data.eventIcon[0],
+        });
+        nextStep();
+      } else {
+        gotoStep(5, 4);
+      }
+    })();
+  };
 
   return (
-    <EventStep
-      title={"Event Icon"}
-      handleNext={handleNext}
-      active={active}
-      handlePrevious={previousStep}
-    >
-      <Grid item>
-        <ControlledDropzone
-          name={"eventIcon"}
-          multiple={false}
-          maxFiles={1}
-          custom
-          replace
-        >
-          {eventIcon && eventIcon.length > 0 ? (
-            <EventDropzoneItem />
-          ) : (
-            <DropzonePlaceholder />
-          )}
-        </ControlledDropzone>
-      </Grid>
-    </EventStep>
+    <FormProvider {...methods}>
+      <EventStep
+        title={"Event Icon"}
+        handleNext={handleNext}
+        active={active}
+        handlePrevious={previousStep}
+      >
+        <Grid item>
+          <ControlledDropzone
+            name={"eventIcon"}
+            multiple={false}
+            maxFiles={1}
+            custom
+            replace
+          >
+            {methods.watch("eventIcon", []).length > 0 ? (
+              <EventDropzoneItem name="eventIcon" />
+            ) : (
+              <DropzonePlaceholder />
+            )}
+          </ControlledDropzone>
+        </Grid>
+      </EventStep>
+    </FormProvider>
   );
 };
 

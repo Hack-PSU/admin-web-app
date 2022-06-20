@@ -31,6 +31,18 @@ const StepperProvider: FC<WithChildren> = ({ children }) => {
   const [steps, setSteps] = useImmer<{ [key: string]: IStepItem }>({});
   const [skipped, setSkipped] = useImmer<{ [key: string]: boolean }>({});
 
+  const resolveSkipped = useCallback(() => {
+    if (skipped[activeStep]) {
+      setSkipped((skipped) => {
+        skipped[activeStep] = false;
+      });
+    }
+  }, [activeStep, setSkipped, skipped]);
+
+  useEffect(() => {
+    resolveSkipped();
+  }, [activeStep, resolveSkipped]);
+
   const onClickNext = useCallback(() => {
     setActiveStep((step) => step + 1);
   }, []);

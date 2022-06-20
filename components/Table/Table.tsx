@@ -1,13 +1,16 @@
-import React, { createContext, FC, useContext, useMemo } from "react";
+import React, {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { WithChildren } from "types/common";
 import {
   Cell,
   ColumnInstance,
   TableState,
   useFilters,
-  UseFiltersColumnOptions,
-  UseFiltersInstanceProps,
-  UseFiltersState,
   useFlexLayout,
   useGlobalFilter,
   UseGlobalFiltersInstanceProps,
@@ -39,8 +42,10 @@ import {
   SortAction,
 } from "components/Table/actions";
 import SortColumn from "components/Table/actions/SortColumn";
+import { useForm, FormProvider } from "react-hook-form";
+import { ControlledSelect } from "components/base";
 
-interface ITableProps extends TableProps<object> {
+export interface ITableProps extends TableProps<object> {
   limit: number;
   names: NamesState[];
   onRefresh(): void;
@@ -100,6 +105,7 @@ const Table: TableComponent = ({
   ...props
 }) => {
   const theme = useTheme();
+  const methods = useForm();
 
   const defaultColumn = useMemo(
     () => ({
@@ -135,6 +141,7 @@ const Table: TableComponent = ({
     state: { pageIndex, globalFilter },
     canNextPage,
     canPreviousPage,
+    setPageSize,
   } = useTable(
     {
       columns,
@@ -182,6 +189,17 @@ const Table: TableComponent = ({
     []
   );
 
+  useEffect(() => {
+    const subscription = methods.watch((data) => {
+      if (data.limit) {
+        setPageSize(Number(data.limit.value));
+      }
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [methods, setPageSize]);
+
   const value = useMemo(
     () => ({
       getTableProps,
@@ -202,7 +220,6 @@ const Table: TableComponent = ({
       onDelete,
       canNextPage,
       canPreviousPage,
-      /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }),
     [
       getTableProps,
@@ -227,11 +244,12 @@ const Table: TableComponent = ({
   );
 
   return (
-    // @ts-ignore
     <TableContext.Provider value={value}>
-      <Grid container gap={1.5} flexDirection="column">
-        {children}
-      </Grid>
+      <FormProvider {...methods}>
+        <Grid container gap={1.5} flexDirection="column">
+          {children}
+        </Grid>
+      </FormProvider>
     </TableContext.Provider>
   );
 };
@@ -245,9 +263,28 @@ const TableGlobalActions: FC = () => {
         globalFilter={globalFilter}
         names={names}
       />
-      <Grid container item xs={7} justifyContent="flex-end">
-        <Grid item xs={3}>
+      <Grid
+        container
+        item
+        xs={7}
+        justifyContent="flex-end"
+        columnSpacing={1}
+        alignItems="center"
+      >
+        <Grid item xs={3} sx={{ height: "100%" }}>
           <RefreshAction onClick={onRefresh} />
+        </Grid>
+        <Grid item xs={3}>
+          <ControlledSelect
+            options={[
+              { value: "4", label: "4 entries" },
+              { value: "8", label: "8 entries" },
+              { value: "10", label: "10 entries" },
+              { value: "20", label: "20 entries" },
+            ]}
+            name={"limit"}
+            defaultValue={{ value: "8", label: "8 entries" }}
+          />
         </Grid>
       </Grid>
     </Grid>

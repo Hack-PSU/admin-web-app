@@ -101,16 +101,16 @@ const PaginationAction: FC<IPaginationActionProps> = ({
   );
 
   const onClickNext = useCallback(() => {
-    if (pageIndex + 1 < pageCount) {
+    if (canNextPage) {
       nextPage();
     }
-  }, [nextPage, pageIndex, pageCount]);
+  }, [canNextPage, nextPage]);
 
   const onClickPrev = useCallback(() => {
-    if (pageIndex > 0) {
+    if (canPreviousPage) {
       previousPage();
     }
-  }, [previousPage, pageIndex]);
+  }, [canPreviousPage, previousPage]);
 
   return (
     <Grid container item justifyContent="center" xs={5.5} alignItems="center">

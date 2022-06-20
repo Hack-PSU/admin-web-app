@@ -15,11 +15,11 @@ function CreatableSelect<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
->(props: CreatableSelectProps<TOption, TIsMulti, TGroup>) {
+>({ error, ...props }: CreatableSelectProps<TOption, TIsMulti, TGroup>) {
   const theme = useTheme();
   const customStyles: StylesConfig<TOption, TIsMulti, TGroup> = useMemo(
-    () => selectStyles(theme),
-    [theme]
+    () => selectStyles(theme, error),
+    [theme, error]
   );
 
   return (
@@ -48,7 +48,7 @@ export function LabelledCreatableSelect<
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
       <Box mt={0.6}>
-        <CreatableSelect {...props} />
+        <CreatableSelect error={!!error} {...props} />
       </Box>
     </>
   );
@@ -67,11 +67,18 @@ export function ControlledCreatableSelect<
 }: ControlledCreatableSelectProps<TOption, TIsMulti, TGroup>) {
   const {
     field: { onChange, onBlur, value },
+    fieldState: { error },
   } = useController({ name, rules, defaultValue });
 
   if (Component) {
     return (
-      <Component onChange={onChange} onBlur={onBlur} value={value} {...props} />
+      <Component
+        onChange={onChange}
+        onBlur={onBlur}
+        value={value}
+        error={error?.message ?? ""}
+        {...props}
+      />
     );
   }
 
@@ -80,6 +87,7 @@ export function ControlledCreatableSelect<
       onChange={onChange}
       onBlur={onBlur}
       value={value}
+      error={!!error?.message ?? undefined}
       {...props}
     />
   );

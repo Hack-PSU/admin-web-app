@@ -8,11 +8,9 @@ import { EventType, IGetAllEventsResponse } from "types/api";
 import { DateTime } from "luxon";
 import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { Button, EvaIcon, Input } from "components/base";
-import Link from "next/link";
+import { EvaIcon } from "components/base";
 import { useQuery } from "react-query";
 import { Cell } from "react-table";
-import dynamic from "next/dynamic";
 import { PaginatedTable } from "components/Table";
 import { GradientButton } from "components/base/Button";
 import { useRouter } from "next/router";
@@ -20,19 +18,6 @@ import { useRouter } from "next/router";
 interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
-
-// const PaginatedTable = dynamic<IPaginatedTableProps>(
-//   () => import("components/Table/PaginatedTable"),
-//   { ssr: false }
-// );
-
-const SearchAdornment: FC = () => (
-  <InputAdornment position={"start"}>
-    <Box mt={0.5}>
-      <EvaIcon name={"search-outline"} size="medium" fill="#1a1a1a" />
-    </Box>
-  </InputAdornment>
-);
 
 const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
   const theme = useTheme();
@@ -74,7 +59,6 @@ const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
 const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const router = useRouter();
-  const { register } = useForm();
 
   const { columns, names } = useColumnBuilder((builder) =>
     builder
@@ -175,7 +159,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
                 color: "common.white",
               },
             }}
-            onClick={() => router.push("/events/new")}
+            onClick={() => router.push("/events/steps")}
           >
             Add an Event
           </GradientButton>

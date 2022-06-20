@@ -1,29 +1,36 @@
 import React, { FC, useCallback } from "react";
-import { useFormContext } from "react-hook-form";
 import Image from "next/image";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
+import { useEventStore } from "common/store";
 
 interface IEventImageReviewProps {
-  name: string;
+  name: "eventImage" | "eventIcon";
 }
 
 const EventImageReview: FC<IEventImageReviewProps> = ({ name }) => {
-  const { getValues } = useFormContext();
+  const event = useEventStore();
 
   const getImageURL = useCallback(() => {
-    const image: File[] = getValues(name);
+    const image = event[name];
 
     if (image) {
-      return URL.createObjectURL(image[0]);
+      return URL.createObjectURL(image);
     }
     return "";
-  }, [getValues, name]);
+  }, [event, name]);
 
   return (
     <>
       <Grid item xs={12}>
         {getImageURL() ? (
-          <Image src={getImageURL()} alt={`event-image-${name}`} />
+          // required to enforce full width and height
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={getImageURL()}
+            alt={`event-image-${name}`}
+            width="100%"
+            height="100%"
+          />
         ) : null}
       </Grid>
     </>

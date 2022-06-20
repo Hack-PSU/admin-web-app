@@ -57,6 +57,7 @@ export interface ISelectItem<T = any> {
 export interface IOption {
   readonly label: string;
   readonly value: string;
+  readonly isNew?: boolean;
 }
 
 // export interface ISelectProps
@@ -95,7 +96,9 @@ export type CreatableSelectProps<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
-> = Omit<CreatableProps<TOption, TIsMulti, TGroup>, "styles">;
+> = Omit<CreatableProps<TOption, TIsMulti, TGroup>, "styles"> & {
+  error?: boolean;
+};
 
 export type LabelledCreatableSelectProps<
   TOption,
@@ -116,6 +119,7 @@ export type CreateOnlyInputProps = Omit<
   "onChange" | "onInputChange" | "onKeyDown" | "value"
 > & {
   onChange?: UseControllerReturn["field"]["onChange"];
+  initialValue?: IOption[];
 };
 
 export type LabelledCreateOnlyInputProps =

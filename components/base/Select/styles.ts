@@ -6,8 +6,9 @@ export const selectStyles: <
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
 >(
-  theme: Theme
-) => StylesConfig<TOption, TIsMulti, TGroup> = (theme) => ({
+  theme: Theme,
+  error?: boolean
+) => StylesConfig<TOption, TIsMulti, TGroup> = (theme, error) => ({
   placeholder: (provided) => ({
     ...provided,
     color: alpha(theme.palette.border.dark, 0.8),
@@ -18,9 +19,11 @@ export const selectStyles: <
   control: (provided, state) => ({
     ...provided,
     cursor: "text",
-    borderColor: state.isFocused
-      ? theme.palette.sunset.light
-      : theme.palette.border.light,
+    borderColor: !error
+      ? state.isFocused
+        ? theme.palette.sunset.light
+        : theme.palette.border.light
+      : theme.palette.error.main,
     borderWidth: 2,
     boxShadow: state.isFocused
       ? `0 0 0 0.125rem ${alpha(theme.palette.sunset.dark, 0.3)}`
@@ -31,6 +34,7 @@ export const selectStyles: <
     borderRadius: "15px",
     padding: theme.spacing(0.3, 1),
     transition: "border-color 100ms ease-in-out",
+    fontSize: "0.9rem",
   }),
   option: (provided, state) => ({
     ...provided,

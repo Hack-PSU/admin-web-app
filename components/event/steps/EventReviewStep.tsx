@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import { useStepper } from "components/base";
-import { useFormContext } from "react-hook-form";
 import { Grid, Typography } from "@mui/material";
 import {
   EventDetailsReview,
@@ -9,22 +8,16 @@ import {
 } from "components/event/review";
 import EventStep from "./EventStep";
 import { EventType } from "types/api";
+import { useEventStore } from "common/store";
 
 const EventReviewStep: FC = () => {
-  const { handleSubmit, getValues } = useFormContext();
   const { active, previousStep } = useStepper(5, "6. Review");
 
   const onSubmit = () => {
-    handleSubmit((data) => {
-      console.log(data);
-    })();
+    return null;
   };
 
-  const [eventType, eventImage, eventIcon] = getValues([
-    "type",
-    "eventImage",
-    "eventIcon",
-  ]);
+  const { eventType, eventImage, eventIcon } = useEventStore();
 
   return (
     <EventStep

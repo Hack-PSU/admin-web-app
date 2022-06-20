@@ -11,9 +11,14 @@ import { InputLabel } from "components/base";
 import { Box } from "@mui/material";
 import { useController } from "react-hook-form";
 
-const CreateOnlyInput: FC<CreateOnlyInputProps> = ({ onChange, ...props }) => {
+const CreateOnlyInput: FC<CreateOnlyInputProps> = ({
+  initialValue,
+  error,
+  onChange,
+  ...props
+}) => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [value, setValue] = useState<IOption[]>([]);
+  const [value, setValue] = useState<IOption[]>(initialValue ?? []);
 
   const createOption: (value: string) => IOption = useCallback((value) => {
     return {
@@ -52,6 +57,7 @@ const CreateOnlyInput: FC<CreateOnlyInputProps> = ({ onChange, ...props }) => {
 
   return (
     <CreatableSelect
+      error={error}
       isClearable
       isMulti
       onChange={handleChange}
@@ -93,14 +99,31 @@ export const ControlledCreateOnlyInput: FC<ControlledCreateOnlyInputProps> = ({
   ...props
 }) => {
   const {
-    field: { onChange, onBlur },
+    field: { onChange, onBlur, value },
+    fieldState: { error },
   } = useController({ name, rules, defaultValue });
 
   if (Component) {
-    return <Component onChange={onChange} onBlur={onBlur} {...props} />;
+    return (
+      <Component
+        onChange={onChange}
+        initialValue={value}
+        onBlur={onBlur}
+        error={error?.message}
+        {...props}
+      />
+    );
   }
 
-  return <CreateOnlyInput onChange={onChange} onBlur={onBlur} {...props} />;
+  return (
+    <CreateOnlyInput
+      onChange={onChange}
+      initialValue={value}
+      error={!!error?.message}
+      onBlur={onBlur}
+      {...props}
+    />
+  );
 };
 
 export default CreateOnlyInput;

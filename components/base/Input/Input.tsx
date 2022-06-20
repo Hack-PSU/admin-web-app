@@ -26,16 +26,22 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Input = forwardRef<any, IInputProps>(({ placeholder, ...props }, ref) => {
-  return (
-    <StyledInput
-      ref={ref}
-      aria-label={props["aria-label"] ?? "Generic Input"}
-      placeholder={placeholder}
-      {...props}
-    />
-  );
-});
+const Input = forwardRef<any, IInputProps>(
+  ({ placeholder, error, ...props }, ref) => {
+    return (
+      <StyledInput
+        {...props}
+        ref={ref}
+        aria-label={props["aria-label"] ?? "Generic Input"}
+        placeholder={placeholder}
+        sx={{
+          borderColor: error ? "error.main" : undefined,
+          ...props.sx,
+        }}
+      />
+    );
+  }
+);
 Input.displayName = "Input";
 
 export const LabelledInput: FC<LabelledInputProps> = ({
@@ -50,7 +56,7 @@ export const LabelledInput: FC<LabelledInputProps> = ({
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
       <Box mt={0.6}>
-        <Input placeholder={placeholder} {...props} />
+        <Input placeholder={placeholder} error={!!error} {...props} />
       </Box>
     </>
   );
@@ -66,6 +72,7 @@ export const ControlledInput: FC<ControlledInputProps> = ({
 }) => {
   const {
     field: { onChange, onBlur, value },
+    fieldState: { error },
   } = useController({ name, rules, defaultValue: defaultValue ?? "" });
 
   if (Component) {
@@ -75,6 +82,7 @@ export const ControlledInput: FC<ControlledInputProps> = ({
         onChange={onChange}
         onBlur={onBlur}
         value={value}
+        error={error?.message ?? ""}
         {...props}
       />
     );
@@ -86,6 +94,7 @@ export const ControlledInput: FC<ControlledInputProps> = ({
       onChange={onChange}
       onBlur={onBlur}
       value={value}
+      error={!!error?.message ?? undefined}
       {...props}
     />
   );

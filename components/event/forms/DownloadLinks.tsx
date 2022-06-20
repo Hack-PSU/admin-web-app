@@ -4,6 +4,7 @@ import {
   UseFieldArrayRemove,
   UseFieldArrayUpdate,
   useForm,
+  useFormContext,
 } from "react-hook-form";
 import {
   Box,
@@ -36,26 +37,11 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
   const { register, handleSubmit, watch } = useForm({ defaultValues: value });
   const theme = useTheme();
 
-  const [confirm, setConfirm] = useState<boolean>(false);
-
   const onClickSubmit = () => {
-    setConfirm(true);
     handleSubmit((data) => {
       update(index, data);
-    });
+    })();
   };
-
-  useEffect(() => {
-    const subscription = watch((data) => {
-      if (data.link !== value.link) {
-        setConfirm(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [value.link, watch]);
 
   return (
     <Grid
@@ -92,7 +78,7 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
               <EvaIcon
                 name={"checkmark"}
                 fill={
-                  confirm
+                  value.link !== ""
                     ? theme.palette.success.main
                     : theme.palette.common.black
                 }
@@ -115,7 +101,7 @@ const DownloadLinkInput: FC<IDownloadLinkInputProps> = ({
 
 const DownloadLinks: FC = () => {
   const { fields, append, update, remove } = useFieldArray({
-    name: "downloadLinks",
+    name: "wsUrls",
   });
   const theme = useTheme();
 

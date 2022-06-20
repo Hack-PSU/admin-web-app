@@ -5,51 +5,75 @@ import {
   DropzonePlaceholder,
   useStepper,
 } from "components/base";
-import { useFormContext } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { Grid } from "@mui/material";
 import EventDropzoneItem from "components/event/forms/EventDropzoneItem";
+import { useEventDispatch, useEventStore } from "common/store";
+import { EventType } from "types/api";
 
 const EventImageStep: FC = () => {
+  const { eventImage, eventType } = useEventStore();
+  const dispatch = useEventDispatch();
+
   const { nextStep, gotoStep, previousStep, active } = useStepper(
     3,
     "4. Event Image",
     { optional: true }
   );
-  const { watch } = useFormContext();
+  const methods = useForm({
+    defaultValues: {
+      eventImage: eventImage ? [eventImage] : [],
+    },
+  });
 
-  const eventImage: File[] = watch("eventImage", []);
+  const handleNext = () => {
+    methods.handleSubmit((data) => {
+      if (data.eventImage.length > 0) {
+        dispatch("UPDATE_IMAGE", {
+          eventImage: data.eventImage[0],
+        });
+        nextStep();
+      } else {
+        // mark current step as skipped
+        gotoStep(4, 3);
+      }
+    })();
+  };
 
-  const handleNext = useCallback(() => {
-    if (!eventImage) {
-      gotoStep(4, 3);
+  const handlePrevious = useCallback(() => {
+    if (eventType && eventType.value === EventType.WORKSHOP) {
+      previousStep();
     } else {
-      nextStep();
+      // skip workshop details (ie. previous step)
+      gotoStep(1, 2);
     }
-  }, [eventImage, gotoStep, nextStep]);
+  }, [eventType, previousStep, gotoStep]);
 
   return (
-    <EventStep
-      title={"Event Image"}
-      handleNext={handleNext}
-      active={active}
-      handlePrevious={previousStep}
-    >
-      <Grid item>
-        <ControlledDropzone
-          name={"eventImage"}
-          multiple={false}
-          maxFiles={1}
-          custom
-          replace
-        >
-          {eventImage && eventImage.length > 0 ? (
-            <EventDropzoneItem />
-          ) : (
-            <DropzonePlaceholder />
-          )}
-        </ControlledDropzone>
-      </Grid>
-    </EventStep>
+    <FormProvider {...methods}>
+      <EventStep
+        title={"Event Image"}
+        handleNext={handleNext}
+        active={active}
+        handlePrevious={handlePrevious}
+      >
+        <Grid item>
+          <ControlledDropzone
+            name={"eventImage"}
+            multiple={false}
+            maxFiles={1}
+            custom
+            replace
+          >
+            {methods.watch("eventImage", []).length > 0 ? (
+              <EventDropzoneItem name="eventImage" />
+            ) : (
+              <DropzonePlaceholder />
+            )}
+          </ControlledDropzone>
+        </Grid>
+      </EventStep>
+    </FormProvider>
   );
 };
 
