@@ -5,7 +5,7 @@ import { useEventStore } from "common/store";
 import { IOption } from "types/components";
 
 const joinMultiple = (values: IOption[], extract?: (value: any) => string) => {
-  if (!values) return "";
+  if (!values || values.length === 0) return "";
 
   let extractValue = (value: any) => value;
 
@@ -14,7 +14,7 @@ const joinMultiple = (values: IOption[], extract?: (value: any) => string) => {
   }
 
   if (values.length < 2) {
-    return values.join("");
+    return extractValue(values[0]);
   } else if (values.length === 2) {
     return `${extractValue(values[0])} and ${extractValue(values[1])}`;
   } else {
@@ -29,6 +29,8 @@ const joinMultiple = (values: IOption[], extract?: (value: any) => string) => {
 
 const WorkshopDetailsReview: FC = () => {
   const { wsPresenterNames, wsRelevantSkills, wsSkillLevel } = useEventStore();
+
+  console.log(wsPresenterNames);
 
   return (
     <>
