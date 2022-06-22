@@ -1,4 +1,4 @@
-export { default as Select, ControlledSelect, LabelledSelect } from "./Select";
+export { default as Select, LabelledSelect, ControlledSelect } from "./Select";
 export {
   default as CreatableSelect,
   LabelledCreatableSelect,

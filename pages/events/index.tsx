@@ -6,7 +6,14 @@ import { DefaultCell, TableCell } from "components/Table";
 import { getAllEvents } from "api/index";
 import { EventType, IGetAllEventsResponse } from "types/api";
 import { DateTime } from "luxon";
-import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { EvaIcon } from "components/base";
 import { useQuery } from "react-query";
@@ -107,6 +114,34 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
           );
         },
       })
+      .addColumn("Actions", {
+        id: "actions",
+        filterType: "hide",
+        type: "custom",
+        hideHeader: true,
+        disableSortBy: true,
+        width: 20,
+        accessor: "uid",
+        Cell: ({ cell, row }) => (
+          <TableCell {...cell.getCellProps()}>
+            <IconButton
+              sx={{
+                borderRadius: "5px",
+                width: "25px",
+                height: "25px",
+              }}
+              // @ts-ignore
+              onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
+            >
+              <EvaIcon
+                name={"edit-outline"}
+                fill={theme.palette.sunset.dark}
+                size="medium"
+              />
+            </IconButton>
+          </TableCell>
+        ),
+      })
   );
 
   const { request: getEvents } = useQueryResolver<IGetAllEventsResponse[]>(() =>
@@ -119,6 +154,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     select: (data) => {
       if (data) {
         return data.map((d) => ({
+          uid: d.uid,
           event_title: d.event_title,
           location_name: d.location_name,
           event_start_time: d.event_start_time,

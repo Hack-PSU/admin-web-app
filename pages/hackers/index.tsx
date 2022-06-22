@@ -82,7 +82,7 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
     <Grid container gap={1.5}>
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
-          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Hackers
           </Typography>
         </Grid>

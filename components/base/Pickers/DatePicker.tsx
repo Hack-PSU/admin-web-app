@@ -138,7 +138,9 @@ export const LabelledDatePicker: FC<LabelledDatePickerProps> = ({
   return (
     <>
       <InputLabel id={id} label={label} error={error} showError={showError} />
-      <DatePicker value={value} onChange={onChange} {...props} />
+      <Box mt={0.6}>
+        <DatePicker value={value} onChange={onChange} {...props} />
+      </Box>
     </>
   );
 };

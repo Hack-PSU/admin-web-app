@@ -434,13 +434,18 @@ const TableHeader: FC = () => {
             if (header.id === "selection") {
               return header.render("Header");
             } else {
+              console.log(header.id, header);
               return (
                 <TableCell
                   container
                   header
                   empty
                   alignItems="center"
-                  {...header.getHeaderProps(header.getSortByToggleProps())}
+                  {...header.getHeaderProps(
+                    !header.disableSortBy
+                      ? header.getSortByToggleProps()
+                      : undefined
+                  )}
                   textProps={{
                     sx: {
                       fontSize: theme.typography.pxToRem(15),
@@ -460,9 +465,11 @@ const TableHeader: FC = () => {
                       {header.render("Header")}
                     </DefaultCell>
                   </Grid>
-                  <Grid item>
-                    <SortColumn header={header} />
-                  </Grid>
+                  {!header.disableSortBy && (
+                    <Grid item>
+                      <SortColumn header={header} />
+                    </Grid>
+                  )}
                 </TableCell>
               );
             }
