@@ -124,9 +124,8 @@ export function useDateTime(name: string, methods: UseFormReturn): UseDateTime {
 }
 
 export function useDateTimeRange(
-  name: string
-  // startDateName: string,
-  // endDateName: string,
+  name: string,
+  options?: { isMultiple?: boolean }
 ): UseDateTimeRange {
   const {
     field: { onChange, value },
@@ -142,7 +141,9 @@ export function useDateTimeRange(
     DateTime.fromFormat("01:00 AM", "hh:mm a").toJSDate()
   );
 
-  const [isMultipleDays, setIsMultipleDays] = useState<boolean>(false);
+  const [isMultipleDays, setIsMultipleDays] = useState<boolean>(
+    options?.isMultiple ?? false
+  );
 
   const formatDate = useCallback((date: Date, time: Date) => {
     return DateTime.fromJSDate(date)
@@ -166,21 +167,6 @@ export function useDateTimeRange(
     const [start, end] = getValue();
     onChange({ start, end });
   }, [name, getValue, onChange]);
-
-  // useEffect(() => {
-  //   register(`${name}.start`);
-  //   register(`${name}.end`);
-  // }, [register, name]);
-  //
-  // useEffect(() => {
-  //   const startDateTime = getValue()[0];
-  //   setValue(`${name}.start`, startDateTime);
-  // }, [name, getValue, setValue, startDate, startTime]);
-  //
-  // useEffect(() => {
-  //   const endDateTime = getValue()[1];
-  //   setValue(`${name}.end`, endDateTime);
-  // }, [name, getValue, endDate, endTime, setValue]);
 
   const toggleMultiple = useCallback(() => {
     setIsMultipleDays((multiple) => !multiple);

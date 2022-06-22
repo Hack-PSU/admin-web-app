@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import SingleSelect, { GroupBase, StylesConfig } from "react-select";
-import { alpha, Box, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import {
   ControlledSelectProps,
   LabelledSelectProps,

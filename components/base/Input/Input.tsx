@@ -13,6 +13,7 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
   border: `2px solid ${theme.palette.border.light}`,
   borderRadius: "15px",
   color: theme.palette.common.black,
+  width: "100%",
   "&::placeholder": {
     color: alpha(theme.palette.border.dark, 0.8),
   },

@@ -136,7 +136,9 @@ export const LabelledTimePicker: FC<LabelledTimePickerProps> = ({
   return (
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
-      <TimePicker {...props} />
+      <Box mt={0.6}>
+        <TimePicker {...props} />
+      </Box>
     </>
   );
 };
