@@ -434,7 +434,6 @@ const TableHeader: FC = () => {
             if (header.id === "selection") {
               return header.render("Header");
             } else {
-              console.log(header.id, header);
               return (
                 <TableCell
                   container
