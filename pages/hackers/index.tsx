@@ -6,16 +6,14 @@ import {
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
-import { useColumnBuilder, useQueryResolver } from "common/hooks";
-import { getAllHackers } from "query";
-import { IGetAllHackersResponse } from "types/api";
+import { useColumnBuilder } from "common/hooks";
 import { Table } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
-import Link from "next/link";
 import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base/Button";
 import { useRouter } from "next/router";
+import { fetch, getAllHackers, IGetAllHackersResponse, QueryKeys } from "api";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
@@ -51,24 +49,28 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       })
   );
 
-  const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
-    () => getAllHackers()
-  );
+  // const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
+  //   () => getAllHackers()
+  // );
 
-  const { data: hackersData } = useQuery("hackers", () => getHackers(), {
-    select: (data) => {
-      if (data) {
-        return data.map((d) => ({
-          name: `${d.firstname} ${d.lastname}`,
-          pin: d.pin,
-          email: d.email,
-          university: d.university,
-        }));
-      }
-    },
-    keepPreviousData: true,
-    initialData: hackers,
-  });
+  const { data: hackersData } = useQuery(
+    QueryKeys.hacker.findAll(),
+    () => fetch(getAllHackers),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            name: `${d.firstname} ${d.lastname}`,
+            pin: d.pin,
+            email: d.email,
+            university: d.university,
+          }));
+        }
+      },
+      keepPreviousData: true,
+      initialData: hackers,
+    }
+  );
 
   const onRefresh = () => {
     return undefined;

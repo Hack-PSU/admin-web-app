@@ -1,26 +1,18 @@
 import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder, useQueryResolver } from "common/hooks";
+import { useColumnBuilder } from "common/hooks";
 import { DefaultCell, TableCell } from "components/Table";
-import { getAllEvents } from "api/index";
-import { EventType, IGetAllEventsResponse } from "types/api";
+import { EventType, IGetAllEventsResponse, getAllEvents, QueryKeys } from "api";
 import { DateTime } from "luxon";
-import {
-  Box,
-  Grid,
-  IconButton,
-  InputAdornment,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { EvaIcon } from "components/base";
 import { useQuery } from "react-query";
 import { Cell } from "react-table";
 import { PaginatedTable } from "components/Table";
 import { GradientButton } from "components/base/Button";
 import { useRouter } from "next/router";
+import { fetch } from "api/utils";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
@@ -144,27 +136,31 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       })
   );
 
-  const { request: getEvents } = useQueryResolver<IGetAllEventsResponse[]>(() =>
-    getAllEvents()
-  );
+  // const { request: getEvents } = useQueryResolver<IGetAllEventsResponse[]>(() =>
+  //   getAllEvents()
+  // );
 
-  const { data: eventsData } = useQuery("events", () => getEvents(), {
-    keepPreviousData: true,
-    initialData: events,
-    select: (data) => {
-      if (data) {
-        return data.map((d) => ({
-          uid: d.uid,
-          event_title: d.event_title,
-          location_name: d.location_name,
-          event_start_time: d.event_start_time,
-          event_end_time: d.event_end_time,
-          event_type: d.event_type,
-        }));
-      }
-      return [];
-    },
-  });
+  const { data: eventsData } = useQuery(
+    QueryKeys.event.findAll(),
+    () => fetch(getAllEvents),
+    {
+      keepPreviousData: true,
+      initialData: events,
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            uid: d.uid,
+            event_title: d.event_title,
+            location_name: d.location_name,
+            event_start_time: d.event_start_time,
+            event_end_time: d.event_end_time,
+            event_type: d.event_type,
+          }));
+        }
+        return [];
+      },
+    }
+  );
 
   const onRefresh = () => {
     return undefined;
@@ -216,11 +212,11 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
 };
 
 export const getServerSideProps = withServerSideProps(async () => {
-  const resp = await getAllEvents();
-  if (resp && resp.data) {
+  const events = await fetch(getAllEvents);
+  if (events) {
     return {
       props: {
-        events: resp.data.body.data,
+        events,
       },
     };
   }
