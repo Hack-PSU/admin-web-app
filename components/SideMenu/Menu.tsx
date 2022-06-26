@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { Drawer, Grid, List, styled, Typography } from "@mui/material";
-import MenuItem from "components/SideMenu/MenuItem";
+import MenuItem, { CollapsibleMenuItem } from "components/SideMenu/MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
 
@@ -56,10 +56,14 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           label={"Extra Credit"}
           to={"/extra-credit"}
         />
-        <MenuItem
-          icon={"shopping-cart-outline"}
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Manage Items", to: "/items/manage" },
+            { label: "Checkout", to: "/items/checkout" },
+          ]}
+          to={"/items"}
           label={"Item Checkout"}
-          to={"/checkout"}
+          icon={"shopping-cart-outline"}
         />
         <MenuItem
           icon={"bar-chart-2-outline"}

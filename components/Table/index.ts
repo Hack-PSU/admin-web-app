@@ -5,6 +5,7 @@ export { default as SimpleTable } from "./SimpleTable";
 export { default as TableCell, DefaultCell } from "./TableCell";
 export { default as TableRow } from "./TableRow";
 export { default as Table } from "./Table";
+export { default as EditRowCell } from "./EditRowCell";
 
 export const PaginatedTable = dynamic<ITableProps>(
   () => import("./PaginatedTable"),

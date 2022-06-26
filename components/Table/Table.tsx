@@ -450,7 +450,7 @@ const TableHeader: FC = () => {
                       fontSize: theme.typography.pxToRem(15),
                     },
                   }}
-                  columnSpacing={1.5}
+                  // columnSpacing={1.5}
                 >
                   <Grid item>
                     <DefaultCell
@@ -465,7 +465,7 @@ const TableHeader: FC = () => {
                     </DefaultCell>
                   </Grid>
                   {!header.disableSortBy && (
-                    <Grid item>
+                    <Grid item sx={{ ml: 1.5 }}>
                       <SortColumn header={header} />
                     </Grid>
                   )}

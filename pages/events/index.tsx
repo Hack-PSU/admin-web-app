@@ -2,7 +2,12 @@ import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
-import { DefaultCell, TableCell, PaginatedTable } from "components/Table";
+import {
+  DefaultCell,
+  TableCell,
+  PaginatedTable,
+  EditRowCell,
+} from "components/Table";
 import {
   EventType,
   IGetAllEventsResponse,
@@ -119,23 +124,30 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         width: 20,
         accessor: "uid",
         Cell: ({ cell, row }) => (
-          <TableCell {...cell.getCellProps()}>
-            <IconButton
-              sx={{
-                borderRadius: "5px",
-                width: "25px",
-                height: "25px",
-              }}
-              // @ts-ignore
-              onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
-            >
-              <EvaIcon
-                name={"edit-outline"}
-                fill={theme.palette.sunset.dark}
-                size="medium"
-              />
-            </IconButton>
-          </TableCell>
+          <EditRowCell
+            cell={cell}
+            // @ts-ignore
+            onClickEdit={() =>
+              router.push(`/events/${row?.original?.uid ?? ""}`)
+            }
+          />
+          // <TableCell {...cell.getCellProps()}>
+          //   <IconButton
+          //     sx={{
+          //       borderRadius: "5px",
+          //       width: "25px",
+          //       height: "25px",
+          //     }}
+          //     // @ts-ignore
+          //     onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
+          //   >
+          //     <EvaIcon
+          //       name={"edit-outline"}
+          //       fill={theme.palette.sunset.dark}
+          //       size="medium"
+          //     />
+          //   </IconButton>
+          // </TableCell>
         ),
       })
   );
