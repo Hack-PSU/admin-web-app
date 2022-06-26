@@ -1,6 +1,7 @@
 import api from "api/axios";
-import { AxiosResponse, Method } from "axios";
+import { AxiosError, AxiosResponse, Method } from "axios";
 import { ApiResponse } from "./types";
+import { GetServerSidePropsContext } from "next";
 
 type QueryReturn<TResponse> = AxiosResponse<ApiResponse<TResponse>>;
 
@@ -80,3 +81,20 @@ export async function fetch<TResponse>(
     return resp.data.body.data;
   }
 }
+
+export const resolveError = (
+  context: GetServerSidePropsContext,
+  error: any
+) => {
+  if (error instanceof AxiosError && error.response) {
+    if (error.response.status === 401) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/login?from=${context.resolvedUrl}`,
+          permanent: false,
+        },
+      };
+    }
+  }
+};

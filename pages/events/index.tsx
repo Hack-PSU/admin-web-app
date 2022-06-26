@@ -2,17 +2,21 @@ import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
-import { DefaultCell, TableCell } from "components/Table";
-import { EventType, IGetAllEventsResponse, getAllEvents, QueryKeys } from "api";
+import { DefaultCell, TableCell, PaginatedTable } from "components/Table";
+import {
+  EventType,
+  IGetAllEventsResponse,
+  getAllEvents,
+  QueryKeys,
+  fetch,
+  resolveError,
+} from "api";
 import { DateTime } from "luxon";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { EvaIcon } from "components/base";
+import { EvaIcon, GradientButton } from "components/base";
 import { useQuery } from "react-query";
 import { Cell } from "react-table";
-import { PaginatedTable } from "components/Table";
-import { GradientButton } from "components/base/Button";
 import { useRouter } from "next/router";
-import { fetch } from "api/utils";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
@@ -136,10 +140,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       })
   );
 
-  // const { request: getEvents } = useQueryResolver<IGetAllEventsResponse[]>(() =>
-  //   getAllEvents()
-  // );
-
   const { data: eventsData } = useQuery(
     QueryKeys.event.findAll(),
     () => fetch(getAllEvents),
@@ -211,14 +211,18 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(async () => {
-  const events = await fetch(getAllEvents);
-  if (events) {
-    return {
-      props: {
-        events,
-      },
-    };
+export const getServerSideProps = withServerSideProps(async (context) => {
+  try {
+    const events = await fetch(getAllEvents);
+    if (events) {
+      return {
+        props: {
+          events,
+        },
+      };
+    }
+  } catch (e: any) {
+    resolveError(context, e);
   }
   return {
     props: {

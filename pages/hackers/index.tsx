@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import React from "react";
 import {
-  resolveError,
   withProtectedRoute,
   withDefaultLayout,
   withServerSideProps,
@@ -13,7 +12,13 @@ import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base/Button";
 import { useRouter } from "next/router";
-import { fetch, getAllHackers, IGetAllHackersResponse, QueryKeys } from "api";
+import {
+  fetch,
+  getAllHackers,
+  IGetAllHackersResponse,
+  QueryKeys,
+  resolveError,
+} from "api";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
@@ -140,11 +145,11 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
 export const getServerSideProps = withServerSideProps(async (context) => {
   try {
-    const resp = await getAllHackers();
-    if (resp && resp.data) {
+    const hackers = await fetch(getAllHackers);
+    if (hackers) {
       return {
         props: {
-          hackers: resp.data.body.data,
+          hackers,
         },
       };
     }
