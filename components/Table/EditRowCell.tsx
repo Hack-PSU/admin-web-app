@@ -4,12 +4,15 @@ import { EvaIcon } from "components/base";
 import { TableCell } from "components/Table/index";
 import { Cell } from "react-table";
 
-interface IEditRowCellProps {
-  cell: Cell;
+interface IEditRowCellProps<T extends object> {
+  cell: Cell<T>;
   onClickEdit(): void;
 }
 
-const EditRowCell: FC<IEditRowCellProps> = ({ cell, onClickEdit }) => {
+function EditRowCell<T extends object>({
+  cell,
+  onClickEdit,
+}: IEditRowCellProps<T>) {
   const theme = useTheme();
 
   return (
@@ -30,6 +33,6 @@ const EditRowCell: FC<IEditRowCellProps> = ({ cell, onClickEdit }) => {
       </IconButton>
     </TableCell>
   );
-};
+}
 
 export default EditRowCell;

@@ -207,11 +207,12 @@ export function useDateTimeRange(
 const _builder: TableColumnBuilderConfig = <T extends object>(
   state: ColumnState<T>
 ) => ({
-  addColumn(name: string, options: ColumnOptions): TableColumnBuilder<T> {
+  addColumn(name: string, options: ColumnOptions<T>): TableColumnBuilder<T> {
     const id = nanoid(10);
     const { hideHeader, type, filterType, ...rest } = options;
 
-    let configOptions: AddConfigOptions = {
+    // @ts-ignore
+    let configOptions: AddConfigOptions<T> = {
       id,
       name,
       defaultCanFilter: false,
@@ -226,6 +227,7 @@ const _builder: TableColumnBuilderConfig = <T extends object>(
       };
     }
 
+    // @ts-ignore
     return _addColumn(state, {
       ...configOptions,
       ...rest,
@@ -252,7 +254,7 @@ const _addColumn: AddColumnConfig = (state, options) => {
   );
 };
 
-const getFilterByType = (type: ColumnOptions["filterType"]) => {
+const getFilterByType = (type: ColumnOptions<object>["filterType"]) => {
   switch (type) {
     case "checkbox":
       return {
@@ -287,7 +289,7 @@ export function useColumnBuilder<T extends object>(
   return useMemo(
     () =>
       (
-        builder(_builder({ columns: [], names: [] })) as ColumnBuilder<T>
+        builder(_builder<T>({ columns: [], names: [] })) as ColumnBuilder<T>
       ).save(),
     /* eslint-disable-next-line react-hooks/exhaustive-deps */ // should not rerender
     []

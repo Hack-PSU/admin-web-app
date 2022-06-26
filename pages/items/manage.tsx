@@ -39,34 +39,36 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     }
   );
 
-  const { columns, names } = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder<{
+    uid: string;
+    name: string;
+    quantity: string;
+  }>((builder) =>
     builder
       .addColumn("Name", {
         id: "name",
-        accessor: "name",
+        accessor: (row) => row.name,
         type: "text",
-        minWidth: 200,
+        minWidth: 150,
       })
       .addColumn("Quantity", {
         id: "quantity",
         // maxWidth: 100,
         // minWidth: 80,
-        accessor: "quantity",
+        accessor: (row) => row.quantity,
         type: "text",
       })
       .addColumn("Actions", {
         id: "actions",
         type: "custom",
         width: 5,
+        maxWidth: 15,
         disableSortBy: true,
         hideHeader: true,
         Cell: ({ cell, row }) => (
           <EditRowCell
             cell={cell}
-            // @ts-ignore
-            onClickEdit={() =>
-              router.push(`/items/manage/${row?.original?.uid}`)
-            }
+            onClickEdit={() => router.push(`/items/manage/${row.original.uid}`)}
           />
         ),
       })

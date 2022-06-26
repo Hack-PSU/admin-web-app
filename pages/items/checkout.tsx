@@ -41,21 +41,26 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
     }
   );
 
-  const { columns, names } = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder<{
+    uid: string;
+    userName: string;
+    itemName: string;
+    quantity: number;
+  }>((builder) =>
     builder
       .addColumn("User Name", {
         id: "userName",
-        accessor: "userName",
+        accessor: (row) => row.userName,
         type: "text",
       })
       .addColumn("Item Name", {
         id: "itemName",
-        accessor: "itemName",
+        accessor: (row) => row.itemName,
         type: "text",
       })
       .addColumn("Quantity", {
         id: "quantity",
-        accessor: "quantity",
+        accessor: (row) => row.quantity,
         type: "text",
       })
       .addColumn("Actions", {
@@ -66,9 +71,8 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
         Cell: ({ cell, row }) => (
           <EditRowCell
             cell={cell}
-            // @ts-ignore
             onClickEdit={() =>
-              router.push(`/items/checkout/${row?.original?.uid}`)
+              router.push(`/items/checkout/${row.original.uid}`)
             }
           />
         ),
@@ -88,7 +92,7 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
       <Grid container item justifyContent="space-between" alignItems="center">
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ fontWeight: 800 }}>
-            Events
+            Checkout Items
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -106,7 +110,7 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
             }}
             onClick={() => router.push("/events/steps")}
           >
-            Add an Event
+            Add Checkout
           </GradientButton>
         </Grid>
       </Grid>

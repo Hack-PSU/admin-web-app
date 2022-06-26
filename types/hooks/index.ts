@@ -51,7 +51,10 @@ export type UseDateTimeRange = {
 
 type ColumnDataType = "text" | "date" | "custom";
 
-export type ColumnOptions = Omit<ColumnWithLooseAccessor, "columns"> & {
+export type ColumnOptions<T extends object> = Omit<
+  ColumnWithLooseAccessor<T>,
+  "columns"
+> & {
   type: ColumnDataType;
   filterType?: "checkbox" | "input" | "date" | "time" | "hide";
   hideHeader?: boolean;
@@ -69,7 +72,7 @@ export type ColumnState<T extends object> = {
 };
 
 export type TableColumnBuilder<T extends object> = {
-  addColumn(name: string, options?: ColumnOptions): TableColumnBuilder<T>;
+  addColumn(name: string, options?: ColumnOptions<T>): TableColumnBuilder<T>;
 };
 
 export type ColumnBuilder<T extends object> = TableColumnBuilder<T> & {
@@ -81,7 +84,7 @@ export type BuilderCallback<
   TBuilder = TableColumnBuilder<T>
 > = (builder: TBuilder) => TBuilder;
 
-export type AddConfigOptions = ColumnWithLooseAccessor & {
+export type AddConfigOptions<T extends object> = ColumnWithLooseAccessor<T> & {
   name: string;
   type: ColumnDataType;
   // filterOption: FilterOptions;
@@ -92,7 +95,7 @@ export type TableColumnBuilderConfig = <T extends object>(
 ) => ColumnBuilder<T>;
 export type AddColumnConfig = <T extends object>(
   state: ColumnState<T>,
-  options: AddConfigOptions
+  options: AddConfigOptions<T>
 ) => TableColumnBuilder<T>;
 
 export type UseColumnBuilderReturn<T extends object> = {

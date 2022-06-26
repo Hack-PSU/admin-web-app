@@ -45,7 +45,7 @@ import SortColumn from "components/Table/actions/SortColumn";
 import { useForm, FormProvider } from "react-hook-form";
 import { ControlledSelect } from "components/base";
 
-export interface ITableProps extends TableProps<object> {
+export interface ITableProps<T extends object> extends TableProps<T> {
   limit: number;
   names: NamesState[];
   onRefresh(): void;
@@ -75,7 +75,7 @@ type TableContextHooks = Pick<
     headerMap: ITableActionProps["headers"];
   };
 
-type TableComponent = FC<WithChildren<ITableProps>> & {
+type TableComponent = FC<WithChildren<ITableProps<any>>> & {
   GlobalActions: FC;
   Container: FC<Required<WithChildren>>;
   Actions: FC<Required<WithChildren>>;
