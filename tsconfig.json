@@ -22,7 +22,7 @@
       "styles": ["./styles"],
       "common/*": ["./common/*"],
       "api/*": ["./common/api/*"],
-      "query": ["./common/api"],
+      "api": ["./common/api"],
       "assets/*": ["./assets/*"]
     }
   },

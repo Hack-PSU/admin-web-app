@@ -36,23 +36,6 @@ export function withDefaultLayout<TProps>(page: NextPageLayout<TProps>) {
   return page;
 }
 
-export const resolveError = (
-  context: GetServerSidePropsContext,
-  error: any
-) => {
-  if (error instanceof AxiosError && error.response) {
-    if (error.response.status === 401) {
-      return {
-        props: {},
-        redirect: {
-          destination: `/login?from=${context.resolvedUrl}`,
-          permanent: false,
-        },
-      };
-    }
-  }
-};
-
 export function withServerSideProps<TProps>(
   getServerSideProps?: (
     context: GetServerSidePropsContext,

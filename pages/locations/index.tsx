@@ -1,18 +1,13 @@
 import { NextPage } from "next";
-import {
-  resolveError,
-  withDefaultLayout,
-  withServerSideProps,
-} from "common/HOCs";
+import React, { useState } from "react";
+import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { GradientButton } from "components/base/Button";
-import { getAllLocations } from "api/index";
-import { ILocationEntity } from "types/api";
-import { useColumnBuilder, useQueryResolver } from "common/hooks";
+import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
+import { useColumnBuilder } from "common/hooks";
 import { useQuery } from "react-query";
 import { Table, TableCell } from "components/Table";
 import { ControlledInput, EvaIcon } from "components/base";
-import React, { useState } from "react";
 import { useRouter } from "next/router";
 
 interface ILocationsPageProps {
@@ -23,12 +18,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { request: getLocations } = useQueryResolver<ILocationEntity[]>(() =>
-    getAllLocations()
-  );
   const { data: locationsData } = useQuery(
     ["locations"],
-    () => getLocations(),
+    () => fetch(getAllLocations),
     {
       keepPreviousData: true,
       initialData: locations,
@@ -164,28 +156,24 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(
-  async (context, token) => {
-    try {
-      const resp = await getAllLocations();
-      if (resp) {
-        if (resp.data.body.data) {
-          return {
-            props: {
-              locations: resp.data.body.data,
-            },
-          };
-        }
-      }
-    } catch (e) {
-      resolveError(context, e);
+export const getServerSideProps = withServerSideProps(async (context) => {
+  try {
+    const locations = await fetch(getAllLocations);
+    if (locations) {
+      return {
+        props: {
+          locations,
+        },
+      };
     }
-    return {
-      props: {
-        locations: [],
-      },
-    };
+  } catch (e) {
+    resolveError(context, e);
   }
-);
+  return {
+    props: {
+      locations: [],
+    },
+  };
+});
 
 export default withDefaultLayout(LocationsPage);

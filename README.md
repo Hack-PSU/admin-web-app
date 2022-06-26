@@ -51,24 +51,65 @@ API, we also `axios`, which is a promise-based HTTP client. Built into the axios
 way to inject the authentication tokens and refresh them when needed. Therefore, it is not
 required to the API token manually.
 
-All endpoint requests can be found in `common/api/index.ts`. Each endpoint is provides a link to the
-API documentation for reference.
+All endpoint requests are grouped together depending on entity types. This enforces colocation of code
+and the essential pieces for each endpoint. All endpoints however, can be
+imported from `common/api/index.ts`.
 
 - [React Query](https://react-query.tanstack.com/overview)
 - [Axios](https://axios-http.com/docs/intro)
+- [Best Practices](https://tkdodo.eu/blog/practical-react-query)
 
-### useQueryResolver
+### Query Keys
 
-The `useQueryResolver` is a hook that helps resolve types before passing them
-into the useQuery hook or useMutation hook for `react-query`. This helps with some features of `react-query`
-to resolve any potential TypeScript errors.
+`QueryKeys` are essential pieces of how `react-query` works. We follow some
+of the best practices mentioned [here](https://tkdodo.eu/blog/leveraging-the-query-function-context)
+to keep track of different iterations of data fetching and makes it easier to invalidate the local cache and
+trigger reliable background refetches. Each endpoint has a file called `queries.ts` that returns a `QueryFactory`
+and is formatted a single element tuple with an object.
+
+### Type Resolution
+
+When using the `select` function in `react-query` it can be hard to enforce TypeScript types when the API
+returns an overly-wrapped HTTP response. Since the actual response is nested inside layers of JSON objects,
+we can use the `fetch` function exported from `common/api/utils.ts` to resolve types from each endpoint.
+
+For example, we use the `getAllEvents` endpoint:
 
 ```ts
-const { request } = useQueryResolver<TResponse>(() => apiCall());
+import { getAllEvents, fetch } from "api";
+
+// no params passed in
+const events = fetch(getAllEvents);
+
+// with params (must use for passing entity)
+const events = fetch(() => getAllEvents(params, token));
 ```
 
-`TResponse` is the type generic that can help resolve the return type of the API call.
-The `request` variable can then be passed into the `queryFn` from `react-query`.
+The `fetch` function returns the final result from the endpoint and makes it easier for TypeScript to infer types
+automatically without passing in specific entity types.
+
+### Authorization
+
+Most endpoints require an `idtoken` to be passed into the header in order to authorize API requests and manage
+permission access. We use `axios` interceptors to manage token refreshes and injecting tokens into requests.
+
+Users can be re-authenticated when the client app is rendered since the `FirebaseProvider` can handle redirection to
+the login page when users need to re-authenticate. However, this is not the case for server-side functions such as
+the `getServerSideProps` function from NextJS. This can be resolved by using the `resolveError` function when a token is
+unable to be injected into the request.
+
+```ts
+import { resolveError } from "api";
+import { withServerSideProps } from "common/HOCs";
+
+export const getServerSideProps = withServerSideProps(async (context) => {
+  try {
+    // perform an API call
+  } catch (error: any) {
+    resolveError(context, error);
+  }
+});
+```
 
 ## Creating a new page
 
@@ -98,7 +139,9 @@ The `withServerSideProps` function accepts an optional callback to prefetch data
 it into the page props.
 
 ```ts
-export const getServerSideProps = withServerSideProps((context, token) => {});
+export const getServerSideProps = withServerSideProps(
+  async (context, token) => {}
+);
 ```
 
 A page can also be guarded by requiring a specific minimum permission. This can be useful
@@ -193,13 +236,11 @@ return (
       <Table.Actions>
         <Table.ActionsLeft>
           <Table.Filter />
-          <Table.Sort />
         </Table.ActionsLeft>
         <Table.ActionsCenter>
           <Table.Pagination />
         </Table.ActionsCenter>
         <Table.ActionsRight>
-          <Table.Refresh />
           <Table.Delete />
         </Table.ActionsRight>
       </Table.Actions>
@@ -214,7 +255,7 @@ return (
 2. `Table.Container`
 3. `Table.Actions` -- required if rendering actions
 4. `Table.ActionsLeft`, `Table.ActionsCenter`, and `Table.ActionsLeft` are required for positioning the actions
-5. `Table.Filter`, `Table.Sort`, `Table.Pagination`, `Table.Refresh`, and `Table.Delete` are optional and if left out, with its respective containers in place, it will maintain the correct positioning.
+5. `Table.Filter`, `Table.Pagination`, and `Table.Delete` are optional and if left out, with its respective containers in place, it will maintain the correct positioning.
 6. `Table.Header` and `Table.Body` will render the necessary content
 
 The second method is recommended to render a custom table with some features left out, but keeping the same styling.
