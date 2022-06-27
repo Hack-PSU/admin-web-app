@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
@@ -9,6 +9,7 @@ import { ActionRowCell, Table, TableCell } from "components/Table";
 import { ControlledInput, GradientButton } from "components/base";
 import { useRouter } from "next/router";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import InputCell from "components/Table/InputCell";
 
 interface ILocationsPageProps {
   locations: ILocationEntity[];
@@ -17,7 +18,6 @@ interface ILocationsPageProps {
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const router = useRouter();
   const theme = useTheme();
-  const methods = useForm();
 
   const { data: locationsData } = useQuery(
     ["locations"],
@@ -36,6 +36,28 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
+  const defaultValues = useMemo(() => {
+    if (locationsData) {
+      return locationsData.reduce((obj, curr) => {
+        obj[curr.uid] = curr.name;
+        return obj;
+      }, {} as { [p: string]: string });
+    }
+    return {};
+  }, [locationsData]);
+
+  const methods = useForm({
+    defaultValues,
+  });
+
+  useEffect(() => {
+    if (defaultValues) {
+      methods.reset({ ...defaultValues });
+    }
+  }, [defaultValues, methods]);
+
+  console.log(defaultValues);
+
   const { columns, names } = useColumnBuilder<{ uid: string; name: string }>(
     (builder) =>
       builder
@@ -44,26 +66,13 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           type: "text",
           accessor: (row) => row.name,
           Header: () => <Box ml={1.8}>Name</Box>,
-          Cell: ({ cell, row }) => {
-            const [isHovering, setIsHovering] = useState<boolean>(false);
-            return (
-              <TableCell
-                empty
-                {...cell.getCellProps()}
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                <ControlledInput
-                  name={`${row.original.uid}.name`}
-                  placeholder={"Enter location name"}
-                  sx={{
-                    border: isHovering ? undefined : "transparent",
-                    transition: "border 200ms ease-in-out",
-                  }}
-                />
-              </TableCell>
-            );
-          },
+          Cell: ({ cell, row }) => (
+            <InputCell
+              cell={cell}
+              name={`${row.original.uid}`}
+              placeholder={"Enter a location"}
+            />
+          ),
         })
         .addColumn("Actions", {
           id: "actions",
@@ -79,7 +88,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
                 cell={cell}
                 icon="refresh-outline"
                 onClickAction={() => {
-                  resetField(`${row.original.uid}.name`);
+                  resetField(`${row.original.uid}`);
                 }}
               />
             );
