@@ -29,7 +29,7 @@ import {
   lighten,
   useTheme,
 } from "@mui/material";
-import { TableProps } from "types/components";
+import { IOption, TableProps } from "types/components";
 import { NamesState } from "types/hooks";
 import { ITableActionProps } from "components/Table/actions/types";
 import GlobalActions from "components/Table/GlobalActions";
@@ -43,7 +43,8 @@ import {
 } from "components/Table/actions";
 import SortColumn from "components/Table/actions/SortColumn";
 import { useForm, FormProvider } from "react-hook-form";
-import { ControlledSelect } from "components/base";
+import { Select } from "components/base";
+import { ActionMeta, SingleValue } from "react-select";
 
 export interface ITableProps<T extends object> extends TableProps<T> {
   limit: number;
@@ -65,6 +66,7 @@ type TableContextHooks = Pick<
     | "pageCount"
     | "canPreviousPage"
     | "canNextPage"
+    | "setPageSize"
   > &
   Pick<UseGlobalFiltersState<object>, "globalFilter"> &
   Pick<TableState, "pageIndex"> &
@@ -189,17 +191,6 @@ const Table: TableComponent = ({
     []
   );
 
-  useEffect(() => {
-    const subscription = methods.watch((data) => {
-      if (data.limit) {
-        setPageSize(Number(data.limit.value));
-      }
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [methods, setPageSize]);
-
   const value = useMemo(
     () => ({
       getTableProps,
@@ -220,6 +211,7 @@ const Table: TableComponent = ({
       onDelete,
       canNextPage,
       canPreviousPage,
+      setPageSize,
     }),
     [
       getTableProps,
@@ -240,22 +232,32 @@ const Table: TableComponent = ({
       onDelete,
       canNextPage,
       canPreviousPage,
+      setPageSize,
     ]
   );
 
   return (
     <TableContext.Provider value={value}>
-      <FormProvider {...methods}>
-        <Grid container gap={1.5} flexDirection="column">
-          {children}
-        </Grid>
-      </FormProvider>
+      <Grid container gap={1.5} flexDirection="column">
+        {children}
+      </Grid>
     </TableContext.Provider>
   );
 };
 
 const TableGlobalActions: FC = () => {
-  const { setGlobalFilter, globalFilter, names, onRefresh } = useTableContext();
+  const { setGlobalFilter, globalFilter, names, onRefresh, setPageSize } =
+    useTableContext();
+
+  const onChangePageSize = (
+    newValue: SingleValue<IOption>,
+    action: ActionMeta<IOption>
+  ) => {
+    if (newValue) {
+      setPageSize(Number(newValue.value));
+    }
+  };
+
   return (
     <Grid container item justifyContent="space-between">
       <GlobalActions
@@ -275,7 +277,7 @@ const TableGlobalActions: FC = () => {
           <RefreshAction onClick={onRefresh} />
         </Grid>
         <Grid item xs={3}>
-          <ControlledSelect
+          <Select
             options={[
               { value: "4", label: "4 entries" },
               { value: "8", label: "8 entries" },
@@ -284,6 +286,7 @@ const TableGlobalActions: FC = () => {
             ]}
             name={"limit"}
             defaultValue={{ value: "8", label: "8 entries" }}
+            onChange={onChangePageSize}
           />
         </Grid>
       </Grid>

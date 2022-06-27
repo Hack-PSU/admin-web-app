@@ -6,8 +6,8 @@ import { GradientButton } from "components/base/Button";
 import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
 import { useColumnBuilder } from "common/hooks";
 import { useQuery } from "react-query";
-import { Table, TableCell } from "components/Table";
-import { ControlledInput, EvaIcon } from "components/base";
+import { ActionRowCell, Table, TableCell } from "components/Table";
+import { ControlledInput } from "components/base";
 import { useRouter } from "next/router";
 
 interface ILocationsPageProps {
@@ -15,7 +15,6 @@ interface ILocationsPageProps {
 }
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
-  const theme = useTheme();
   const router = useRouter();
 
   const { data: locationsData } = useQuery(
@@ -35,61 +34,49 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
-  const { columns, names } = useColumnBuilder((builder) =>
-    builder
-      .addColumn("Name", {
-        id: "name",
-        type: "text",
-        accessor: "name",
-        Header: () => <Box ml={1.8}>Name</Box>,
-        Cell: ({ cell, row }) => {
-          const [isHovering, setIsHovering] = useState<boolean>(false);
-          return (
-            <TableCell
-              empty
-              {...cell.getCellProps()}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              <ControlledInput
-                // @ts-ignore
-                name={`${row.original.uid}.name`}
-                placeholder={"Enter location name"}
-                sx={{
-                  border: isHovering ? undefined : "transparent",
-                  transition: "border 200ms ease-in-out",
-                }}
-              />
-            </TableCell>
-          );
-        },
-      })
-      .addColumn("Actions", {
-        id: "actions",
-        type: "custom",
-        hideHeader: true,
-        disableSortBy: true,
-        maxWidth: 5,
-        Cell: ({ cell, row }) => (
-          <TableCell empty {...cell.getCellProps()}>
-            <IconButton
-              sx={{
-                borderRadius: "5px",
-                width: "25px",
-                height: "25px",
-              }}
-              // @ts-ignore
-              onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
-            >
-              <EvaIcon
-                name={"edit-outline"}
-                fill={theme.palette.sunset.dark}
-                size="medium"
-              />
-            </IconButton>
-          </TableCell>
-        ),
-      })
+  const { columns, names } = useColumnBuilder<{ uid: string; name: string }>(
+    (builder) =>
+      builder
+        .addColumn("Name", {
+          id: "name",
+          type: "text",
+          accessor: (row) => row.name,
+          Header: () => <Box ml={1.8}>Name</Box>,
+          Cell: ({ cell, row }) => {
+            const [isHovering, setIsHovering] = useState<boolean>(false);
+            return (
+              <TableCell
+                empty
+                {...cell.getCellProps()}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                <ControlledInput
+                  name={`${row.original.uid}.name`}
+                  placeholder={"Enter location name"}
+                  sx={{
+                    border: isHovering ? undefined : "transparent",
+                    transition: "border 200ms ease-in-out",
+                  }}
+                />
+              </TableCell>
+            );
+          },
+        })
+        .addColumn("Actions", {
+          id: "actions",
+          type: "custom",
+          hideHeader: true,
+          disableSortBy: true,
+          maxWidth: 5,
+          Cell: ({ cell, row }) => (
+            <ActionRowCell
+              cell={cell}
+              icon="edit-outline"
+              onClickAction={() => router.push(`locations/${row.original.uid}`)}
+            />
+          ),
+        })
   );
 
   const onRefresh = () => {

@@ -4,15 +4,17 @@ import { EvaIcon } from "components/base";
 import { TableCell } from "components/Table/index";
 import { Cell } from "react-table";
 
-interface IEditRowCellProps<T extends object> {
+interface IActionRowCellProps<T extends object> {
   cell: Cell<T>;
-  onClickEdit(): void;
+  icon: string;
+  onClickAction(): void;
 }
 
-function EditRowCell<T extends object>({
+function ActionRowCell<T extends object>({
   cell,
-  onClickEdit,
-}: IEditRowCellProps<T>) {
+  onClickAction,
+  icon,
+}: IActionRowCellProps<T>) {
   const theme = useTheme();
 
   return (
@@ -23,16 +25,12 @@ function EditRowCell<T extends object>({
           width: "25px",
           height: "25px",
         }}
-        onClick={onClickEdit}
+        onClick={onClickAction}
       >
-        <EvaIcon
-          name={"edit-outline"}
-          fill={theme.palette.sunset.dark}
-          size="medium"
-        />
+        <EvaIcon name={icon} fill={theme.palette.sunset.dark} size="medium" />
       </IconButton>
     </TableCell>
   );
 }
 
-export default EditRowCell;
+export default ActionRowCell;

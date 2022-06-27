@@ -6,7 +6,7 @@ import {
   DefaultCell,
   TableCell,
   PaginatedTable,
-  EditRowCell,
+  ActionRowCell,
 } from "components/Table";
 import {
   EventType,
@@ -134,9 +134,10 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         width: 20,
         accessor: (row) => row.uid,
         Cell: ({ cell, row }) => (
-          <EditRowCell
+          <ActionRowCell
             cell={cell}
-            onClickEdit={() => router.push(`/events/${row.original.uid}`)}
+            icon={"edit-outline"}
+            onClickAction={() => router.push(`/events/${row.original.uid}`)}
           />
         ),
       })

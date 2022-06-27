@@ -291,8 +291,7 @@ export function useColumnBuilder<T extends object>(
       (
         builder(_builder<T>({ columns: [], names: [] })) as ColumnBuilder<T>
       ).save(),
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */ // should not rerender
-    []
+    [builder]
   );
 }
 
