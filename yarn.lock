@@ -1726,6 +1726,7 @@ __metadata:
     framer-motion: ^6.3.11
     husky: ">=6"
     immer: ^9.0.14
+    is-email: ^1.0.2
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
     lottie-react: ^2.2.1
@@ -3464,6 +3465,13 @@ __metadata:
   dependencies:
     has-tostringtag: ^1.0.0
   checksum: baa9077cdf15eb7b58c79398604ca57379b2fc4cf9aa7a9b9e295278648f628c9b201400c01c5e0f7afae56507d741185730307cbe7cad3b9f90a77e5ee342fc
+  languageName: node
+  linkType: hard
+
+"is-email@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "is-email@npm:1.0.2"
+  checksum: 6aae2cd492b8d0f6cf0d386122c72c6a37e270b9f89abd610166048e1dad99786bb4ef7c90175cb3e11bba6df235b6b13911fcdeaec6d36dc0dadf0b679a3c03
   languageName: node
   linkType: hard
 

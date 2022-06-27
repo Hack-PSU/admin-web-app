@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, Typography } from "@mui/material";
-import { ControlledInput, GradientButton, Input } from "components/base";
+import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
 import {
@@ -15,11 +15,35 @@ import { useQuery } from "react-query";
 import { ActionRowCell, Table, TableCell } from "components/Table";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import InputCell from "components/Table/InputCell";
-import ModalProvider from "components/context/ModalProvider";
+import { ModalProvider, useModalContext } from "components/context";
+import AddNewItemModal from "components/modal/AddNewItemModal";
 
 interface IManageItemsProps {
   items: ICheckoutItemEntity[];
 }
+
+const AddNewItemButton: FC = () => {
+  const { showModal } = useModalContext();
+
+  return (
+    <GradientButton
+      variant="text"
+      sx={(theme) => ({
+        width: "100%",
+        padding: theme.spacing(1, 3.5),
+      })}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addNewItem")}
+    >
+      Add an Item
+    </GradientButton>
+  );
+};
 
 const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
   const router = useRouter();
@@ -108,18 +132,7 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
         disableSortBy: true,
         hideHeader: true,
         Cell: ({ cell, row }) => {
-          const {
-            formState: { dirtyFields },
-            resetField,
-          } = useFormContext();
-
-          if (!dirtyFields[row.original.uid]) {
-            return (
-              <TableCell {...cell.getCellProps()} empty>
-                <Box />
-              </TableCell>
-            );
-          }
+          const { resetField } = useFormContext();
 
           return (
             <ActionRowCell
@@ -145,6 +158,7 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
 
   return (
     <ModalProvider>
+      <AddNewItemModal />
       <Grid container gap={1.5}>
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={10}>
@@ -153,25 +167,10 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <GradientButton
-              variant="text"
-              sx={(theme) => ({
-                width: "100%",
-                padding: theme.spacing(1, 3.5),
-              })}
-              textProps={{
-                sx: {
-                  lineHeight: "1.8rem",
-                  color: "common.white",
-                },
-              }}
-              onClick={() => router.push("/items/manage/new")}
-            >
-              Add an Item
-            </GradientButton>
+            <AddNewItemButton />
           </Grid>
         </Grid>
-        <Grid item>
+        <Grid item sx={{ width: "100%" }}>
           <Table
             limit={8}
             names={names}

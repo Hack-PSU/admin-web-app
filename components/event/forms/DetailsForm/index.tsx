@@ -7,9 +7,9 @@ import {
   LabelledDropzone,
 } from "components/base";
 import LabelledEventInput from "../LabelledEventInput";
-import { alpha, Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import LabelledEventSelect from "../LabelledEventSelect";
-import { EventType } from "types/api";
+import { EventType } from "api";
 import DateTimeForm from "./DateTimeForm";
 import { useFormContext } from "react-hook-form";
 import produce from "immer";

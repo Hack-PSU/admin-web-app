@@ -1,3 +1,4 @@
+import React, { FC } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import {
@@ -9,18 +10,42 @@ import {
 } from "api";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { GradientButton } from "components/base";
-import { EditRowCell, PaginatedTable } from "components/Table";
-import React from "react";
+import { ActionRowCell, PaginatedTable } from "components/Table";
 import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
 import { useQuery } from "react-query";
+import { ModalProvider, useModalContext } from "components/context";
+import AddCheckoutModal from "components/modal/AddCheckoutModal";
 
 interface ICheckoutPageProps {
   items: IGetAllCheckoutItemsResponse[];
 }
 
-const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
+const AddCheckoutButton: FC = () => {
+  const { showModal } = useModalContext();
   const theme = useTheme();
+
+  return (
+    <GradientButton
+      variant="text"
+      sx={{
+        width: "100%",
+        padding: theme.spacing(1, 3.5),
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addCheckout")}
+    >
+      Add Checkout
+    </GradientButton>
+  );
+};
+
+const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
   const router = useRouter();
 
   const { data: itemsData, refetch } = useQuery(
@@ -69,9 +94,10 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
         hideHeader: true,
         disableSortBy: true,
         Cell: ({ cell, row }) => (
-          <EditRowCell
+          <ActionRowCell
             cell={cell}
-            onClickEdit={() =>
+            icon={"edit-outline"}
+            onClickAction={() =>
               router.push(`/items/checkout/${row.original.uid}`)
             }
           />
@@ -88,43 +114,31 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
   };
 
   return (
-    <Grid container gap={1.5}>
-      <Grid container item justifyContent="space-between" alignItems="center">
-        <Grid item xs={10}>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
-            Checkout Items
-          </Typography>
+    <ModalProvider>
+      <AddCheckoutModal />
+      <Grid container gap={1.5}>
+        <Grid container item justifyContent="space-between" alignItems="center">
+          <Grid item xs={10}>
+            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+              Checkout Items
+            </Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <AddCheckoutButton />
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          <GradientButton
-            variant="text"
-            sx={{
-              width: "100%",
-              padding: theme.spacing(1, 3.5),
-            }}
-            textProps={{
-              sx: {
-                lineHeight: "1.8rem",
-                color: "common.white",
-              },
-            }}
-            onClick={() => router.push("/events/steps")}
-          >
-            Add Checkout
-          </GradientButton>
+        <Grid item sx={{ width: "100%" }}>
+          <PaginatedTable
+            limit={8}
+            columns={columns}
+            names={names}
+            data={itemsData ?? []}
+            onRefresh={onRefresh}
+            onDelete={onDelete}
+          />
         </Grid>
       </Grid>
-      <Grid item>
-        <PaginatedTable
-          limit={8}
-          columns={columns}
-          names={names}
-          data={itemsData ?? []}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-        />
-      </Grid>
-    </Grid>
+    </ModalProvider>
   );
 };
 

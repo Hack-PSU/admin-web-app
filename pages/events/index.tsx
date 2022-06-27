@@ -200,7 +200,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
           </GradientButton>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item sx={{ width: "100%" }}>
         <PaginatedTable
           limit={8}
           columns={columns}

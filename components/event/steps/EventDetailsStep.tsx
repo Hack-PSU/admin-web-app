@@ -12,9 +12,9 @@ import { Box, Grid } from "@mui/material";
 import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
 import { useForm, FormProvider } from "react-hook-form";
-import { EventType } from "types/api";
+import { EventType } from "api";
 import { useEventDispatch, useEventStore } from "common/store";
-import { any, assert, date, object, optional } from "superstruct";
+import { any, date, object, optional } from "superstruct";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
 

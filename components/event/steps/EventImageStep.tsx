@@ -9,7 +9,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { Grid } from "@mui/material";
 import EventDropzoneItem from "components/event/forms/EventDropzoneItem";
 import { useEventDispatch, useEventStore } from "common/store";
-import { EventType } from "types/api";
+import { EventType } from "api";
 
 const EventImageStep: FC = () => {
   const { eventImage, eventType } = useEventStore();

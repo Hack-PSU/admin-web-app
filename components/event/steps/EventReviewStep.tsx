@@ -7,7 +7,7 @@ import {
   EventImageReview,
 } from "components/event/review";
 import EventStep from "./EventStep";
-import { EventType } from "types/api";
+import { EventType } from "api";
 import { useEventStore } from "common/store";
 
 const EventReviewStep: FC = () => {

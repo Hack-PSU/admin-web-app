@@ -1,5 +1,5 @@
-import { EventType } from "types/api";
-import { ContentState, EditorState, RawDraftContentState } from "draft-js";
+import { EventType } from "api";
+import { RawDraftContentState } from "draft-js";
 import {
   ModelSlice,
   State,
@@ -8,8 +8,6 @@ import {
 } from "common/store/types";
 import { IOption } from "types/components";
 import produce from "immer";
-import { omit } from "lodash";
-import { decorator } from "components/base/RichText";
 
 export interface IEventModel {
   eventType: IOption | null;

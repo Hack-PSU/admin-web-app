@@ -84,7 +84,7 @@ declare module "@mui/material/styles" {
       border: string;
     };
     button: {
-      grey: string;
+      light: string;
     };
     table: {
       header: string;
@@ -126,7 +126,7 @@ declare module "@mui/material/styles" {
       border?: string;
     };
     button?: {
-      grey?: string;
+      light?: string;
     };
     table?: {
       header?: string;

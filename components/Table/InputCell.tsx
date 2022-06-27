@@ -25,6 +25,12 @@ function InputCell<T extends object>({ cell, ...props }: IInputCellProps<T>) {
           transition: "border 200ms ease-in-out",
           ...props.sx,
         }}
+        inputProps={{
+          style: {
+            fontWeight: 600,
+            fontSize: "0.9rem",
+          },
+        }}
       />
     </TableCell>
   );

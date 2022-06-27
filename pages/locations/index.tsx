@@ -1,14 +1,14 @@
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { GradientButton } from "components/base/Button";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
 import { useColumnBuilder } from "common/hooks";
 import { useQuery } from "react-query";
 import { ActionRowCell, Table, TableCell } from "components/Table";
-import { ControlledInput } from "components/base";
+import { ControlledInput, GradientButton } from "components/base";
 import { useRouter } from "next/router";
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
 
 interface ILocationsPageProps {
   locations: ILocationEntity[];
@@ -16,6 +16,8 @@ interface ILocationsPageProps {
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const router = useRouter();
+  const theme = useTheme();
+  const methods = useForm();
 
   const { data: locationsData } = useQuery(
     ["locations"],
@@ -69,13 +71,19 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           hideHeader: true,
           disableSortBy: true,
           maxWidth: 5,
-          Cell: ({ cell, row }) => (
-            <ActionRowCell
-              cell={cell}
-              icon="edit-outline"
-              onClickAction={() => router.push(`locations/${row.original.uid}`)}
-            />
-          ),
+          Cell: ({ cell, row }) => {
+            const { resetField } = useFormContext();
+
+            return (
+              <ActionRowCell
+                cell={cell}
+                icon="refresh-outline"
+                onClickAction={() => {
+                  resetField(`${row.original.uid}.name`);
+                }}
+              />
+            );
+          },
         })
   );
 
@@ -98,11 +106,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         <Grid item xs={2.3}>
           <GradientButton
             variant="text"
-            sx={(theme) => ({
-              // ml: "auto",
+            sx={{
               width: "100%",
               padding: theme.spacing(1, 3.5),
-            })}
+            }}
             textProps={{
               sx: {
                 lineHeight: "1.8rem",
@@ -114,7 +121,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           </GradientButton>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item sx={{ width: "100%" }}>
         <Table
           limit={8}
           names={names}
@@ -135,7 +142,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               </Table.ActionsRight>
             </Table.Actions>
             <Table.Header />
-            <Table.Body />
+            <FormProvider {...methods}>
+              <Table.Body />
+            </FormProvider>
           </Table.Container>
         </Table>
       </Grid>
