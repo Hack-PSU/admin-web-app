@@ -95,6 +95,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         minWidth: 150,
       })
       .addColumn("Start Date", {
+        id: "startDate",
         type: "date",
         filterType: "date",
         accessor: (row) => row.event_start_time,
@@ -103,6 +104,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         Cell: ({ cell }) => <DateTimeCell cell={cell} />,
       })
       .addColumn("End Date", {
+        id: "endDate",
         filterType: "date",
         type: "date",
         accessor: (row) => row.event_end_time,
