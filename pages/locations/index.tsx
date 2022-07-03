@@ -1,5 +1,11 @@
 import { NextPage } from "next";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { alpha, Box, Grid, lighten, Typography, useTheme } from "@mui/material";
 import {
@@ -31,12 +37,12 @@ interface ILocationsPageProps {
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const theme = useTheme();
   const queryClient = useQueryClient();
+  const currentInputKey = useRef<{ key: string }>({ key: "" });
 
   const { data: locationsData, refetch } = useQuery(
     QueryKeys.location.findAll(),
     () => fetch(getAllLocations),
     {
-      keepPreviousData: true,
       initialData: locations,
       select: (data) => {
         if (data) {
@@ -49,22 +55,16 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
-  const { mutate, isLoading } = useMutation(
+  const { mutateAsync } = useMutation(
     QueryKeys.location.updateBatch(),
     ({ entity }: { entity: Partial<ILocationUpdateEntity> }) =>
       updateLocation(entity),
     {
       onSuccess: async () => {
-        console.log("SUCCESS");
         await queryClient.invalidateQueries(QueryKeys.location.all);
-      },
-      onMutate: (variables) => {
-        console.log(variables);
       },
     }
   );
-
-  console.log(isLoading);
 
   const defaultValues = useMemo(() => {
     if (locationsData) {
@@ -80,26 +80,27 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     defaultValues,
   });
 
+  const { formState, reset, handleSubmit } = methods;
+  const { dirtyFields } = formState;
+
   useEffect(() => {
     if (defaultValues) {
-      methods.reset({ ...defaultValues });
+      reset({ ...defaultValues });
     }
-  }, [defaultValues, methods]);
+  }, [defaultValues, reset]);
 
   const onClickSave = () => {
-    const {
-      formState: { dirtyFields },
-    } = methods;
-
-    methods.handleSubmit(async (data) => {
+    handleSubmit(async (data) => {
       const editedFields = Object.keys(dirtyFields).filter(
         (field) => dirtyFields[field].name
       );
 
-      console.log("HERE");
-
-      editedFields.forEach((uid) =>
-        mutate({ entity: { uid: data[uid].uid, locationName: data[uid].name } })
+      await Promise.all(
+        editedFields.map((uid) =>
+          mutateAsync({
+            entity: { uid: data[uid].uid, locationName: data[uid].name },
+          })
+        )
       );
     })();
   };
@@ -117,6 +118,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               cell={cell}
               name={`${row.original.uid}.name`}
               placeholder={"Enter a location"}
+              onFocus={() => {
+                currentInputKey.current.key = row.original.uid;
+              }}
+              autoFocus={row.original.uid === currentInputKey.current.key}
             />
           ),
         })
