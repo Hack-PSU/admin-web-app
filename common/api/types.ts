@@ -6,6 +6,7 @@ export enum QueryScope {
 export enum QueryAction {
   query = "get",
   update = "update",
+  updateBatch = "updateBatch",
   delete = "delete",
 }
 

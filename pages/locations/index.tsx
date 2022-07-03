@@ -1,12 +1,25 @@
 import { NextPage } from "next";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
-import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
+import { alpha, Box, Grid, lighten, Typography, useTheme } from "@mui/material";
+import {
+  fetch,
+  getAllLocations,
+  ILocationEntity,
+  ILocationUpdateEntity,
+  QueryKeys,
+  resolveError,
+  updateLocation,
+} from "api";
 import { useColumnBuilder } from "common/hooks";
-import { useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { ActionRowCell, Table, TableCell } from "components/Table";
-import { ControlledInput, GradientButton } from "components/base";
+import {
+  Button,
+  ControlledInput,
+  EvaIcon,
+  GradientButton,
+} from "components/base";
 import { useRouter } from "next/router";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import InputCell from "components/Table/InputCell";
@@ -16,11 +29,11 @@ interface ILocationsPageProps {
 }
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
-  const router = useRouter();
   const theme = useTheme();
+  const queryClient = useQueryClient();
 
-  const { data: locationsData } = useQuery(
-    ["locations"],
+  const { data: locationsData, refetch } = useQuery(
+    QueryKeys.location.findAll(),
     () => fetch(getAllLocations),
     {
       keepPreviousData: true,
@@ -36,12 +49,29 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
+  const { mutate, isLoading } = useMutation(
+    QueryKeys.location.updateBatch(),
+    ({ entity }: { entity: Partial<ILocationUpdateEntity> }) =>
+      updateLocation(entity),
+    {
+      onSuccess: async () => {
+        console.log("SUCCESS");
+        await queryClient.invalidateQueries(QueryKeys.location.all);
+      },
+      onMutate: (variables) => {
+        console.log(variables);
+      },
+    }
+  );
+
+  console.log(isLoading);
+
   const defaultValues = useMemo(() => {
     if (locationsData) {
       return locationsData.reduce((obj, curr) => {
-        obj[curr.uid] = curr.name;
+        obj[String(curr.uid)] = curr;
         return obj;
-      }, {} as { [p: string]: string });
+      }, {} as { [p: string]: { uid: number; name: string } });
     }
     return {};
   }, [locationsData]);
@@ -56,7 +86,23 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   }, [defaultValues, methods]);
 
-  console.log(defaultValues);
+  const onClickSave = () => {
+    const {
+      formState: { dirtyFields },
+    } = methods;
+
+    methods.handleSubmit(async (data) => {
+      const editedFields = Object.keys(dirtyFields).filter(
+        (field) => dirtyFields[field].name
+      );
+
+      console.log("HERE");
+
+      editedFields.forEach((uid) =>
+        mutate({ entity: { uid: data[uid].uid, locationName: data[uid].name } })
+      );
+    })();
+  };
 
   const { columns, names } = useColumnBuilder<{ uid: string; name: string }>(
     (builder) =>
@@ -69,7 +115,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           Cell: ({ cell, row }) => (
             <InputCell
               cell={cell}
-              name={`${row.original.uid}`}
+              name={`${row.original.uid}.name`}
               placeholder={"Enter a location"}
             />
           ),
@@ -88,7 +134,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
                 cell={cell}
                 icon="refresh-outline"
                 onClickAction={() => {
-                  resetField(`${row.original.uid}`);
+                  resetField(`${row.original.uid}.name`);
                 }}
               />
             );
@@ -97,7 +143,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   );
 
   const onRefresh = () => {
-    return null;
+    return refetch();
   };
 
   const onDelete = () => {
@@ -128,6 +174,58 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           >
             Add a Location
           </GradientButton>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        item
+        justifyContent="space-between"
+        xs={12}
+        alignItems="center"
+        mt={1}
+      >
+        <Grid container item xs={10} alignItems="center" spacing={1}>
+          <Grid item>
+            <Box mt={0.3}>
+              <EvaIcon name={"alert-circle-outline"} />
+            </Box>
+          </Grid>
+          <Grid item>
+            <Typography variant="subtitle1">
+              Manage locations by editing the table
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid item xs={2}>
+          <Button
+            disabled={!methods.formState.isDirty}
+            sx={{
+              width: "100%",
+              borderRadius: "15px",
+              backgroundColor: methods.formState.isDirty
+                ? "common.black"
+                : "transparent",
+              border: methods.formState.isDirty
+                ? undefined
+                : `2px solid ${theme.palette.common.black}`,
+              ":hover": {
+                backgroundColor: methods.formState.isDirty
+                  ? lighten(theme.palette.common.black, 0.05)
+                  : undefined,
+              },
+            }}
+            textProps={{
+              sx: {
+                color: methods.formState.isDirty
+                  ? "common.white"
+                  : "common.black",
+                lineHeight: "1.3rem",
+              },
+            }}
+            onClick={onClickSave}
+          >
+            Save
+          </Button>
         </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>
