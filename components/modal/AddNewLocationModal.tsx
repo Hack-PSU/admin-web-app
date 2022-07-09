@@ -1,70 +1,115 @@
 import { FC } from "react";
 import { useModal } from "components/context/ModalProvider";
-import { Grid, useTheme } from "@mui/material";
-import { Button, LabelledInput, LabelledSelect, Modal } from "components/base";
-import { useForm } from "react-hook-form";
+import { Grid, Box } from "@mui/material";
+import {
+  ControlledInput,
+  LabelledInput,
+  MenuButton,
+  Modal,
+} from "components/base";
+import { useForm, FormProvider } from "react-hook-form";
 import { ISelectItem } from "types/components";
+import { useMutation, useQueryClient } from "react-query";
+import {
+  CreateEntity,
+  createLocation,
+  fetch,
+  ILocationEntity,
+  ILocationUpdateEntity,
+  QueryKeys,
+} from "api";
+import { object } from "superstruct";
+import { NonEmptyString } from "common/form";
+import { superstructResolver } from "@hookform/resolvers/superstruct";
 
-const items: ISelectItem[] = [
-  { value: "room", display: "Room" },
-  { value: "zoom", display: "Zoom" },
-  { value: "discord", display: "Discord" },
-];
+const schema = object({
+  name: NonEmptyString,
+});
 
 const AddNewLocationModal: FC = () => {
   const { show, handleHide } = useModal("addNewLocation");
-  const { register } = useForm();
-  const theme = useTheme();
+  const methods = useForm({
+    defaultValues: {
+      name: "",
+    },
+    resolver: superstructResolver(schema),
+  });
+
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isLoading } = useMutation(
+    QueryKeys.location.createOne(),
+    ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+      fetch(() => createLocation(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.location.all);
+      },
+    }
+  );
+
+  const handleSubmitAndCreate = () => {
+    methods.handleSubmit(async (data) => {
+      await mutateAsync({ entity: { locationName: data.name } });
+      methods.reset();
+    })();
+  };
+
+  const handleSubmit = () => {
+    methods.handleSubmit(async (data) => {
+      await mutateAsync({ entity: { locationName: data.name } });
+      handleHide();
+    })();
+  };
 
   return (
-    <Modal
-      open={show}
-      onClose={handleHide}
-      position="center"
-      alignment="center"
-    >
-      <Modal.Header>New Location</Modal.Header>
-      <Modal.Body alignItems="center">
-        <Grid container item>
-          <Grid item xs={6}>
-            <LabelledInput
-              placeholder={"Enter location name"}
-              id={"location-name"}
-              label={"Name"}
-              sx={{
-                width: "90%",
-                mt: 0.6,
-              }}
-              inputProps={{
-                style: {
-                  fontSize: theme.typography.pxToRem(14),
-                },
-              }}
-              {...register("name")}
-            />
+    <Modal open={show} onClose={handleHide}>
+      <FormProvider {...methods}>
+        <Modal.Header>New Location</Modal.Header>
+        <Modal.Body alignItems="center">
+          <Grid container item>
+            <Grid item xs={12}>
+              <ControlledInput
+                name={"name"}
+                placeholder={"Enter location name"}
+                as={LabelledInput}
+                label={"Name"}
+                id={"name"}
+                showError
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <LabelledSelect
-              items={items}
-              sx={{
-                width: "90%",
-                mt: 0.6,
-              }}
-              selectInputStyle={{
-                fontSize: theme.typography.pxToRem(14),
-              }}
-              menuWidth={"300px"}
-              placeholder={"Select a location type"}
-              id={"location-type"}
-              label={"Type"}
-              {...register("type")}
-            />
+          <Grid
+            container
+            item
+            xs={6}
+            spacing={1}
+            mx={"auto"}
+            justifyContent="center"
+          >
+            <Grid item xs={6}>
+              <Box mt={2}>
+                <MenuButton
+                  isDirty={methods.formState.isDirty}
+                  loading={isLoading}
+                  menuItems={[
+                    {
+                      label: "Submit and Create",
+                      onClick: handleSubmitAndCreate,
+                    },
+                  ]}
+                  onClick={handleSubmit}
+                  progressColor={
+                    methods.formState.isDirty ? "common.black" : "common.white"
+                  }
+                >
+                  Submit
+                </MenuButton>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid item mt={4}>
-          <Button variant="text">Submit</Button>
-        </Grid>
-      </Modal.Body>
+        </Modal.Body>
+      </FormProvider>
     </Modal>
   );
 };
