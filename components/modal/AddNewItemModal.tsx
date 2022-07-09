@@ -62,7 +62,6 @@ const AddNewItemModal: FC = () => {
       await mutateAsync({
         entity: { name: data.name, quantity: Number(data.quantity) },
       });
-      // perform API submission
       methods.reset();
     })();
   };

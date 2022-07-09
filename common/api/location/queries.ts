@@ -24,7 +24,7 @@ export const getAllLocations: CreateQueryReturn<ILocationEntity[]> =
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Create_Location
  */
 export const createLocation: CreateMutationReturn<
-  Omit<ILocationEntity, "uid">,
+  Omit<ILocationUpdateEntity, "uid">,
   ILocationEntity
 > = createMutation("/admin/location");
 
@@ -64,6 +64,14 @@ export const LocationKeys = {
     ] as const,
   findById: (id: string | number) =>
     [{ ...LocationKeys.all[0], action: QueryAction.query, scope: id }] as const,
+  createOne: () =>
+    [
+      {
+        ...LocationKeys.all[0],
+        action: QueryAction.create,
+        scope: QueryScope.NEW,
+      },
+    ] as const,
   update: (id: string | number) =>
     [
       { ...LocationKeys.all[0], action: QueryAction.update, scope: id },
