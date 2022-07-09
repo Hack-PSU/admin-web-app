@@ -8,8 +8,8 @@ import {
   QueryKeys,
   resolveError,
 } from "api";
-import { Grid, Typography, useTheme } from "@mui/material";
-import { GradientButton } from "components/base";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { ActionRowCell, PaginatedTable } from "components/Table";
 import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
@@ -125,6 +125,37 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
           </Grid>
           <Grid item xs={2}>
             <AddCheckoutButton />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          item
+          justifyContent="space-between"
+          xs={12}
+          alignItems="center"
+          mt={1}
+        >
+          <Grid container item xs={10} alignItems="center" spacing={1}>
+            <Grid item>
+              <Box mt={0.3}>
+                <EvaIcon name={"alert-circle-outline"} />
+              </Box>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">
+                Manage checkout requests by editing the table
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item xs={2}>
+            <SaveButton
+            // isDirty={methods.formState.isDirty}
+            // onClick={onClickSave}
+            // loading={isLoading}
+            // progressColor={methods.formState.isDirty ? "common.white" : "common.black"}
+            >
+              Save
+            </SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>

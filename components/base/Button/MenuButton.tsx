@@ -1,11 +1,11 @@
-import React, { FC, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import {
   Box,
-  Button as BaseButton,
+  ButtonGroup,
   ButtonProps,
   darken,
-  Grid,
   IconButton,
+  lighten,
   Menu,
   MenuItem,
   Typography,
@@ -13,13 +13,17 @@ import {
   useTheme,
 } from "@mui/material";
 import { EvaIcon } from "components/base";
+import SaveButton, {
+  ISaveButtonProps,
+} from "components/base/Button/SaveButton";
 
-interface IMenuButtonProps extends Omit<ButtonProps, "ref" | "touchRippleRef"> {
-  textProps?: Omit<TypographyProps, "children" | "variant" | "ref">;
-  menuItems: { label: string; icon?: React.ReactNode; onClick(): void }[];
-}
+type MenuButtonProps = Omit<ButtonProps, "ref" | "touchRippleRef"> &
+  Omit<ISaveButtonProps, "children"> & {
+    textProps?: Omit<TypographyProps, "children" | "variant" | "ref">;
+    menuItems: { label: string; icon?: React.ReactNode; onClick(): void }[];
+  };
 
-const MenuButton: FC<IMenuButtonProps> = ({
+const MenuButton: FC<MenuButtonProps> = ({
   menuItems,
   children,
   textProps,
@@ -28,31 +32,54 @@ const MenuButton: FC<IMenuButtonProps> = ({
   const theme = useTheme();
   const { sx: textPropsSx, ...rest } = textProps ?? { sx: {} };
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const open = Boolean(anchorEl);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleClick = () => {
+    setIsOpen((open) => !open);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClose = (event: Event) => {
+    if (
+      anchorRef.current &&
+      anchorRef.current.contains(event.target as HTMLElement)
+    ) {
+      return;
+    }
+
+    setIsOpen(false);
   };
 
   return (
-    <Grid container>
-      <Grid item xs={9}>
-        <BaseButton
+    <>
+      <ButtonGroup
+        sx={{
+          borderRadius: "10px",
+          "& .MuiButtonGroup-grouped:not(:last-of-type)": {
+            border: "none",
+            borderRight: `1.8px solid ${lighten(
+              theme.palette.common.black,
+              0.8
+            )}`,
+            ":hover": {
+              borderRight: `1.8px solid ${lighten(
+                theme.palette.common.black,
+                0.8
+              )}`,
+            },
+          },
+        }}
+        ref={anchorRef}
+      >
+        <SaveButton
           {...props}
           sx={{
-            width: "100%",
-            height: "100%",
             textTransform: "none",
             color: "common.black",
             fontWeight: "bold",
             backgroundColor: "button.light",
-            borderRadius: "15px 0 0 15px",
-            padding: theme.spacing(1, 5),
+            borderRadius: "10px 0 0 10px",
+            padding: theme.spacing(1.3, 5),
             fontSize: theme.typography.pxToRem(16),
             ":hover": {
               backgroundColor: darken(theme.palette.button.light, 0.05),
@@ -74,20 +101,13 @@ const MenuButton: FC<IMenuButtonProps> = ({
           >
             {children}
           </Typography>
-        </BaseButton>
-      </Grid>
-      <Grid
-        item
-        xs={3}
-        sx={{ borderLeft: `2px solid ${theme.palette.border.light}` }}
-      >
+        </SaveButton>
         <IconButton
+          size={"small"}
           disableRipple
           sx={{
-            height: "100%",
-            width: "100%",
             backgroundColor: "button.light",
-            borderRadius: "0 15px 15px 0",
+            borderRadius: "0 10px 10px 0",
             ":hover": {
               backgroundColor: darken(theme.palette.button.light, 0.05),
             },
@@ -99,45 +119,45 @@ const MenuButton: FC<IMenuButtonProps> = ({
             <EvaIcon name={"chevron-down-outline"} />
           </Box>
         </IconButton>
-        <Menu
-          open={open}
-          anchorEl={anchorEl}
-          elevation={0}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          onClose={handleClose}
-          sx={{
-            borderRadius: "15px",
-            mt: theme.spacing(1),
-          }}
-          PaperProps={{
-            sx: {
-              boxShadow: 2,
-            },
-          }}
-        >
-          {menuItems.map(({ label, icon, onClick }, index) => (
-            <MenuItem
-              key={`${label}-${index}`}
-              onClick={() => {
-                onClick();
-                handleClose();
-              }}
-              disableRipple
-            >
-              {icon ? icon : null}
-              {label}
-            </MenuItem>
-          ))}
-        </Menu>
-      </Grid>
-    </Grid>
+      </ButtonGroup>
+      <Menu
+        open={isOpen}
+        anchorEl={anchorRef.current}
+        elevation={0}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        onClose={handleClose}
+        sx={{
+          borderRadius: "15px",
+          mt: theme.spacing(1),
+        }}
+        PaperProps={{
+          sx: {
+            boxShadow: 2,
+          },
+        }}
+      >
+        {menuItems.map(({ label, icon, onClick }, index) => (
+          <MenuItem
+            key={`${label}-${index}`}
+            onClick={() => {
+              onClick();
+              setIsOpen(false);
+            }}
+            disableRipple
+          >
+            {icon ? icon : null}
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 };
 

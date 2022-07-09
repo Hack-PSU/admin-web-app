@@ -10,7 +10,7 @@ import {
   ICheckoutRequestResponse,
   IGetAllCheckoutItemsResponse,
 } from "./entity";
-import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
+import { QueryAction, QueryScope } from "api/types";
 
 /**
  * Get All Checked Out Items
@@ -30,6 +30,17 @@ export const getAllCheckoutItems: CreateQueryReturn<
  */
 export const getAllAvailableItems: CreateQueryReturn<ICheckoutItemEntity[]> =
   createQuery("/admin/checkout/items");
+
+/**
+ * Create a Checkout Item
+ * @param entity
+ * @param params (optional)
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Item_Checkout-Add_new_item_for_checkout
+ */
+export const createCheckoutItem: CreateMutationReturn<
+  Omit<ICheckoutItemEntity, "uid">
+> = createMutation("/admin/checkout/items");
 
 /**
  * Create a Checkout Request
@@ -70,8 +81,20 @@ export const ItemKeys = {
     ] as const,
   findById: (id: string | number) =>
     [{ ...ItemKeys.all[0], action: QueryAction.query, scope: id }] as const,
+  createOne: () =>
+    [
+      { ...ItemKeys.all[0], action: QueryAction.create, scope: QueryScope.NEW },
+    ] as const,
   update: (id: string | number) =>
     [{ ...ItemKeys.all[0], action: QueryAction.update, scope: id }] as const,
+  updateBatch: () =>
+    [
+      {
+        ...ItemKeys.all[0],
+        action: QueryAction.updateBatch,
+        scope: QueryScope.ALL,
+      },
+    ] as const,
   delete: (id: string | number) =>
     [{ ...ItemKeys.all[0], action: QueryAction.delete, scope: id }] as const,
 };

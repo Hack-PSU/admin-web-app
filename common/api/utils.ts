@@ -43,7 +43,7 @@ export function createQuery<TResponse, TParam extends object = {}>(
       url,
       method: "GET",
       params: {
-        ...(params ? { params } : {}),
+        ...(params ?? {}),
         ignoreCache: true,
       },
       ...(token

@@ -1,32 +1,21 @@
 import { NextPage } from "next";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { alpha, Box, Grid, lighten, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import {
   fetch,
   getAllLocations,
   ILocationEntity,
   ILocationUpdateEntity,
+  MutateEntity,
   QueryKeys,
   resolveError,
   updateLocation,
 } from "api";
 import { useColumnBuilder } from "common/hooks";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { ActionRowCell, Table, TableCell } from "components/Table";
-import {
-  Button,
-  ControlledInput,
-  EvaIcon,
-  GradientButton,
-} from "components/base";
-import { useRouter } from "next/router";
+import { ActionRowCell, Table } from "components/Table";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import InputCell from "components/Table/InputCell";
 
@@ -55,10 +44,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
-  const { mutateAsync } = useMutation(
+  const { mutateAsync, isLoading } = useMutation(
     QueryKeys.location.updateBatch(),
-    ({ entity }: { entity: Partial<ILocationUpdateEntity> }) =>
-      updateLocation(entity),
+    ({ entity }: MutateEntity<ILocationUpdateEntity>) => updateLocation(entity),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.location.all);
@@ -202,35 +190,16 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           </Grid>
         </Grid>
         <Grid item xs={2}>
-          <Button
-            disabled={!methods.formState.isDirty}
-            sx={{
-              width: "100%",
-              borderRadius: "15px",
-              backgroundColor: methods.formState.isDirty
-                ? "common.black"
-                : "transparent",
-              border: methods.formState.isDirty
-                ? undefined
-                : `2px solid ${theme.palette.common.black}`,
-              ":hover": {
-                backgroundColor: methods.formState.isDirty
-                  ? lighten(theme.palette.common.black, 0.05)
-                  : undefined,
-              },
-            }}
-            textProps={{
-              sx: {
-                color: methods.formState.isDirty
-                  ? "common.white"
-                  : "common.black",
-                lineHeight: "1.3rem",
-              },
-            }}
+          <SaveButton
+            isDirty={methods.formState.isDirty}
             onClick={onClickSave}
+            loading={isLoading}
+            progressColor={
+              methods.formState.isDirty ? "common.white" : "common.black"
+            }
           >
             Save
-          </Button>
+          </SaveButton>
         </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>

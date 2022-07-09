@@ -1,17 +1,18 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import { Box, Grid, Typography } from "@mui/material";
-import { GradientButton } from "components/base";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
 import {
   fetch,
   getAllAvailableItems,
   ICheckoutItemEntity,
+  MutateEntity,
   QueryKeys,
 } from "api";
-import { useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { ActionRowCell, Table, TableCell } from "components/Table";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import InputCell from "components/Table/InputCell";
@@ -24,14 +25,15 @@ interface IManageItemsProps {
 
 const AddNewItemButton: FC = () => {
   const { showModal } = useModalContext();
+  const theme = useTheme();
 
   return (
     <GradientButton
       variant="text"
-      sx={(theme) => ({
+      sx={{
         width: "100%",
         padding: theme.spacing(1, 3.5),
-      })}
+      }}
       textProps={{
         sx: {
           lineHeight: "1.8rem",
@@ -46,7 +48,8 @@ const AddNewItemButton: FC = () => {
 };
 
 const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const currentInputKey = useRef<{ key: string }>({ key: "" });
 
   const { data: itemsData, refetch } = useQuery(
     QueryKeys.manageItems.findAll(),
@@ -66,15 +69,29 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     }
   );
 
+  const { mutateAsync, isLoading } = useMutation(
+    QueryKeys.manageItems.updateBatch(),
+    ({ entity }: MutateEntity<ICheckoutItemEntity>) => fetch(),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.manageItems.all);
+      },
+    }
+  );
+
   const defaultValues = useMemo(() => {
     if (itemsData) {
       return itemsData.reduce((obj, curr) => {
         if (curr.uid) {
-          obj[curr.uid] = { name: curr.name, quantity: curr.quantity };
+          obj[curr.uid] = {
+            uid: curr.uid,
+            name: curr.name,
+            quantity: curr.quantity,
+          };
           return obj;
         }
         return obj;
-      }, {} as { [p: string]: { name: string; quantity: number } });
+      }, {} as { [p: string]: { uid: number; name: string; quantity: number } });
     }
   }, [itemsData]);
 
@@ -82,9 +99,32 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     defaultValues,
   });
 
+  const { formState, reset, handleSubmit } = methods;
+  const { dirtyFields } = formState;
+
   useEffect(() => {
-    methods.reset({ ...defaultValues });
-  }, [defaultValues, methods]);
+    reset({ ...defaultValues });
+  }, [defaultValues, reset]);
+
+  const onClickSave = () => {
+    handleSubmit(async (data) => {
+      const editedFields = Object.keys(dirtyFields).filter(
+        (field) => dirtyFields[field].name || dirtyFields[field].quantity
+      );
+
+      await Promise.all(
+        editedFields.map((uid) =>
+          mutateAsync({
+            entity: {
+              uid: data[uid].uid,
+              name: data[uid].name,
+              quantity: data[uid].quantity,
+            },
+          })
+        )
+      );
+    })();
+  };
 
   const { columns, names } = useColumnBuilder<{
     uid: string;
@@ -104,6 +144,12 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
             cell={cell}
             name={`${row.original.uid}.name`}
             placeholder={"Enter an item name"}
+            onFocus={() => {
+              currentInputKey.current.key = `${row.original.uid}.name`;
+            }}
+            autoFocus={
+              `${row.original.uid}.name` === currentInputKey.current.key
+            }
           />
         ),
       })
@@ -121,6 +167,12 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
             cell={cell}
             name={`${row.original.uid}.quantity`}
             placeholder={"Enter a quantity"}
+            onFocus={() => {
+              currentInputKey.current.key = `${row.original.uid}.quantity`;
+            }}
+            autoFocus={
+              `${row.original.uid}.quantity` === currentInputKey.current.key
+            }
           />
         ),
       })
@@ -168,6 +220,39 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
           </Grid>
           <Grid item xs={2}>
             <AddNewItemButton />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          item
+          justifyContent="space-between"
+          xs={12}
+          alignItems="center"
+          mt={1}
+        >
+          <Grid container item xs={10} alignItems="center" spacing={1}>
+            <Grid item>
+              <Box mt={0.3}>
+                <EvaIcon name={"alert-circle-outline"} />
+              </Box>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">
+                Manage items by editing the table
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item xs={2}>
+            <SaveButton
+              isDirty={methods.formState.isDirty}
+              onClick={onClickSave}
+              loading={isLoading}
+              progressColor={
+                methods.formState.isDirty ? "common.white" : "common.black"
+              }
+            >
+              Save
+            </SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>

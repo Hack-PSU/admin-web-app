@@ -1,8 +1,6 @@
 import React, { FC } from "react";
 import {
-  Button,
   ControlledInput,
-  EvaIcon,
   LabelledInput,
   MenuButton,
   Modal,
@@ -13,6 +11,14 @@ import { useForm, FormProvider } from "react-hook-form";
 import { object } from "superstruct";
 import { NonEmptyNumber, NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
+import { useMutation, useQueryClient } from "react-query";
+import {
+  createCheckoutItem,
+  CreateEntity,
+  fetch,
+  ICheckoutItemEntity,
+  QueryKeys,
+} from "api";
 
 const schema = object({
   name: NonEmptyString,
@@ -21,6 +27,8 @@ const schema = object({
 
 const AddNewItemModal: FC = () => {
   const { show, handleHide } = useModal("addNewItem");
+  const queryClient = useQueryClient();
+
   const methods = useForm({
     defaultValues: {
       name: "",
@@ -29,14 +37,31 @@ const AddNewItemModal: FC = () => {
     resolver: superstructResolver(schema),
   });
 
+  const { mutateAsync, isLoading } = useMutation(
+    QueryKeys.manageItems.createOne(),
+    ({ entity }: CreateEntity<ICheckoutItemEntity>) =>
+      fetch(() => createCheckoutItem(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.manageItems.all);
+      },
+    }
+  );
+
   const onSubmit = () => {
-    methods.handleSubmit((data) => {
-      console.log(data);
+    methods.handleSubmit(async (data) => {
+      await mutateAsync({
+        entity: { name: data.name, quantity: Number(data.quantity) },
+      });
+      handleHide();
     })();
   };
 
   const handleSubmitAndCreate = () => {
-    methods.handleSubmit((data) => {
+    methods.handleSubmit(async (data) => {
+      await mutateAsync({
+        entity: { name: data.name, quantity: Number(data.quantity) },
+      });
       // perform API submission
       methods.reset();
     })();
@@ -80,6 +105,8 @@ const AddNewItemModal: FC = () => {
               <Grid item xs={6}>
                 <Box mt={2}>
                   <MenuButton
+                    isDirty={methods.formState.isDirty}
+                    loading={isLoading}
                     menuItems={[
                       {
                         label: "Submit and Create",

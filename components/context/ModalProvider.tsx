@@ -22,6 +22,7 @@ type ModalState = {
 
 type UseModalReturn = ModalHooks & {
   handleHide(): void;
+  handleShow(): void;
 };
 
 interface IModalProviderHooks {
@@ -95,7 +96,12 @@ const ModalProvider: FC<WithChildren> = ({ children }) => {
 export const useModalContext = () => useContext(ModalContext);
 
 export function useModal(name: string): UseModalReturn {
-  const { getState, handleHide: hideModal, register } = useModalContext();
+  const {
+    getState,
+    handleHide: hideModal,
+    register,
+    showModal,
+  } = useModalContext();
 
   useEffect(() => {
     register(name);
@@ -105,6 +111,9 @@ export function useModal(name: string): UseModalReturn {
     show: getState(name) ?? false,
     handleHide() {
       hideModal(name);
+    },
+    handleShow() {
+      showModal(name);
     },
   };
 }
