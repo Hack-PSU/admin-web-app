@@ -107,7 +107,6 @@ const Table: TableComponent = ({
   ...props
 }) => {
   const theme = useTheme();
-  const methods = useForm();
 
   const defaultColumn = useMemo(
     () => ({
