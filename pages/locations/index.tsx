@@ -18,10 +18,36 @@ import { ActionRowCell, Table } from "components/Table";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import InputCell from "components/Table/InputCell";
+import { ModalProvider, useModalContext } from "components/context";
+import AddNewLocationModal from "components/modal/AddNewLocationModal";
 
 interface ILocationsPageProps {
   locations: ILocationEntity[];
 }
+
+const AddNewLocationButton = () => {
+  const { showModal } = useModalContext();
+  const theme = useTheme();
+
+  return (
+    <GradientButton
+      variant="text"
+      sx={{
+        width: "100%",
+        padding: theme.spacing(1, 3.5),
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addNewLocation")}
+    >
+      Add a Location
+    </GradientButton>
+  );
+};
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const theme = useTheme();
@@ -144,92 +170,81 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   };
 
   return (
-    <Grid container gap={1.5} flexDirection="column">
-      <Grid container item justifyContent="space-between" alignItems="center">
-        <Grid item xs={9.7}>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Locations
-          </Typography>
-        </Grid>
-        <Grid item xs={2.3}>
-          <GradientButton
-            variant="text"
-            sx={{
-              width: "100%",
-              padding: theme.spacing(1, 3.5),
-            }}
-            textProps={{
-              sx: {
-                lineHeight: "1.8rem",
-                color: "common.white",
-              },
-            }}
-          >
-            Add a Location
-          </GradientButton>
-        </Grid>
-      </Grid>
-      <Grid
-        container
-        item
-        justifyContent="space-between"
-        xs={12}
-        alignItems="center"
-        mt={1}
-      >
-        <Grid container item xs={10} alignItems="center" spacing={1}>
-          <Grid item>
-            <Box mt={0.3}>
-              <EvaIcon name={"alert-circle-outline"} />
-            </Box>
-          </Grid>
-          <Grid item>
-            <Typography variant="subtitle1">
-              Manage locations by editing the table
+    <ModalProvider>
+      <AddNewLocationModal />
+      <Grid container gap={1.5} flexDirection="column">
+        <Grid container item justifyContent="space-between" alignItems="center">
+          <Grid item xs={9.7}>
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              Locations
             </Typography>
           </Grid>
+          <Grid item xs={2.3}>
+            <AddNewLocationButton />
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          <SaveButton
-            isDirty={methods.formState.isDirty}
-            onClick={onClickSave}
-            loading={isLoading}
-            progressColor={
-              methods.formState.isDirty ? "common.white" : "common.black"
-            }
-          >
-            Save
-          </SaveButton>
-        </Grid>
-      </Grid>
-      <Grid item sx={{ width: "100%" }}>
-        <Table
-          limit={8}
-          names={names}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-          columns={columns}
-          data={locationsData ?? []}
+        <Grid
+          container
+          item
+          justifyContent="space-between"
+          xs={12}
+          alignItems="center"
+          mt={1}
         >
-          <Table.GlobalActions />
-          <Table.Container>
-            <Table.Actions>
-              <Table.ActionsLeft />
-              <Table.ActionsCenter>
-                <Table.Pagination />
-              </Table.ActionsCenter>
-              <Table.ActionsRight>
-                <Table.Delete />
-              </Table.ActionsRight>
-            </Table.Actions>
-            <Table.Header />
-            <FormProvider {...methods}>
-              <Table.Body />
-            </FormProvider>
-          </Table.Container>
-        </Table>
+          <Grid container item xs={10} alignItems="center" spacing={1}>
+            <Grid item>
+              <Box mt={0.3}>
+                <EvaIcon name={"alert-circle-outline"} />
+              </Box>
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">
+                Manage locations by editing the table
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item xs={2}>
+            <SaveButton
+              isDirty={methods.formState.isDirty}
+              onClick={onClickSave}
+              loading={isLoading}
+              progressColor={
+                methods.formState.isDirty ? "common.white" : "common.black"
+              }
+            >
+              Save
+            </SaveButton>
+          </Grid>
+        </Grid>
+        <Grid item sx={{ width: "100%" }}>
+          <Table
+            limit={8}
+            names={names}
+            onRefresh={onRefresh}
+            onDelete={onDelete}
+            columns={columns}
+            data={locationsData ?? []}
+          >
+            <Table.GlobalActions />
+            <Table.Container>
+              <Table.Actions>
+                <Table.ActionsLeft />
+                <Table.ActionsCenter>
+                  <Table.Pagination />
+                </Table.ActionsCenter>
+                <Table.ActionsRight>
+                  <Table.Delete />
+                </Table.ActionsRight>
+              </Table.Actions>
+              <Table.Header />
+              <FormProvider {...methods}>
+                <Table.Body />
+              </FormProvider>
+            </Table.Container>
+          </Table>
+        </Grid>
       </Grid>
-    </Grid>
+    </ModalProvider>
   );
 };
 
