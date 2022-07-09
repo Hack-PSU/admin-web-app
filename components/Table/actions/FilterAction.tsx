@@ -57,7 +57,7 @@ const Accordion: FC<WithChildren<IAccordionProps>> = ({ children, title }) => {
       </StyledAccordionTitle>
       <AccordionDetails
         sx={{
-          backgroundColor: theme.palette.button.grey,
+          backgroundColor: theme.palette.button.light,
           boxShadow: 0,
           borderBottom: "none",
         }}

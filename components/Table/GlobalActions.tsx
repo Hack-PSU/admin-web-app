@@ -23,6 +23,10 @@ const GlobalActions: FC<IGlobalActionsProps> = ({
     const texts = names
       .filter((state) => state.type === "text")
       .map((state) => _.toLower(state.name));
+    if (texts.length === 1) {
+      return `Search by ${texts[texts.length - 1]}`;
+    }
+
     const lastText = texts[texts.length - 1];
     texts.splice(texts.length - 1, 1, `or ${lastText}`);
 

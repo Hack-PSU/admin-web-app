@@ -14,12 +14,12 @@ function Select<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
->(props: SelectProps<TOption, TIsMulti, TGroup>) {
+>({ error, ...props }: SelectProps<TOption, TIsMulti, TGroup>) {
   const theme = useTheme();
 
   const customStyles: StylesConfig<TOption, TIsMulti, TGroup> = useMemo(
-    () => selectStyles(theme),
-    [theme]
+    () => selectStyles(theme, !!error),
+    [theme, error]
   );
 
   return (
@@ -48,7 +48,7 @@ export function LabelledSelect<
     <>
       <InputLabel id={id} label={label} showError={showError} error={error} />
       <Box mt={0.6}>
-        <Select {...props} />
+        <Select {...props} error={!!error} />
       </Box>
     </>
   );
@@ -67,16 +67,29 @@ export function ControlledSelect<
 }: ControlledSelectProps<TOption, TIsMulti, TGroup>) {
   const {
     field: { onChange, onBlur, value },
+    fieldState: { error },
   } = useController({ name, rules, defaultValue });
 
   if (Component) {
     return (
-      <Component onChange={onChange} onBlur={onBlur} value={value} {...props} />
+      <Component
+        error={error?.message ?? ""}
+        onChange={onChange}
+        onBlur={onBlur}
+        value={value}
+        {...props}
+      />
     );
   }
 
   return (
-    <Select onChange={onChange} onBlur={onBlur} value={value} {...props} />
+    <Select
+      onChange={onChange}
+      onBlur={onBlur}
+      value={value}
+      error={!!error}
+      {...props}
+    />
   );
 }
 

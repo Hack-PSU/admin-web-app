@@ -76,7 +76,9 @@ export type SelectProps<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
-> = Omit<Props<TOption, TIsMulti, TGroup>, "styles">;
+> = Omit<Props<TOption, TIsMulti, TGroup>, "styles"> & {
+  error?: boolean;
+};
 
 export type LabelledSelectProps<
   TOption,

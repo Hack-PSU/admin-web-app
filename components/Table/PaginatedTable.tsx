@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Table, { ITableProps } from "./Table";
 
-const PaginatedTable: FC<ITableProps> = ({
+const PaginatedTable: FC<ITableProps<any>> = ({
   limit,
   names,
   onRefresh,

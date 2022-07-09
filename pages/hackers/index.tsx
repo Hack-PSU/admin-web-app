@@ -10,7 +10,7 @@ import { Table } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
-import { GradientButton } from "components/base/Button";
+import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
 import {
   fetch,
@@ -28,7 +28,12 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder<{
+    name: string;
+    pin: number;
+    email: string;
+    university: string;
+  }>((builder) =>
     builder
       .addColumn("Name", {
         maxWidth: 120,
@@ -87,7 +92,13 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
   return (
     <Grid container gap={1.5}>
-      <Grid container item justifyContent="space-between" alignItems="center">
+      <Grid
+        container
+        item
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ width: "100%" }}
+      >
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Hackers
@@ -112,7 +123,7 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           </GradientButton>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item sx={{ width: "100%" }}>
         <Table
           limit={8}
           names={names}

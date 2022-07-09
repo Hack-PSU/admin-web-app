@@ -54,7 +54,7 @@ const PaginationButton: FC<IPaginationButtonProps> = ({
         width: "35px",
         height: "35px",
         ":hover": {
-          backgroundColor: darken(theme.palette.button.grey, 0.03),
+          backgroundColor: darken(theme.palette.button.light, 0.03),
         },
         ...sx,
       }}
@@ -142,6 +142,7 @@ const PaginationAction: FC<IPaginationActionProps> = ({
             }}
             inputProps={{
               sx: {
+                fontSize: "1.0625rem",
                 textAlign: "center",
               },
             }}

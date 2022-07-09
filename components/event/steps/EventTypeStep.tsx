@@ -2,7 +2,7 @@ import React, { FC, useCallback } from "react";
 import EventStep from "./EventStep";
 import { Grid } from "@mui/material";
 import { ControlledSelect, LabelledSelect, useStepper } from "components/base";
-import { EventType } from "types/api";
+import { EventType } from "api";
 import { useForm, FormProvider } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { assert, enums, object, string } from "superstruct";

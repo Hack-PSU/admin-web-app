@@ -2,6 +2,7 @@ import React, { FC } from "react";
 
 // @ts-ignore (no types available for this package)
 import EvaBaseIcon from "react-eva-icons";
+import { useTheme } from "@mui/material";
 
 interface IEvaIcon {
   name: string;
@@ -11,9 +12,15 @@ interface IEvaIcon {
 }
 
 const EvaIcon: FC<IEvaIcon> = ({ name, size, fill, style }) => {
+  const theme = useTheme();
+
   return (
     <div key={`${name}-${size ?? ""}-${fill ?? ""}`} style={style}>
-      <EvaBaseIcon name={name} fill={fill} size={size} />
+      <EvaBaseIcon
+        name={name}
+        fill={fill ?? theme.palette.common.black}
+        size={size ?? "medium"}
+      />
     </div>
   );
 };

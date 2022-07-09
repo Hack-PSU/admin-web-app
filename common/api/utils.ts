@@ -42,7 +42,10 @@ export function createQuery<TResponse, TParam extends object = {}>(
     api.request<ApiResponse<TResponse>>({
       url,
       method: "GET",
-      ...(params ? { params } : {}),
+      params: {
+        ...(params ?? {}),
+        ignoreCache: true,
+      },
       ...(token
         ? {
             headers: {

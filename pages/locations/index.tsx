@@ -1,14 +1,23 @@
 import { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { GradientButton } from "components/base/Button";
-import { fetch, getAllLocations, ILocationEntity, resolveError } from "api";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import {
+  fetch,
+  getAllLocations,
+  ILocationEntity,
+  ILocationUpdateEntity,
+  MutateEntity,
+  QueryKeys,
+  resolveError,
+  updateLocation,
+} from "api";
 import { useColumnBuilder } from "common/hooks";
-import { useQuery } from "react-query";
-import { Table, TableCell } from "components/Table";
-import { ControlledInput, EvaIcon } from "components/base";
-import { useRouter } from "next/router";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { ActionRowCell, Table } from "components/Table";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import InputCell from "components/Table/InputCell";
 
 interface ILocationsPageProps {
   locations: ILocationEntity[];
@@ -16,13 +25,13 @@ interface ILocationsPageProps {
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const theme = useTheme();
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const currentInputKey = useRef<{ key: string }>({ key: "" });
 
-  const { data: locationsData } = useQuery(
-    ["locations"],
+  const { data: locationsData, refetch } = useQuery(
+    QueryKeys.location.findAll(),
     () => fetch(getAllLocations),
     {
-      keepPreviousData: true,
       initialData: locations,
       select: (data) => {
         if (data) {
@@ -35,65 +44,99 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
-  const { columns, names } = useColumnBuilder((builder) =>
-    builder
-      .addColumn("Name", {
-        id: "name",
-        type: "text",
-        accessor: "name",
-        Header: () => <Box ml={1.8}>Name</Box>,
-        Cell: ({ cell, row }) => {
-          const [isHovering, setIsHovering] = useState<boolean>(false);
-          return (
-            <TableCell
-              empty
-              {...cell.getCellProps()}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              <ControlledInput
-                // @ts-ignore
-                name={`${row.original.uid}.name`}
-                placeholder={"Enter location name"}
-                sx={{
-                  border: isHovering ? undefined : "transparent",
-                  transition: "border 200ms ease-in-out",
+  const { mutateAsync, isLoading } = useMutation(
+    QueryKeys.location.updateBatch(),
+    ({ entity }: MutateEntity<ILocationUpdateEntity>) => updateLocation(entity),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.location.all);
+      },
+    }
+  );
+
+  const defaultValues = useMemo(() => {
+    if (locationsData) {
+      return locationsData.reduce((obj, curr) => {
+        obj[String(curr.uid)] = curr;
+        return obj;
+      }, {} as { [p: string]: { uid: number; name: string } });
+    }
+    return {};
+  }, [locationsData]);
+
+  const methods = useForm({
+    defaultValues,
+  });
+
+  const { formState, reset, handleSubmit } = methods;
+  const { dirtyFields } = formState;
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset({ ...defaultValues });
+    }
+  }, [defaultValues, reset]);
+
+  const onClickSave = () => {
+    handleSubmit(async (data) => {
+      const editedFields = Object.keys(dirtyFields).filter(
+        (field) => dirtyFields[field].name
+      );
+
+      await Promise.all(
+        editedFields.map((uid) =>
+          mutateAsync({
+            entity: { uid: data[uid].uid, locationName: data[uid].name },
+          })
+        )
+      );
+    })();
+  };
+
+  const { columns, names } = useColumnBuilder<{ uid: string; name: string }>(
+    (builder) =>
+      builder
+        .addColumn("Name", {
+          id: "name",
+          type: "text",
+          accessor: (row) => row.name,
+          Header: () => <Box ml={1.8}>Name</Box>,
+          Cell: ({ cell, row }) => (
+            <InputCell
+              cell={cell}
+              name={`${row.original.uid}.name`}
+              placeholder={"Enter a location"}
+              onFocus={() => {
+                currentInputKey.current.key = row.original.uid;
+              }}
+              autoFocus={row.original.uid === currentInputKey.current.key}
+            />
+          ),
+        })
+        .addColumn("Actions", {
+          id: "actions",
+          type: "custom",
+          hideHeader: true,
+          disableSortBy: true,
+          maxWidth: 5,
+          Cell: ({ cell, row }) => {
+            const { resetField } = useFormContext();
+
+            return (
+              <ActionRowCell
+                cell={cell}
+                icon="refresh-outline"
+                onClickAction={() => {
+                  resetField(`${row.original.uid}.name`);
                 }}
               />
-            </TableCell>
-          );
-        },
-      })
-      .addColumn("Actions", {
-        id: "actions",
-        type: "custom",
-        hideHeader: true,
-        disableSortBy: true,
-        maxWidth: 5,
-        Cell: ({ cell, row }) => (
-          <TableCell empty {...cell.getCellProps()}>
-            <IconButton
-              sx={{
-                borderRadius: "5px",
-                width: "25px",
-                height: "25px",
-              }}
-              // @ts-ignore
-              onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
-            >
-              <EvaIcon
-                name={"edit-outline"}
-                fill={theme.palette.sunset.dark}
-                size="medium"
-              />
-            </IconButton>
-          </TableCell>
-        ),
-      })
+            );
+          },
+        })
   );
 
   const onRefresh = () => {
-    return null;
+    return refetch();
   };
 
   const onDelete = () => {
@@ -111,11 +154,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         <Grid item xs={2.3}>
           <GradientButton
             variant="text"
-            sx={(theme) => ({
-              // ml: "auto",
+            sx={{
               width: "100%",
               padding: theme.spacing(1, 3.5),
-            })}
+            }}
             textProps={{
               sx: {
                 lineHeight: "1.8rem",
@@ -127,7 +169,40 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           </GradientButton>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid
+        container
+        item
+        justifyContent="space-between"
+        xs={12}
+        alignItems="center"
+        mt={1}
+      >
+        <Grid container item xs={10} alignItems="center" spacing={1}>
+          <Grid item>
+            <Box mt={0.3}>
+              <EvaIcon name={"alert-circle-outline"} />
+            </Box>
+          </Grid>
+          <Grid item>
+            <Typography variant="subtitle1">
+              Manage locations by editing the table
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid item xs={2}>
+          <SaveButton
+            isDirty={methods.formState.isDirty}
+            onClick={onClickSave}
+            loading={isLoading}
+            progressColor={
+              methods.formState.isDirty ? "common.white" : "common.black"
+            }
+          >
+            Save
+          </SaveButton>
+        </Grid>
+      </Grid>
+      <Grid item sx={{ width: "100%" }}>
         <Table
           limit={8}
           names={names}
@@ -148,7 +223,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               </Table.ActionsRight>
             </Table.Actions>
             <Table.Header />
-            <Table.Body />
+            <FormProvider {...methods}>
+              <Table.Body />
+            </FormProvider>
           </Table.Container>
         </Table>
       </Grid>

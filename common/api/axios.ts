@@ -1,9 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { auth, getEnvironment } from "common/config";
-import { getApp } from "@firebase/app";
-import { User, getAuth, getIdToken, getIdTokenResult } from "@firebase/auth";
+import { User, getIdToken, getIdTokenResult } from "@firebase/auth";
 import moment from "moment";
-import { DateTime } from "luxon";
 import nookies from "nookies";
 
 type ApiAxiosInstance = AxiosInstance & {

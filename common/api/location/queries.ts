@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { ILocationEntity } from "./entity";
+import { ILocationEntity, ILocationUpdateEntity } from "./entity";
 import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
 
 /**
@@ -36,7 +36,7 @@ export const createLocation: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Update_Location
  */
 export const updateLocation: CreateMutationReturn<
-  Partial<ILocationEntity>,
+  Partial<ILocationUpdateEntity>,
   ILocationEntity
 > = createMutation("/admin/location/update");
 
@@ -71,5 +71,13 @@ export const LocationKeys = {
   delete: (id: string | number) =>
     [
       { ...LocationKeys.all[0], action: QueryAction.delete, scope: id },
+    ] as const,
+  updateBatch: () =>
+    [
+      {
+        ...LocationKeys.all[0],
+        action: QueryAction.updateBatch,
+        scope: QueryScope.ALL,
+      },
     ] as const,
 };

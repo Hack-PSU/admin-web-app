@@ -1,4 +1,4 @@
-import { CheckoutItemKeys } from "./checkout_item";
+import { CheckoutItemKeys, ItemKeys } from "./checkout_item";
 import { EventKeys } from "./event";
 import { HackathonKeys } from "./hackathon";
 import { HackerKeys } from "./hacker";
@@ -6,6 +6,7 @@ import { LocationKeys } from "./location";
 
 export const QueryKeys = {
   event: EventKeys,
+  manageItems: ItemKeys,
   checkoutItem: CheckoutItemKeys,
   hacker: HackerKeys,
   hackathon: HackathonKeys,

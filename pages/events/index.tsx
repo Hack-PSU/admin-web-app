@@ -2,7 +2,12 @@ import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
-import { DefaultCell, TableCell, PaginatedTable } from "components/Table";
+import {
+  DefaultCell,
+  TableCell,
+  PaginatedTable,
+  ActionRowCell,
+} from "components/Table";
 import {
   EventType,
   IGetAllEventsResponse,
@@ -22,7 +27,17 @@ interface IEventsProps {
   events: IGetAllEventsResponse[];
 }
 
-const DateTimeCell: FC<{ cell: Cell }> = ({ cell }) => {
+type EventRowValues = Pick<
+  IGetAllEventsResponse,
+  | "event_title"
+  | "location_name"
+  | "event_start_time"
+  | "event_end_time"
+  | "event_type"
+  | "uid"
+>;
+
+const DateTimeCell: FC<{ cell: Cell<EventRowValues> }> = ({ cell }) => {
   const theme = useTheme();
 
   return (
@@ -63,34 +78,36 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder((builder) =>
+  const { columns, names } = useColumnBuilder<EventRowValues>((builder) =>
     builder
       .addColumn("Name", {
         id: "name",
         type: "text",
         filterType: "input",
-        accessor: "event_title",
+        accessor: (row) => row.event_title,
         maxWidth: 120,
       })
       .addColumn("Location", {
         id: "location",
         type: "text",
         filterType: "input",
-        accessor: "location_name",
+        accessor: (row) => row.location_name,
         minWidth: 150,
       })
       .addColumn("Start Date", {
+        id: "startDate",
         type: "date",
         filterType: "date",
-        accessor: "event_start_time",
+        accessor: (row) => row.event_start_time,
         maxWidth: 100,
         width: 100,
         Cell: ({ cell }) => <DateTimeCell cell={cell} />,
       })
       .addColumn("End Date", {
+        id: "endDate",
         filterType: "date",
         type: "date",
-        accessor: "event_end_time",
+        accessor: (row) => row.event_end_time,
         width: 100,
         Cell: ({ cell }) => <DateTimeCell cell={cell} />,
       })
@@ -98,7 +115,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         id: "type",
         filterType: "checkbox",
         type: "text",
-        accessor: "event_type",
+        accessor: (row) => row.event_type,
         width: 100,
         Cell: ({ cell }) => {
           return (
@@ -117,25 +134,13 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         hideHeader: true,
         disableSortBy: true,
         width: 20,
-        accessor: "uid",
+        accessor: (row) => row.uid,
         Cell: ({ cell, row }) => (
-          <TableCell {...cell.getCellProps()}>
-            <IconButton
-              sx={{
-                borderRadius: "5px",
-                width: "25px",
-                height: "25px",
-              }}
-              // @ts-ignore
-              onClick={() => router.push(`/events/${row?.original?.uid ?? ""}`)}
-            >
-              <EvaIcon
-                name={"edit-outline"}
-                fill={theme.palette.sunset.dark}
-                size="medium"
-              />
-            </IconButton>
-          </TableCell>
+          <ActionRowCell
+            cell={cell}
+            icon={"edit-outline"}
+            onClickAction={() => router.push(`/events/${row.original.uid}`)}
+          />
         ),
       })
   );
@@ -197,7 +202,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
           </GradientButton>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item sx={{ width: "100%" }}>
         <PaginatedTable
           limit={8}
           columns={columns}
