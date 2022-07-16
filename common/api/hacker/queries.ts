@@ -1,8 +1,12 @@
 import { createQuery, CreateQueryReturn } from "api/utils";
 import { IGetAllHackersResponse } from "./entity";
-import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
+import { QueryAction, QueryScope } from "api/types";
 
-type GetAllHackersParams = { type: string };
+type GetAllHackersParams = {
+  type: string;
+  hackathon?: string;
+  allHackathons?: boolean;
+};
 
 /**
  * Get All Hackers
