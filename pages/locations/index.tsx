@@ -50,9 +50,8 @@ const AddNewLocationButton = () => {
 };
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
-  const theme = useTheme();
   const queryClient = useQueryClient();
-  const currentInputKey = useRef<{ key: string }>({ key: "" });
+  const currentInputKey = useRef<string | null>(null);
 
   const { data: locationsData, refetch } = useQuery(
     QueryKeys.location.findAll(),
@@ -133,9 +132,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               name={`${row.original.uid}.name`}
               placeholder={"Enter a location"}
               onFocus={() => {
-                currentInputKey.current.key = row.original.uid;
+                currentInputKey.current = row.original.uid;
               }}
-              autoFocus={row.original.uid === currentInputKey.current.key}
+              autoFocus={row.original.uid === currentInputKey.current}
             />
           ),
         })

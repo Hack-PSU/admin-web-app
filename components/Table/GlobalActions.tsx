@@ -25,6 +25,8 @@ const GlobalActions: FC<IGlobalActionsProps> = ({
       .map((state) => _.toLower(state.name));
     if (texts.length === 1) {
       return `Search by ${texts[texts.length - 1]}`;
+    } else if (texts.length === 2) {
+      return `Search by ${texts[0]} or ${texts[1]}`;
     }
 
     const lastText = texts[texts.length - 1];

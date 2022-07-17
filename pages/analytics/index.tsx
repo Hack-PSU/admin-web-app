@@ -109,8 +109,6 @@ const AnalyticsPage: NextPage = () => {
     }
   }, [registrationsByHackathon]);
 
-  console.log(growthByHackathon);
-
   return (
     <Grid container gap={1.5} flexDirection="column">
       <Grid container item justifyContent="space-between" alignItems="center">

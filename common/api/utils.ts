@@ -31,7 +31,7 @@ export type CreateMutationReturn<
   TParam extends object = {}
 > = (
   entity: TEntity,
-  param?: TParam,
+  params?: TParam,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
 
