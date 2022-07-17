@@ -10,7 +10,7 @@ import _ from "lodash";
 
 // @ts-expect-error no typedefs
 import Color from "colorjs.io";
-import { Box, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 interface IPieProps<TData> extends PieProps<TData> {
   // units are in px
@@ -22,6 +22,10 @@ interface IPieProps<TData> extends PieProps<TData> {
   height?: number;
   arcWidth?: number;
   useD3Color?: boolean;
+
+  // Interval in ms before hiding tooltip when mouse leaves the graph.
+  // Defaults to 1000ms
+  tooltipFocusTimeout?: number;
 
   // range must be in hex
   colorRange?: [string, string];
@@ -55,6 +59,7 @@ function Pie<TData extends object>({
   getTooltipData,
   getCount,
   useD3Color = true,
+  tooltipFocusTimeout,
   ...props
 }: IPieProps<TData>) {
   const {
@@ -73,9 +78,7 @@ function Pie<TData extends object>({
   );
 
   const svgRef = useRef<SVGSVGElement>(null);
-  const tooltipTimeout = useRef<{ timeout?: NodeJS.Timeout }>({
-    timeout: undefined,
-  });
+  const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const centerX = width / 2;
   const centerY = height ? height / 2 : centerX;
@@ -121,9 +124,9 @@ function Pie<TData extends object>({
 
   const onHoverData = useCallback(
     (event: React.MouseEvent, data: TData) => {
-      if (tooltipTimeout.current?.timeout)
-        clearTimeout(tooltipTimeout.current.timeout);
+      if (tooltipTimeout.current) clearTimeout(tooltipTimeout.current);
 
+      // Get coordinates relative to container bounds
       const containerX =
         ("clientX" in event ? event.clientX : 0) - containerBounds.left;
       const containerY =
@@ -139,13 +142,13 @@ function Pie<TData extends object>({
   );
 
   const onMouseLeave = useCallback(() => {
-    tooltipTimeout.current.timeout = setTimeout(() => {
+    tooltipTimeout.current = setTimeout(() => {
       hideTooltip();
-    }, 3000);
-  }, [hideTooltip]);
+    }, tooltipFocusTimeout ?? 1000);
+  }, [hideTooltip, tooltipFocusTimeout]);
 
   return (
-    <Grid container item ref={containerRef} pt={2}>
+    <Grid item ref={containerRef} pt={2}>
       <svg
         width={width + 2 * margin.vertical}
         height={height ?? width + 2 * margin.horizontal}
@@ -169,7 +172,7 @@ function Pie<TData extends object>({
                 const [centroidX, centroidY] = pie.path.centroid(arc);
 
                 return (
-                  <g
+                  <Group
                     key={`pie-arc-${getKey(arc.data)}-${arc.index}`}
                     onMouseMove={(e) => onHoverData(e, arc.data)}
                     onMouseLeave={onMouseLeave}
@@ -183,7 +186,7 @@ function Pie<TData extends object>({
                       }
                     />
                     {hasSpaceForLabel && (
-                      <g key={`pie-arc-text-${getKey(arc.data)}`}>
+                      <Group key={`pie-arc-text-${getKey(arc.data)}`}>
                         <text
                           textAnchor={"middle"}
                           x={centroidX}
@@ -209,9 +212,9 @@ function Pie<TData extends object>({
                         >
                           {getTooltipData(arc.data)}
                         </text>
-                      </g>
+                      </Group>
                     )}
-                  </g>
+                  </Group>
                 );
               })
             }
