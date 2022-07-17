@@ -1,8 +1,7 @@
 import React from "react";
 import { NextPage } from "next";
-import { EventType, IGetAllEventsResponse } from "types/api";
+import { EventType, IGetAllEventsResponse, getAllEvents, fetch } from "api";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { getAllEvents } from "api/index";
 import { Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import EventEditDetails from "components/event/edit/EventEditDetails";
@@ -84,10 +83,10 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
 
 export const getServerSideProps = withServerSideProps(async (context) => {
   const { uid } = context.query;
-  const events = await getAllEvents();
+  const events = await fetch(getAllEvents);
 
-  if (events && events?.data.body.data) {
-    const event = events?.data.body.data.find((value) => value.uid === uid);
+  if (events) {
+    const event = events.find((value) => value.uid === uid);
     if (event) {
       return {
         props: {
