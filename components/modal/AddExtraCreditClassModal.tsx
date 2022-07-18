@@ -16,7 +16,6 @@ import { CreateEntity, fetch, QueryKeys } from "api";
 import {
   createExtraCreditClass,
   IExtraCreditClassCreateEntity,
-  IExtraCreditClassEntity,
 } from "api/extra_credit";
 
 const schema = object({
@@ -84,7 +83,7 @@ const AddExtraCreditClassModal: FC = () => {
             mx={"auto"}
             justifyContent="center"
           >
-            <Grid item xs={6}>
+            <Grid item>
               <Box mt={2}>
                 <MenuButton
                   isDirty={methods.formState.isDirty}

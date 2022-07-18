@@ -6,10 +6,12 @@ import {
 } from "api/utils";
 import { IGetAllHackersResponse } from "../hacker";
 import {
+  IAssignExtraCreditClassEntity,
   IExtraCreditAssignmentEntity,
+  IExtraCreditClassCreateEntity,
   IExtraCreditClassEntity,
 } from "./entity";
-import { QueryAction, QueryScope } from "api/types";
+import { CreateEntity, QueryAction, QueryScope } from "api/types";
 
 /**
  * Get all extra credit classes
@@ -69,9 +71,14 @@ export const getAssignmentByHacker: CreateQueryReturn<
  * @param token (optional)
  */
 export const createExtraCreditClass: CreateMutationReturn<
-  Omit<IExtraCreditClassEntity, "uid">,
+  Omit<IExtraCreditClassCreateEntity, "uid">,
   IExtraCreditClassEntity
 > = createMutation("/users/extra-credit/add-class");
+
+export const assignExtraCreditClass: CreateMutationReturn<
+  IAssignExtraCreditClassEntity,
+  IExtraCreditAssignmentEntity
+> = createMutation("/users/extra-credit");
 
 /**
  * Delete all assignments by hacker
@@ -133,6 +140,14 @@ export const ExtraCreditAssignmentKeys = {
         ...ExtraCreditAssignmentKeys.all[0],
         action: QueryAction.query,
         scope: id,
+      },
+    ] as const,
+  createOne: () =>
+    [
+      {
+        ...ExtraCreditAssignmentKeys.all[0],
+        action: QueryAction.create,
+        scope: QueryScope.ID,
       },
     ] as const,
   deleteOne: () =>

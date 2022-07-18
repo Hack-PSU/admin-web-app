@@ -15,6 +15,8 @@ import {
   UseDateTimeRange,
   UsePaginatedQuery,
   UsePaginatedQueryOptions,
+  UseTableStateOptions,
+  UseTableStateReturn,
 } from "types/hooks";
 import { useController, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
@@ -292,6 +294,78 @@ export function useColumnBuilder<T extends object>(
         builder(_builder<T>({ columns: [], names: [] })) as ColumnBuilder<T>
       ).save(),
     [builder]
+  );
+}
+
+export function useTableState<T extends object>(
+  options: UseTableStateOptions<T>
+): UseTableStateReturn<T> {
+  const { getKey, data } = options;
+
+  const initialIds = useMemo(() => {
+    if (data) {
+      return data.reduce((acc, curr) => {
+        acc[getKey(curr)] = false;
+        return acc;
+      }, {} as Record<string, boolean>);
+    }
+    return {};
+  }, [data, getKey]);
+
+  const [selectedRowIds, setSelectedRowIds] =
+    useState<Record<string, boolean>>(initialIds);
+  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+  const [hasSelections, setHasSelections] = useState<boolean>(false);
+
+  const onRowSelected: UseTableStateReturn<T>["onRowSelected"] = useCallback(
+    (rows) => {
+      setSelectedRowIds(rows);
+    },
+    []
+  );
+
+  const getSelectedRows: UseTableStateReturn<T>["getSelectedRows"] =
+    useCallback(() => {
+      if (data && selectedRowIds) {
+        const selectedData = new Set(
+          Object.entries(selectedRowIds)
+            .filter(([, selected]) => selected)
+            .map(([key]) => key)
+        );
+        return data.filter((d) => selectedData.has(getKey(d)));
+      }
+      return [];
+    }, [data, selectedRowIds, getKey]);
+
+  // useEffect(() => {
+  //   const selected = getSelectedRows();
+  //   setSelectedRows(selected);
+  //   setHasSelections(selected.length > 0);
+  // }, [getSelectedRows]);
+
+  return useMemo(
+    () => ({
+      selectedRows,
+      hasSelections,
+      selectedRowIds,
+      onRowSelected,
+      states: {
+        initialState: {
+          selectedRowIds: initialIds,
+        },
+        getRowId: getKey,
+      },
+      getSelectedRows,
+    }),
+    [
+      selectedRowIds,
+      onRowSelected,
+      initialIds,
+      getKey,
+      getSelectedRows,
+      selectedRows,
+      hasSelections,
+    ]
   );
 }
 

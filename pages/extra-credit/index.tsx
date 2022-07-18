@@ -1,11 +1,25 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton, SaveButton } from "components/base";
+import {
+  Box,
+  darken,
+  Grid,
+  lighten,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import { Button, EvaIcon, GradientButton, SaveButton } from "components/base";
 import { ActionRowCell, Table, InputCell } from "components/Table";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { useColumnBuilder } from "common/hooks";
+import { useColumnBuilder, useTableState } from "common/hooks";
 import { useQuery } from "react-query";
 import { fetch, QueryKeys } from "api";
 import {
@@ -14,6 +28,13 @@ import {
 } from "api/extra_credit";
 import { ModalProvider, useModalContext } from "components/context";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
+import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
+
+type DataRow = {
+  uid: string;
+  name: string;
+  users: number;
+};
 
 const AddNewClassButton = () => {
   const { showModal } = useModalContext();
@@ -39,39 +60,64 @@ const AddNewClassButton = () => {
   );
 };
 
-const ExtraCreditPage: NextPage = () => {
-  const currentInputKey = useRef<string | null>(null);
+const AssignClassButton: FC<{ hasSelections: boolean }> = ({
+  hasSelections,
+}) => {
+  const { showModal } = useModalContext();
+  const theme = useTheme();
 
-  const { columns, names } = useColumnBuilder<{
-    uid: string;
-    name: string;
-    users: number;
-  }>((builder) =>
+  return (
+    <Button
+      onClick={() => showModal("assignExtraCreditClass")}
+      disabled={!hasSelections}
+      sx={{
+        border: hasSelections
+          ? `2px solid transparent`
+          : `2px solid ${theme.palette.common.black}`,
+        backgroundColor: hasSelections ? "common.black" : "transparent",
+        width: "100%",
+        ":hover": {
+          backgroundColor: lighten(theme.palette.common.black, 0.05),
+        },
+      }}
+      textProps={{
+        sx: {
+          color: hasSelections ? "common.white" : "common.black",
+        },
+      }}
+    >
+      Assign
+    </Button>
+  );
+};
+
+const ExtraCreditPage: NextPage = () => {
+  const { columns, names } = useColumnBuilder<DataRow>((builder) =>
     builder
       .addColumn("Name", {
         id: "name",
         type: "text",
-        width: 120,
+        width: 200,
         accessor: (row) => row.name,
-        Header: () => <Box ml={1.8}>Name</Box>,
-        Cell: ({ cell, row }) => {
-          return (
-            <InputCell
-              cell={cell}
-              name={`${row.original.uid}.name`}
-              placeholder={"Enter class name"}
-              onFocus={() => {
-                currentInputKey.current = row.original.uid;
-              }}
-              autoFocus={row.original.uid === currentInputKey.current}
-            />
-          );
-        },
+        // Header: () => <Box ml={1.8}>Name</Box>,
+        // Cell: ({ cell, row }) => {
+        //   return (
+        //     <InputCell
+        //       cell={cell}
+        //       name={`${row.original.uid}.name`}
+        //       placeholder={"Enter class name"}
+        //       onFocus={() => {
+        //         currentInputKey.current = row.original.uid;
+        //       }}
+        //       autoFocus={row.original.uid === currentInputKey.current}
+        //     />
+        //   );
+        // },
       })
       .addColumn("Hackers", {
         id: "hackers",
         type: "text",
-        width: 60,
+        width: 120,
         accessor: (row) => row.users,
       })
       .addColumn("Actions", {
@@ -142,6 +188,14 @@ const ExtraCreditPage: NextPage = () => {
     }
   }, [allClasses]);
 
+  const { getSelectedRows, onRowSelected, states } = useTableState({
+    data: allClasses,
+    getKey: (item) => String(item.uid),
+  });
+
+  const selectedRows = useMemo(() => getSelectedRows(), [getSelectedRows]);
+  const hasSelections = useMemo(() => selectedRows.length > 0, [selectedRows]);
+
   const methods = useForm({
     defaultValues,
   });
@@ -152,10 +206,6 @@ const ExtraCreditPage: NextPage = () => {
       reset({ ...defaultValues });
     }
   }, [defaultValues, reset]);
-
-  const onClickSave = () => {
-    return null;
-  };
 
   const onRefresh = () => {
     return null;
@@ -168,6 +218,7 @@ const ExtraCreditPage: NextPage = () => {
   return (
     <ModalProvider>
       <AddExtraCreditClassModal />
+      <AssignExtraCreditClassModal selectedRows={selectedRows} />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={9.7}>
@@ -195,21 +246,12 @@ const ExtraCreditPage: NextPage = () => {
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
-                Manage class names by editing the table
+                Select classes to assign to hackers
               </Typography>
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton
-              isDirty={methods.formState.isDirty}
-              onClick={onClickSave}
-              loading={false}
-              progressColor={
-                methods.formState.isDirty ? "common.white" : "common.black"
-              }
-            >
-              Save
-            </SaveButton>
+            <AssignClassButton hasSelections={hasSelections} />
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
@@ -220,6 +262,8 @@ const ExtraCreditPage: NextPage = () => {
             onDelete={onDelete}
             columns={columns}
             data={allClasses ?? []}
+            onSelectRows={onRowSelected}
+            {...states}
           >
             <Table.GlobalActions />
             <Table.Container>

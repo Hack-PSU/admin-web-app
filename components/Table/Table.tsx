@@ -15,9 +15,11 @@ import {
   useGlobalFilter,
   UseGlobalFiltersInstanceProps,
   UseGlobalFiltersState,
+  useMountedLayoutEffect,
   usePagination,
   UsePaginationInstanceProps,
   useRowSelect,
+  UseRowSelectInstanceProps,
   useSortBy,
   useTable,
   UseTableInstanceProps,
@@ -42,7 +44,6 @@ import {
   SortAction,
 } from "components/Table/actions";
 import SortColumn from "components/Table/actions/SortColumn";
-import { useForm, FormProvider } from "react-hook-form";
 import { Select } from "components/base";
 import { ActionMeta, SingleValue } from "react-select";
 
@@ -51,6 +52,7 @@ export interface ITableProps<T extends object> extends TableProps<T> {
   names: NamesState[];
   onRefresh(): void;
   onDelete(): void;
+  onSelectRows?(rows: Record<string, boolean>): void;
 }
 
 type TableContextHooks = Pick<
@@ -104,10 +106,10 @@ const Table: TableComponent = ({
   onRefresh,
   children,
   limit,
+  onSelectRows,
   ...props
 }) => {
   const theme = useTheme();
-  const methods = useForm();
 
   const defaultColumn = useMemo(
     () => ({
@@ -140,12 +142,16 @@ const Table: TableComponent = ({
     nextPage,
     previousPage,
     pageCount,
-    state: { pageIndex, globalFilter },
+    state: { pageIndex, globalFilter, selectedRowIds },
     canNextPage,
     canPreviousPage,
     setPageSize,
+
+    // Row selection
+    selectedFlatRows,
   } = useTable(
     {
+      ...props,
       columns,
       data,
       defaultColumn,
@@ -153,8 +159,9 @@ const Table: TableComponent = ({
       initialState: {
         pageIndex: 0,
         pageSize: limit,
+        ...props.initialState,
       },
-      ...props,
+      autoResetPage: false,
     },
     useFlexLayout, // use flexbox instead of HTML tables
     useFilters, // use column filters
@@ -168,12 +175,22 @@ const Table: TableComponent = ({
           id: "selection",
           Header: ({ getToggleAllPageRowsSelectedProps }) => (
             <TableCell empty>
-              <MuiCheckbox {...getToggleAllPageRowsSelectedProps()} />
+              <MuiCheckbox
+                sx={{
+                  color: "border.dark",
+                }}
+                {...getToggleAllPageRowsSelectedProps()}
+              />
             </TableCell>
           ),
           Cell: ({ row }) => (
             <TableCell empty>
-              <MuiCheckbox {...row.getToggleRowSelectedProps()} />
+              <MuiCheckbox
+                sx={{
+                  color: "border.dark",
+                }}
+                {...row.getToggleRowSelectedProps()}
+              />
             </TableCell>
           ),
         },
@@ -190,6 +207,12 @@ const Table: TableComponent = ({
       }, {} as { [key: string]: ColumnInstance<object> }),
     []
   );
+
+  useEffect(() => {
+    if (onSelectRows) {
+      onSelectRows(selectedRowIds);
+    }
+  }, [onSelectRows, selectedRowIds]);
 
   const value = useMemo(
     () => ({
@@ -453,7 +476,6 @@ const TableHeader: FC = () => {
                       fontSize: theme.typography.pxToRem(15),
                     },
                   }}
-                  // columnSpacing={1.5}
                 >
                   <Grid item>
                     <DefaultCell

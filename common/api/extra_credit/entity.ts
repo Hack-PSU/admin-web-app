@@ -4,7 +4,13 @@ export interface IExtraCreditClassEntity {
 }
 
 export interface IExtraCreditClassCreateEntity {
+  uid: string;
   className: string;
+}
+
+export interface IAssignExtraCreditClassEntity {
+  classUid: string;
+  userUid: string;
 }
 
 export interface IExtraCreditAssignmentEntity {
