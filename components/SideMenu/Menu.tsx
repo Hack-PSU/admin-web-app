@@ -51,10 +51,19 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
         <MenuItem icon={"people-outline"} label={"Hackers"} to={"/hackers"} />
         <MenuItem icon={"calendar-outline"} label={"Events"} to={"/events"} />
         <MenuItem icon={"pin-outline"} label={"Locations"} to={"/locations"} />
-        <MenuItem
-          icon={"award-outline"}
-          label={"Extra Credit"}
+        {/*<MenuItem*/}
+        {/*  icon={"award-outline"}*/}
+        {/*  label={"Extra Credit"}*/}
+        {/*  to={"/extra-credit"}*/}
+        {/*/>*/}
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Manage Classes", to: "/extra-credit/classes" },
+            { label: "Manage Assignments", to: "/extra-credit/assignments" },
+          ]}
           to={"/extra-credit"}
+          label={"Extra Credit"}
+          icon={"award-outline"}
         />
         <CollapsibleMenuItem
           nestedItems={[

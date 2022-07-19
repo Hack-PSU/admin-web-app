@@ -6,7 +6,7 @@ import { LocationKeys } from "./location";
 import {
   ExtraCreditAssignmentKeys,
   ExtraCreditClassKeys,
-} from "api/extra_credit";
+} from "./extra_credit";
 
 export const QueryKeys = {
   event: EventKeys,
