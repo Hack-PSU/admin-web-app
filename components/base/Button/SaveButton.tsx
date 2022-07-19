@@ -38,9 +38,6 @@ const SaveButton: FC<ISaveButtonProps> = ({
         borderRadius: "15px",
         padding: theme.spacing(1, 5),
         fontSize: theme.typography.pxToRem(16),
-        ":hover": {
-          backgroundColor: darken(theme.palette.button.light, 0.05),
-        },
         width: "100%",
         borderRadius: "15px",
         backgroundColor: isDirty ? "common.black" : "transparent",

@@ -173,7 +173,7 @@ const ModalHeader: FC<ModalHeaderProps> = ({
 
   return (
     <Grid container item justifyContent="space-between" alignItems="center">
-      <Grid item xs={11}>
+      <Grid item>
         <Typography
           variant={variant ?? "h5"}
           sx={{
@@ -189,7 +189,7 @@ const ModalHeader: FC<ModalHeaderProps> = ({
           {children}
         </Typography>
       </Grid>
-      <Grid item xs={1} sx={{ marginBlockStart: "auto" }}>
+      <Grid item>
         <IconButton
           sx={{
             padding: theme.spacing(0.5, 1),

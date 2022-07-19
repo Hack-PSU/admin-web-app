@@ -3,6 +3,10 @@ import { EventKeys } from "./event";
 import { HackathonKeys } from "./hackathon";
 import { HackerKeys } from "./hacker";
 import { LocationKeys } from "./location";
+import {
+  ExtraCreditAssignmentKeys,
+  ExtraCreditClassKeys,
+} from "./extra_credit";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -11,6 +15,8 @@ export const QueryKeys = {
   hacker: HackerKeys,
   hackathon: HackathonKeys,
   location: LocationKeys,
+  extraCreditClass: ExtraCreditClassKeys,
+  extraCreditAssignment: ExtraCreditAssignmentKeys,
 };
 
 export * from "./checkout_item";

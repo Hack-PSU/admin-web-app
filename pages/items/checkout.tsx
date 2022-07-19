@@ -148,14 +148,7 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton
-            // isDirty={methods.formState.isDirty}
-            // onClick={onClickSave}
-            // loading={isLoading}
-            // progressColor={methods.formState.isDirty ? "common.white" : "common.black"}
-            >
-              Save
-            </SaveButton>
+            <SaveButton>Save</SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
