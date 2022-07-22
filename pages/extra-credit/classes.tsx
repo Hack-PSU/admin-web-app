@@ -1,31 +1,18 @@
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { FC, useEffect, useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import {
-  Box,
-  darken,
-  Grid,
-  lighten,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { Button, EvaIcon, GradientButton, SaveButton } from "components/base";
-import { ActionRowCell, Table, InputCell } from "components/Table";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Box, Grid, lighten, Typography, useTheme } from "@mui/material";
+import { Button, EvaIcon, GradientButton } from "components/base";
+import { Table } from "components/Table";
+import { FormProvider, useForm } from "react-hook-form";
 import { useColumnBuilder, useTableState } from "common/hooks";
 import { useQuery } from "react-query";
-import { fetch, QueryKeys } from "api";
 import {
+  fetch,
+  QueryKeys,
   getAllExtraCreditAssignments,
   getAllExtraCreditClasses,
-} from "api/extra_credit";
+} from "api";
 import { ModalProvider, useModalContext } from "components/context";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
 import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
@@ -222,7 +209,7 @@ const ExtraCreditClassesPage: NextPage = () => {
       <AssignExtraCreditClassModal selectedRows={selectedRows} />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
-          <Grid item xs={9.7}>
+          <Grid item xs={10}>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               Manage Classes
             </Typography>

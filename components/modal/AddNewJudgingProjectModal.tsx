@@ -12,17 +12,22 @@ import { object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "react-query";
-import { CreateEntity, fetch, QueryKeys } from "api";
-import { createExtraCreditClass, IExtraCreditClassCreateEntity } from "api";
+import {
+  CreateEntity,
+  createProject,
+  fetch,
+  IProjectEntity,
+  QueryKeys,
+} from "api";
 
 const schema = object({
   name: NonEmptyString,
 });
 
-const AddExtraCreditClassModal: FC = () => {
-  const { show, handleHide } = useModal("addExtraCreditClass");
-
+const AddNewJudgingProjectModal: FC = () => {
   const queryClient = useQueryClient();
+
+  const { show, handleHide } = useModal("addJudgingProject");
   const methods = useForm({
     defaultValues: {
       name: "",
@@ -31,44 +36,44 @@ const AddExtraCreditClassModal: FC = () => {
   });
 
   const { mutateAsync, isLoading } = useMutation(
-    QueryKeys.extraCreditClass.createOne(),
-    ({ entity }: CreateEntity<IExtraCreditClassCreateEntity>) =>
-      fetch(() => createExtraCreditClass(entity)),
+    QueryKeys.judgingProject.createOne(),
+    ({ entity }: CreateEntity<IProjectEntity, "uid" | "hackathon">) =>
+      fetch(() => createProject(entity)),
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(QueryKeys.extraCreditClass.all);
+        await queryClient.invalidateQueries(QueryKeys.judgingProject.all);
       },
     }
   );
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { className: data.name } });
+      await mutateAsync({ entity: { project: data.name } });
       handleHide();
     })();
   };
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { className: data.name } });
+      await mutateAsync({ entity: { project: data.name } });
       methods.reset();
-    });
+    })();
   };
 
   return (
     <Modal open={show} onClose={handleHide}>
       <FormProvider {...methods}>
-        <Modal.Header>Add Class</Modal.Header>
-        <Modal.Body>
+        <Modal.Header>Add Project</Modal.Header>
+        <Modal.Body alignItems="center">
           <Grid container item>
             <Grid item xs={12}>
               <ControlledInput
                 name={"name"}
-                placeholder={"Enter a class name"}
+                placeholder={"Enter a project name"}
                 as={LabelledInput}
-                showError
-                id={"name"}
                 label={"Name"}
+                id={"name"}
+                showError
               />
             </Grid>
           </Grid>
@@ -80,7 +85,7 @@ const AddExtraCreditClassModal: FC = () => {
             mx={"auto"}
             justifyContent="center"
           >
-            <Grid item>
+            <Grid item xs={6}>
               <Box mt={2}>
                 <MenuButton
                   isDirty={methods.formState.isDirty}
@@ -107,4 +112,4 @@ const AddExtraCreditClassModal: FC = () => {
   );
 };
 
-export default AddExtraCreditClassModal;
+export default AddNewJudgingProjectModal;

@@ -1,73 +1,73 @@
+import React from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
-import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
-import { Box, Grid, Typography } from "@mui/material";
-import { EvaIcon } from "components/base";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { EvaIcon, GradientButton } from "components/base";
 import { Table } from "components/Table";
-import { ModalProvider } from "components/context";
-import React from "react";
-import { useQuery } from "react-query";
-import {
-  fetch,
-  getAllHackers,
-  QueryKeys,
-  getAllExtraCreditAssignments,
-  getAllExtraCreditClasses,
-} from "api";
+import { ModalProvider, useModalContext } from "components/context";
 import { useColumnBuilder, useTableState } from "common/hooks";
+import { useQuery } from "react-query";
+import { fetch, getAllProjects, QueryKeys } from "api";
+import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
 
-type DataRow = {
-  uid: number;
-  userName: string;
-  className: string;
+const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
+
+const AddProjectButton = () => {
+  const { showModal } = useModalContext();
+  const theme = useTheme();
+
+  return (
+    <GradientButton
+      variant="text"
+      sx={{
+        width: "100%",
+        padding: theme.spacing(1, 3.5),
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addJudgingProject")}
+    >
+      Add a Project
+    </GradientButton>
+  );
 };
 
-const ExtraCreditAssignments: NextPage = () => {
-  const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
-    fetch(getAllHackers)
-  );
-
-  const { data: allClasses } = useQuery(
-    QueryKeys.extraCreditClass.findAll(),
-    () => fetch(getAllExtraCreditClasses)
-  );
-
-  const { data: allAssignments } = useQuery(
-    QueryKeys.extraCreditAssignment.findAll(),
-    () => fetch(getAllExtraCreditAssignments),
+const ManageProjectsPage: NextPage = () => {
+  const { data: allProjects } = useQuery(
+    QueryKeys.judgingProject.findAll(),
+    () => fetch(getAllProjects),
     {
       select: (data) => {
-        if (data && allClasses && allUsers) {
-          return data.map((d) => {
-            const user = allUsers.find((u) => u.uid === d.user_uid);
-            const ecClass = allClasses.find((c) => c.uid === d.class_uid);
-
-            return {
+        if (data) {
+          return data
+            .filter((d) => d.hackathon === CURRENT_HACKATHON)
+            .map((d) => ({
               uid: d.uid,
-              userName: `${user?.firstname} ${user?.lastname}`,
-              className: ecClass?.class_name,
-            };
-          });
+              name: d.project,
+            }));
         }
       },
-      enabled: !!allClasses && !!allUsers,
     }
   );
 
-  const { columns, names } = useColumnBuilder<DataRow>((builder) =>
-    builder
-      .addColumn("Hacker", {
-        id: "hacker",
+  const { columns, names } = useColumnBuilder<{ uid: number; name: string }>(
+    (builder) =>
+      builder.addColumn("Name", {
+        id: "name",
         type: "text",
-        accessor: (row) => row.userName,
-      })
-      .addColumn("Class", {
-        id: "class",
-        type: "text",
-        accessor: (row) => row.className,
+        accessor: (row) => row.name,
       })
   );
+
+  const { states, onRowSelected } = useTableState({
+    data: allProjects,
+    getKey: (item) => String(item.uid),
+  });
 
   const onRefresh = () => {
     return null;
@@ -77,20 +77,18 @@ const ExtraCreditAssignments: NextPage = () => {
     return null;
   };
 
-  const { states, onRowSelected } = useTableState({
-    data: allAssignments,
-    getKey: (item) => String(item.uid),
-  });
-
   return (
     <ModalProvider>
-      <AddExtraCreditClassModal />
+      <AddNewJudgingProjectModal />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={10}>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              Manage Assignments
+              Manage Projects
             </Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <AddProjectButton />
           </Grid>
         </Grid>
         <Grid
@@ -109,7 +107,8 @@ const ExtraCreditAssignments: NextPage = () => {
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
-                Make assignments in the Manage Classes page
+                Assigning projects to be judged will default to all projects
+                unless rows are selected
               </Typography>
             </Grid>
           </Grid>
@@ -124,7 +123,7 @@ const ExtraCreditAssignments: NextPage = () => {
             onRefresh={onRefresh}
             onDelete={onDelete}
             columns={columns}
-            data={allAssignments ?? []}
+            data={allProjects ?? []}
             onSelectRows={onRowSelected}
             {...states}
           >
@@ -149,4 +148,4 @@ const ExtraCreditAssignments: NextPage = () => {
   );
 };
 
-export default withDefaultLayout(ExtraCreditAssignments);
+export default withDefaultLayout(ManageProjectsPage);

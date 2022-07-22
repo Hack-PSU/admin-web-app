@@ -10,13 +10,16 @@ import {
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Grid, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { CreateEntity, fetch, getAllHackers, QueryKeys } from "api";
-import { IOption } from "types/components";
 import {
+  CreateEntity,
+  fetch,
+  getAllHackers,
+  QueryKeys,
   assignExtraCreditClass,
   getAllExtraCreditAssignments,
   IAssignExtraCreditClassEntity,
-} from "api/extra_credit";
+} from "api";
+import { IOption } from "types/components";
 import { object } from "superstruct";
 import { NonEmptySelectArray } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
