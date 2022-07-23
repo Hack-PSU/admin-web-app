@@ -7,7 +7,7 @@ import {
   ExtraCreditAssignmentKeys,
   ExtraCreditClassKeys,
 } from "./extra_credit";
-import { JudgingScoreQueryKeys } from "api/judging";
+import { JudgingProjectQueryKeys, JudgingScoreQueryKeys } from "api/judging";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -18,7 +18,7 @@ export const QueryKeys = {
   location: LocationKeys,
   extraCreditClass: ExtraCreditClassKeys,
   extraCreditAssignment: ExtraCreditAssignmentKeys,
-  judgingProject: JudgingScoreQueryKeys,
+  judgingProject: JudgingProjectQueryKeys,
   judgingScore: JudgingScoreQueryKeys,
 };
 

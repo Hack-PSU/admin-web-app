@@ -23,6 +23,7 @@
     "@visx/axis": "^2.11.1",
     "@visx/event": "^2.6.0",
     "@visx/glyph": "^2.10.0",
+    "@visx/gradient": "^2.10.0",
     "@visx/grid": "^2.11.1",
     "@visx/marker": "^2.11.1",
     "@visx/responsive": "^2.10.0",

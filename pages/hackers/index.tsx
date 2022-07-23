@@ -135,9 +135,7 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           <Table.GlobalActions />
           <Table.Container>
             <Table.Actions>
-              <Table.ActionsLeft>
-                <Table.Filter />
-              </Table.ActionsLeft>
+              <Table.ActionsLeft />
               <Table.ActionsCenter>
                 <Table.Pagination />
               </Table.ActionsCenter>

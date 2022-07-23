@@ -162,6 +162,7 @@ const Table: TableComponent = ({
         ...props.initialState,
       },
       autoResetPage: false,
+      isMultiSortEvent: () => true,
     },
     useFlexLayout, // use flexbox instead of HTML tables
     useFilters, // use column filters
