@@ -10,29 +10,89 @@ import { ControlledSelect, Input, Select } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePicker, TimePicker } from "components/base/Pickers";
 import { useDateTime } from "common/hooks";
+import { Table } from "components/Table2";
+import { useColumnDef, useTable } from "components/Table2/hooks";
+import { useQuery } from "react-query";
+import { fetch, getAllLocations, QueryKeys } from "api";
+import { useEffect, useMemo } from "react";
+
+type LocationEntity = {
+  Name: string;
+  uid: number;
+};
 
 const Home: NextPage = () => {
-  const methods = useForm();
+  const { data: allLocations } = useQuery(
+    QueryKeys.location.findAll(),
+    () => fetch(getAllLocations),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            uid: d.uid,
+            Name: d.location_name,
+          }));
+        }
+      },
+    }
+  );
 
-  const onClickButton = () => {
-    methods.handleSubmit((data, event) => {
-      console.log(data);
-    })();
-  };
+  const defaultValues = useMemo(() => {
+    if (allLocations) {
+      return allLocations.reduce((acc, curr) => {
+        acc[curr.uid] = curr;
+        return acc;
+      }, {} as { [key: number]: { Name: string; uid: number } });
+    }
+  }, [allLocations]);
+
+  const methods = useForm({
+    defaultValues,
+  });
+  const { reset } = methods;
+
+  useEffect(() => {
+    reset({ ...defaultValues });
+  }, [reset, defaultValues]);
+
+  const defs = useColumnDef<LocationEntity>({
+    columns: [
+      {
+        id: "name",
+        type: "input",
+        name: "Name",
+        placeholder: "Enter a location",
+        accessorKey: "Name",
+      },
+    ],
+  });
+
+  const table = useTable({
+    data: allLocations ?? [],
+    getRowId: (row) => String(row.uid),
+    ...defs,
+  });
 
   return (
     <Grid container justifyContent="center" alignItems="center">
-      <Grid item xs={10}>
-        <Select
-          options={[
-            { value: "Option1", label: "Option 1" },
-            { value: "Option3", label: "Option 1" },
-            { value: "Option2", label: "Option 2" },
-          ]}
-        />
+      <Grid item sx={{ width: "100%" }}>
+        <Table {...table}>
+          <Table.GlobalActions>
+            {/*<Table.GlobalRefresh onRefresh={() => {}} />*/}
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
+          <Table.Container>
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              // right={<Table.DeleteAction onDelete={() => {}} />}
+            />
+            <Table.Header />
+            <FormProvider {...methods}>
+              <Table.Body />
+            </FormProvider>
+          </Table.Container>
+        </Table>
       </Grid>
-      <button onClick={onClickButton}>Click</button>
-      {/*<Select placeholder={"Select here"} items={[{ value: "1", display: "1" }, { value: "2", display: "2" }]} />*/}
     </Grid>
   );
 };

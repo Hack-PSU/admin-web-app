@@ -1835,6 +1835,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-table@npm:^8.3.3":
+  version: 8.3.3
+  resolution: "@tanstack/react-table@npm:8.3.3"
+  dependencies:
+    "@tanstack/table-core": 8.3.3
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: bc5295389b5bfef58d3d4372fc5f0d5872544ea610808977adfa58f41273e6bf33746e52cab973fe3da1fa2119a4a2b8b74080ddff54783f4735fdd2f1ff9c74
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.3.3":
+  version: 8.3.3
+  resolution: "@tanstack/table-core@npm:8.3.3"
+  checksum: b23908b195c706ab940ae53996a295e86366f2253bfbdbe95e814f5cdcce598a044b7df0d6279c1391f7036f0c4551c88b3f41381ed3c99fb8c25b35cbbf5877
+  languageName: node
+  linkType: hard
+
 "@types/d3-color@npm:^1":
   version: 1.4.2
   resolution: "@types/d3-color@npm:1.4.2"
@@ -2498,6 +2517,7 @@ __metadata:
     "@mui/lab": ^5.0.0-alpha.89
     "@mui/material": ^5.8.1
     "@mui/styled-engine-sc": ^5.8.0
+    "@tanstack/react-table": ^8.3.3
     "@types/d3-scale-chromatic": ^3.0.0
     "@types/draft-js": ^0.11.9
     "@types/luxon": ^2.3.2
