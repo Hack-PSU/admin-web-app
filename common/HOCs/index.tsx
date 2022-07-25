@@ -10,7 +10,6 @@ import UnauthorizedError from "components/base/Error/UnauthorizedError";
 import { DefaultLayout } from "components/layout";
 import { NextPageLayout } from "types/common";
 import nookies from "nookies";
-import { AxiosError } from "axios";
 
 export function withProtectedRoute(
   Component: NextPage | NextPageLayout,

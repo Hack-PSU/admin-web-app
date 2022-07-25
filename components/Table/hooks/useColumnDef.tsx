@@ -1,26 +1,19 @@
-import { ColumnDef, RowData, TableMeta } from "@tanstack/react-table";
-import { ColumnType, ColumnTypeMeta } from "../types";
+import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnFormatterMeta, ColumnType, ColumnTypeMeta } from "../types";
 import { useCallback, useMemo } from "react";
 import {
-  DefaultHeaderCell,
   DefaultInputCell,
   DefaultRowSelectionCell,
   DefaultTextCell,
 } from "../defaults";
 import _ from "lodash";
-import { Grid } from "@mui/material";
-import { SortColumn } from "../actions";
-
-type ColumnConfig = {
-  name: string;
-  placeholder?: string;
-};
+import { Checkbox } from "@mui/material";
 
 type TableColumnDef<TData extends RowData> = ColumnDef<TData> & {
   type: ColumnType;
-  name: string;
+  format?: (value: unknown) => string;
+  inputName?: string;
   placeholder?: string;
-  // meta: ColumnConfig;
 };
 
 type UseColumnDefOptions<TData extends RowData> = {
@@ -36,6 +29,7 @@ type UseColumnDefOptions<TData extends RowData> = {
 type UseColumnDefReturn<TData extends RowData> = {
   columns: ColumnDef<TData>[];
   columnType: ColumnTypeMeta;
+  formatter: ColumnFormatterMeta;
   defaultColumn: Partial<ColumnDef<TData>>;
 };
 
@@ -55,13 +49,12 @@ export function useColumnDef<TData extends RowData>(
         if (curr.type === "input") {
           acc[curr.id] = {
             type: curr.type,
-            name: curr.name,
+            inputName: curr.inputName ?? "",
             placeholder: curr?.placeholder ?? "",
           };
         } else {
           acc[curr.id] = {
             type: curr.type,
-            name: curr.name ?? "",
           };
         }
       }
@@ -79,17 +72,10 @@ export function useColumnDef<TData extends RowData>(
     if (useRowSelection) {
       columnDefs = [
         {
-          id: "selection",
-          size: 1,
-          maxSize: 8,
+          id: "select",
           header: ({ table, column }) => (
             <DefaultRowSelectionCell
-              cellProps={{
-                sx: {
-                  flex: `${column.getSize()} 0 auto`,
-                  width: `${column.getSize()}px`,
-                },
-              }}
+              column={column}
               checked={table.getIsAllRowsSelected()}
               indeterminate={table.getIsSomeRowsSelected()}
               onChange={
@@ -101,12 +87,7 @@ export function useColumnDef<TData extends RowData>(
           ),
           cell: ({ row, column }) => (
             <DefaultRowSelectionCell
-              cellProps={{
-                sx: {
-                  flex: `${column.getSize()} 0 auto`,
-                  width: `${column.getSize()}px`,
-                },
-              }}
+              column={column}
               checked={row.getIsSelected()}
               indeterminate={row.getIsSomeSelected()}
               onChange={row.getToggleSelectedHandler()}
@@ -116,9 +97,22 @@ export function useColumnDef<TData extends RowData>(
         ...processedColumns,
       ] as ColumnDef<TData>[];
     }
+
+    const formatter = initialColumns.reduce((acc, curr) => {
+      if (curr.id) {
+        if (curr.format) {
+          acc[curr.id] = curr.format;
+        } else {
+          acc[curr.id] = (value: unknown) => `${value}`;
+        }
+      }
+      return acc;
+    }, {} as ColumnFormatterMeta);
+
     return {
       columns: columnDefs,
       columnType,
+      formatter,
     };
   }, [initialColumns, useRowSelection, usePageRowSelection]);
 
@@ -128,59 +122,44 @@ export function useColumnDef<TData extends RowData>(
     [getColumnConfig]
   );
 
+  const formatter = useMemo(
+    () => getColumnConfig().formatter,
+    [getColumnConfig]
+  );
+
   const defaultColumn: Partial<ColumnDef<TData>> = useMemo(
     () => ({
       minSize: 30,
       size: 150,
       maxSize: 200,
-      header: ({ column }) => {
-        const meta = columnType[column.id];
-
-        if (meta.type === "input" || meta.type === "text") {
-          return meta.name;
-        }
-      },
       cell: ({ row, table, cell, column }) => {
         const meta = columnType[column.id];
 
         if (meta.type !== "input") {
-          const formatter =
-            table.options.meta?.formatter[column.id] ||
-            ((value: unknown) => `${value}`);
+          const format =
+            formatter[column.id] || ((value: unknown) => `${value}`);
 
           return (
-            <DefaultTextCell
-              cellProps={{
-                sx: {
-                  flex: `${column.getSize()} 0 auto`,
-                  width: `${column.getSize()}px`,
-                },
-              }}
-            >
-              {formatter(cell.getValue())}
+            <DefaultTextCell column={column}>
+              {format(cell.getValue())}
             </DefaultTextCell>
           );
         } else {
           return (
             <DefaultInputCell
-              cellProps={{
-                sx: {
-                  flex: `${column.getSize()} 0 auto`,
-                  width: `${column.getSize()}px`,
-                },
-              }}
+              column={column}
               name={`${
                 table.options.getRowId
                   ? table.options.getRowId(row.original, row.index)
                   : row.index
-              }.${meta.name}`}
+              }.${meta.inputName}`}
               placeholder={meta.placeholder}
             />
           );
         }
       },
     }),
-    [columnType]
+    [columnType, formatter]
   );
 
   return useMemo(
@@ -188,7 +167,8 @@ export function useColumnDef<TData extends RowData>(
       columns,
       columnType,
       defaultColumn,
+      formatter,
     }),
-    [columns, columnType, defaultColumn]
+    [columns, columnType, defaultColumn, formatter]
   );
 }

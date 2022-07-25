@@ -30,10 +30,10 @@ import {
   CheckboxFilterRows,
   InputFilter,
   InputFilterRows,
-} from "components/Table/filters";
+} from "components/Table2/filters";
 import DateFilter, {
   DateFilterRows,
-} from "components/Table/filters/DateFilter";
+} from "components/Table2/filters/DateFilter";
 
 export function useQueryResolver<
   TData,

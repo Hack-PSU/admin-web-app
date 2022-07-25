@@ -1,11 +1,10 @@
 import { FC } from "react";
-import { GridProps, styled, Typography } from "@mui/material";
+import { styled, TableCellProps, Typography } from "@mui/material";
 import { WithChildren } from "types/common";
 import DefaultCell from "./DefaultCell";
+import { BaseCellProps } from "./types";
 
-interface IDefaultTextCellProps {
-  cellProps?: GridProps;
-}
+type DefaultTextCellProps = BaseCellProps<any>;
 
 export const TextCell = styled(Typography)({
   overflow: "hidden",
@@ -13,12 +12,13 @@ export const TextCell = styled(Typography)({
   whiteSpace: "nowrap",
 });
 
-const DefaultTextCell: FC<WithChildren<IDefaultTextCellProps>> = ({
+const DefaultTextCell: FC<WithChildren<DefaultTextCellProps>> = ({
+  column,
   cellProps,
   children,
 }) => {
   return (
-    <DefaultCell {...cellProps}>
+    <DefaultCell column={column} {...cellProps}>
       <TextCell
         variant="body1"
         sx={{

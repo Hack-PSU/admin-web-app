@@ -1,549 +1,284 @@
-import React, {
-  createContext,
-  FC,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
-import { WithChildren } from "types/common";
+import React, { createContext, FC, useContext } from "react";
+import { flexRender, RowData, Table as BaseTable } from "@tanstack/react-table";
 import {
-  Cell,
-  ColumnInstance,
-  TableState,
-  useFilters,
-  useFlexLayout,
-  useGlobalFilter,
-  UseGlobalFiltersInstanceProps,
-  UseGlobalFiltersState,
-  useMountedLayoutEffect,
-  usePagination,
-  UsePaginationInstanceProps,
-  useRowSelect,
-  UseRowSelectInstanceProps,
-  useSortBy,
-  useTable,
-  UseTableInstanceProps,
-} from "react-table";
-import TableCell, { DefaultCell } from "components/Table/TableCell";
-import {
-  Checkbox as MuiCheckbox,
+  TableContainer,
   Grid,
   lighten,
+  TableBody,
+  Table as MuiTable,
   useTheme,
+  TableHead,
+  Collapse,
+  Box,
+  darken,
 } from "@mui/material";
-import { IOption, TableProps } from "types/components";
-import { NamesState } from "types/hooks";
-import { ITableActionProps } from "components/Table/actions/types";
-import GlobalActions from "components/Table/GlobalActions";
-import TableRow from "components/Table/TableRow";
+import { WithChildren } from "types/common";
 import {
+  GlobalSearch,
+  GlobalRefresh,
+  GlobalPageSize,
   DeleteAction,
-  FilterAction,
   PaginationAction,
-  RefreshAction,
-  SortAction,
-} from "components/Table/actions";
-import SortColumn from "components/Table/actions/SortColumn";
-import { Select } from "components/base";
-import { ActionMeta, SingleValue } from "react-select";
+  SortColumn,
+} from "./actions";
+import { DefaultCell, DefaultHeaderCell, DefaultRow } from "./defaults";
 
-export interface ITableProps<T extends object> extends TableProps<T> {
-  limit: number;
-  names: NamesState[];
-  onRefresh(): void;
-  onDelete(): void;
-  onSelectRows?(rows: Record<string, boolean>): void;
-}
+const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
+export const useTableContext = () => useContext(TableContext);
 
-type TableContextHooks = Pick<
-  UseTableInstanceProps<object>,
-  "getTableProps" | "headerGroups" | "prepareRow" | "headers"
-> &
-  Pick<
-    UsePaginationInstanceProps<object>,
-    | "page"
-    | "gotoPage"
-    | "nextPage"
-    | "previousPage"
-    | "pageCount"
-    | "canPreviousPage"
-    | "canNextPage"
-    | "setPageSize"
-  > &
-  Pick<UseGlobalFiltersState<object>, "globalFilter"> &
-  Pick<TableState, "pageIndex"> &
-  Pick<UseGlobalFiltersInstanceProps<object>, "setGlobalFilter"> &
-  Pick<ITableActionProps, "names"> & {
-    onRefresh(): void;
-    onDelete(): void;
-    headerMap: ITableActionProps["headers"];
-  };
-
-type TableComponent = FC<WithChildren<ITableProps<any>>> & {
-  GlobalActions: FC;
-  Container: FC<Required<WithChildren>>;
-  Actions: FC<Required<WithChildren>>;
-  ActionsLeft: FC<WithChildren>;
-  Filter: FC;
-  Sort: FC;
-  ActionsCenter: FC<WithChildren>;
-  Pagination: FC;
-  ActionsRight: FC<WithChildren>;
-  Refresh: FC;
-  Delete: FC;
-  Header: FC;
-  Body: FC;
+type TableProps<TData extends RowData> = BaseTable<TData> & {
+  renderSubRows?: (rows: any[]) => React.ReactNode;
 };
 
-const TableContext = createContext<TableContextHooks>({} as TableContextHooks);
-const useTableContext = () => useContext(TableContext);
+type TableActionsProps = {
+  left?: React.ReactNode;
+  center?: React.ReactNode;
+  right?: React.ReactNode;
+};
 
-const Table: TableComponent = ({
-  columns,
-  data,
-  names,
-  onDelete,
-  onRefresh,
-  children,
-  limit,
-  onSelectRows,
-  ...props
-}) => {
-  const theme = useTheme();
+interface ITableComponent {
+  <TData extends RowData = any>(
+    props: WithChildren<TableProps<TData>>
+  ): ReturnType<FC>;
+  GlobalActions: FC<WithChildren>;
+  GlobalRefresh: typeof GlobalRefresh;
+  GlobalPageSize: typeof GlobalPageSize;
+  Container: FC<WithChildren>;
+  Actions: FC<TableActionsProps>;
+  PaginationAction: typeof PaginationAction;
+  DeleteAction: typeof DeleteAction;
+  Content: FC<WithChildren>;
+  Header: FC;
+  Body: FC;
+}
 
-  const defaultColumn = useMemo(
-    () => ({
-      minWidth: 30,
-      width: 150,
-      maxWidth: 200,
-      Cell: ({ cell }: { cell: Cell }) => (
-        <TableCell
-          {...cell.getCellProps()}
-          sx={{ padding: theme.spacing(0, 2, 0, 0) }}
-        >
-          {cell.value}
-        </TableCell>
-      ),
-    }),
-    [theme]
-  );
-
-  const {
-    // Table instance
-    getTableProps,
-    headerGroups,
-    prepareRow,
-    headers,
-
-    // Pagination and Filter
-    page,
-    gotoPage,
-    setGlobalFilter,
-    nextPage,
-    previousPage,
-    pageCount,
-    state: { pageIndex, globalFilter, selectedRowIds },
-    canNextPage,
-    canPreviousPage,
-    setPageSize,
-
-    // Row selection
-    selectedFlatRows,
-  } = useTable(
-    {
-      ...props,
-      columns,
-      data,
-      defaultColumn,
-      pageCount: data ? data.length : 0,
-      initialState: {
-        pageIndex: 0,
-        pageSize: limit,
-        ...props.initialState,
-      },
-      autoResetPage: false,
-      isMultiSortEvent: () => true,
-    },
-    useFlexLayout, // use flexbox instead of HTML tables
-    useFilters, // use column filters
-    useGlobalFilter, // use global filters
-    useSortBy, // use column sorting
-    usePagination, // use row pagination
-    useRowSelect, // use row selection with checkbox
-    (hooks) => {
-      hooks.visibleColumns.push((columns) => [
-        {
-          id: "selection",
-          Header: ({ getToggleAllPageRowsSelectedProps }) => (
-            <TableCell empty>
-              <MuiCheckbox
-                sx={{
-                  color: "border.dark",
-                }}
-                {...getToggleAllPageRowsSelectedProps()}
-              />
-            </TableCell>
-          ),
-          Cell: ({ row }) => (
-            <TableCell empty>
-              <MuiCheckbox
-                sx={{
-                  color: "border.dark",
-                }}
-                {...row.getToggleRowSelectedProps()}
-              />
-            </TableCell>
-          ),
-        },
-        ...columns,
-      ]);
-    }
-  );
-
-  const headerMap = useMemo(
-    () =>
-      headers.reduce((acc, header) => {
-        acc[String(header.id)] = header;
-        return acc;
-      }, {} as { [key: string]: ColumnInstance<object> }),
-    []
-  );
-
-  useEffect(() => {
-    if (onSelectRows) {
-      onSelectRows(selectedRowIds);
-    }
-  }, [onSelectRows, selectedRowIds]);
-
-  const value = useMemo(
-    () => ({
-      getTableProps,
-      headerGroups,
-      prepareRow,
-      headers,
-      page,
-      gotoPage,
-      nextPage,
-      setGlobalFilter,
-      previousPage,
-      pageCount,
-      pageIndex,
-      globalFilter,
-      names,
-      headerMap,
-      onRefresh,
-      onDelete,
-      canNextPage,
-      canPreviousPage,
-      setPageSize,
-    }),
-    [
-      getTableProps,
-      headerGroups,
-      prepareRow,
-      headers,
-      page,
-      gotoPage,
-      nextPage,
-      setGlobalFilter,
-      previousPage,
-      pageCount,
-      pageIndex,
-      globalFilter,
-      names,
-      headerMap,
-      onRefresh,
-      onDelete,
-      canNextPage,
-      canPreviousPage,
-      setPageSize,
-    ]
-  );
-
+const Table: ITableComponent = ({ children, ...props }) => {
   return (
-    <TableContext.Provider value={value}>
-      <Grid container gap={1.5} flexDirection="column">
+    <TableContext.Provider value={props as TableProps<any>}>
+      <Grid container gap={1.5} flexDirection={"column"}>
         {children}
       </Grid>
     </TableContext.Provider>
   );
 };
 
-const TableGlobalActions: FC = () => {
-  const { setGlobalFilter, globalFilter, names, onRefresh, setPageSize } =
-    useTableContext();
-
-  const onChangePageSize = (
-    newValue: SingleValue<IOption>,
-    action: ActionMeta<IOption>
-  ) => {
-    if (newValue) {
-      setPageSize(Number(newValue.value));
-    }
-  };
-
+const GlobalActions: FC<WithChildren> = ({ children }) => {
   return (
-    <Grid container item justifyContent="space-between">
-      <GlobalActions
-        setGlobalFilter={setGlobalFilter}
-        globalFilter={globalFilter}
-        names={names}
-      />
+    <Grid container item justifyContent={"space-between"}>
+      <GlobalSearch />
       <Grid
         container
         item
         xs={7}
-        justifyContent="flex-end"
+        justifyContent={"flex-end"}
         columnSpacing={1}
-        alignItems="center"
+        alignItems={"center"}
       >
-        <Grid item xs={3} sx={{ height: "100%" }}>
-          <RefreshAction onClick={onRefresh} />
-        </Grid>
-        <Grid item xs={3}>
-          <Select
-            options={[
-              { value: "4", label: "4 entries" },
-              { value: "8", label: "8 entries" },
-              { value: "10", label: "10 entries" },
-              { value: "20", label: "20 entries" },
-            ]}
-            name={"limit"}
-            defaultValue={{ value: "8", label: "8 entries" }}
-            onChange={onChangePageSize}
-          />
-        </Grid>
+        {children}
       </Grid>
     </Grid>
   );
 };
 
-const TableContainer: FC<Required<WithChildren>> = ({ children }) => {
+const Container: FC<WithChildren> = ({ children }) => {
   const theme = useTheme();
-  const { getTableProps } = useTableContext();
 
   return (
     <Grid
       container
       sx={{
-        border: `1px solid ${theme.palette.table.border}`,
+        border: `1px solid ${theme.palette.border.light}`,
         borderRadius: "10px",
         boxShadow: 1,
       }}
-      {...getTableProps()}
     >
       {children}
     </Grid>
   );
 };
 
-const TableActions: FC<Required<WithChildren>> = ({ children }) => {
+const Actions: FC<TableActionsProps> = ({ left, center, right }) => {
   const theme = useTheme();
 
   return (
-    <TableRow
+    <Grid
+      container
       sx={{
         padding: theme.spacing(2),
-        borderBottom: `2px solid ${theme.palette.table.border}`,
+        borderBottom: `2px solid ${theme.palette.border.light}`,
       }}
-      alignItems="center"
     >
-      {children}
-    </TableRow>
-  );
-};
-
-const TableActionsLeft: FC<WithChildren> = ({ children }) => {
-  return (
-    <Grid container item xs={3}>
-      {children}
+      <Grid container item xs={3}>
+        {left}
+      </Grid>
+      <Grid container item justifyContent="center" xs={6}>
+        {center}
+      </Grid>
+      <Grid container item xs={3} justifyContent="flex-end">
+        {right}
+      </Grid>
     </Grid>
   );
 };
 
-const TableFilterAction: FC = () => {
-  const { headerMap, names } = useTableContext();
-
+const Content: FC<WithChildren> = ({ children }) => {
   return (
-    <Grid item xs={6}>
-      <FilterAction headers={headerMap} names={names} />
-    </Grid>
+    <TableContainer sx={{ width: "100%" }}>
+      <MuiTable sx={{ width: "100%" }}>{children}</MuiTable>
+    </TableContainer>
   );
 };
 
-const TableSortAction: FC = () => {
-  const { headerMap, names } = useTableContext();
-
-  return (
-    <Grid item xs={6}>
-      <SortAction headers={headerMap} names={names} />
-    </Grid>
-  );
-};
-
-const TableActionsCenter: FC<WithChildren> = ({ children }) => {
-  return (
-    <Grid container item justifyContent="center" xs={6}>
-      {children}
-    </Grid>
-  );
-};
-
-const TablePaginationAction: FC = () => {
-  const {
-    nextPage,
-    previousPage,
-    gotoPage,
-    pageCount,
-    pageIndex,
-    canPreviousPage,
-    canNextPage,
-  } = useTableContext();
-
-  return (
-    <PaginationAction
-      nextPage={nextPage}
-      previousPage={previousPage}
-      gotoPage={gotoPage}
-      pageCount={pageCount}
-      pageIndex={pageIndex}
-      canNextPage={canNextPage}
-      canPreviousPage={canPreviousPage}
-    />
-  );
-};
-
-const TableActionsRight: FC<WithChildren> = ({ children }) => {
-  return (
-    <Grid container item xs={3} justifyContent="flex-end">
-      {children}
-    </Grid>
-  );
-};
-
-const TableRefreshAction: FC = () => {
-  const { onRefresh } = useTableContext();
-
-  return (
-    <Grid container item xs={6} justifyContent="flex-end">
-      <RefreshAction onClick={onRefresh} />
-    </Grid>
-  );
-};
-
-const TableDeleteAction: FC = () => {
-  const { onDelete } = useTableContext();
-
-  return (
-    <Grid container item xs={6} justifyContent="flex-end">
-      <DeleteAction onClick={onDelete} />
-    </Grid>
-  );
-};
-
-const TableHeader: FC = () => {
-  const { headerGroups } = useTableContext();
+const Header: FC = () => {
+  const { getHeaderGroups } = useTableContext();
   const theme = useTheme();
 
   return (
-    <Grid container item>
-      {headerGroups.map((headerGroup) => (
-        // eslint-disable-next-line react/jsx-key
-        <TableRow
-          {...headerGroup.getHeaderGroupProps()}
+    <TableHead>
+      {getHeaderGroups().map((headerGroup) => (
+        <DefaultRow
+          key={headerGroup.id}
           sx={{
-            padding: theme.spacing(1, 1.5),
-            backgroundColor: lighten(theme.palette.table.border, 0.3),
-            borderBottom: `2px solid ${theme.palette.table.border}`,
+            backgroundColor: lighten(theme.palette.border.light, 0.3),
+            borderBottom: `2px solid ${theme.palette.border.light}`,
           }}
         >
           {headerGroup.headers.map((header) => {
-            if (header.id === "selection") {
-              return header.render("Header");
-            } else {
-              return (
-                <TableCell
-                  container
-                  header
-                  empty
-                  alignItems="center"
-                  {...header.getHeaderProps(
-                    !header.disableSortBy
-                      ? header.getSortByToggleProps()
-                      : undefined
-                  )}
-                  textProps={{
-                    sx: {
-                      fontSize: theme.typography.pxToRem(15),
-                    },
-                  }}
-                >
-                  <Grid item>
-                    <DefaultCell
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "header.light",
-                        fontSize: theme.typography.pxToRem(15),
-                      }}
-                    >
-                      {header.render("Header")}
-                    </DefaultCell>
-                  </Grid>
-                  {!header.disableSortBy && (
-                    <Grid item sx={{ ml: 1.5 }}>
-                      <SortColumn header={header} />
-                    </Grid>
-                  )}
-                </TableCell>
-              );
+            if (header.id === "select") {
+              return flexRender(header.column.columnDef.header, {
+                ...header.getContext(),
+                key: header.id,
+              });
             }
+
+            return (
+              <DefaultHeaderCell
+                column={header.column}
+                cellProps={{
+                  sx: {
+                    cursor: "pointer",
+                    userSelect: "none",
+                  },
+                  onClick: header.column.getCanSort()
+                    ? header.column.getToggleSortingHandler()
+                    : undefined,
+                }}
+                key={header.id}
+                after={
+                  header.column.getCanSort() ? (
+                    <Grid item sx={{ ml: 1.5, mt: 0.3 }}>
+                      <SortColumn
+                        isSorted={!!header.column.getIsSorted()}
+                        isSortedDesc={header.column.getIsSorted() === "desc"}
+                      />
+                    </Grid>
+                  ) : null
+                }
+              >
+                {flexRender(
+                  header.column.columnDef.header,
+                  header.getContext()
+                )}
+              </DefaultHeaderCell>
+            );
           })}
-        </TableRow>
+        </DefaultRow>
       ))}
-    </Grid>
+    </TableHead>
   );
 };
 
-const TableBody: FC = () => {
+const Body: FC = () => {
   const theme = useTheme();
-  const { page, prepareRow } = useTableContext();
+  const {
+    getRowModel,
+    options: { meta },
+    getAllColumns,
+  } = useTableContext();
 
   return (
-    <Grid container item>
-      {page.map((row) => {
-        prepareRow(row);
-        return (
-          // eslint-disable-next-line react/jsx-key
-          <TableRow
+    <TableBody>
+      {getRowModel().rows.map((row, index) => (
+        <>
+          <DefaultRow
+            key={`${row.id}-${index}`}
             sx={{
               padding: theme.spacing(1.5),
-              ":last-child": {
+              ":last-of-type": {
                 borderBottom: 0,
               },
+              ...(meta?.rowType === "expand"
+                ? {
+                    borderBottom: 0,
+                    cursor: "pointer",
+                    ":hover": {
+                      backgroundColor: darken(theme.palette.common.white, 0.05),
+                    },
+                    transition: "background-color 200ms ease-in-out",
+                  }
+                : {}),
             }}
-            {...row.getRowProps()}
+            onClick={
+              meta?.rowType === "expand"
+                ? () => row.toggleExpanded()
+                : undefined
+            }
           >
-            {row.cells.map((cell) => cell.render("Cell"))}
-          </TableRow>
-        );
-      })}
-    </Grid>
+            {row.getVisibleCells().map((cell) =>
+              flexRender(cell.column.columnDef.cell, {
+                ...cell.getContext(),
+                key: cell.id,
+              })
+            )}
+          </DefaultRow>
+          {meta?.rowType === "expand" && (
+            <DefaultRow
+              sx={{
+                padding: theme.spacing(0),
+              }}
+            >
+              <DefaultCell
+                disableDefault
+                colSpan={getAllColumns().length}
+                sx={{
+                  ":first-child": {
+                    padding: 0,
+                  },
+                }}
+              >
+                <Collapse
+                  key={`${row.id}-${index}`}
+                  in={row.getIsExpanded()}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <Box
+                    sx={{
+                      backgroundColor: "common.black",
+                      height: "150px",
+                      width: "100%",
+                    }}
+                  />
+                  {/*{renderSubRows && renderSubRows(meta?.getExpandRows(row))}*/}
+                </Collapse>
+              </DefaultCell>
+            </DefaultRow>
+          )}
+        </>
+      ))}
+    </TableBody>
   );
 };
 
-Table.GlobalActions = TableGlobalActions;
-Table.Container = TableContainer;
-Table.Actions = TableActions;
-Table.ActionsLeft = TableActionsLeft;
-Table.ActionsCenter = TableActionsCenter;
-Table.ActionsRight = TableActionsRight;
-Table.Filter = TableFilterAction;
-Table.Sort = TableSortAction;
-Table.Pagination = TablePaginationAction;
-Table.Refresh = TableRefreshAction;
-Table.Delete = TableDeleteAction;
-Table.Header = TableHeader;
-Table.Body = TableBody;
+Table.GlobalActions = GlobalActions;
+Table.GlobalRefresh = GlobalRefresh;
+Table.GlobalPageSize = GlobalPageSize;
+Table.Container = Container;
+Table.Actions = Actions;
+Table.PaginationAction = PaginationAction;
+Table.DeleteAction = DeleteAction;
+Table.Content = Content;
+Table.Header = Header;
+Table.Body = Body;
 
 export default Table;

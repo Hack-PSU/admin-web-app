@@ -6,7 +6,7 @@ import {
   withServerSideProps,
 } from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
-import { Table } from "components/Table";
+import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
@@ -23,6 +23,13 @@ import {
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
 }
+
+type HackerEntity = {
+  name: string;
+  pin: number;
+  email: string;
+  university: string;
+};
 
 const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
@@ -59,6 +66,35 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       })
   );
 
+  const defs = useColumnDef<HackerEntity>({
+    columns: [
+      {
+        id: "name",
+        type: "text",
+        header: "Name",
+        accessorKey: "name",
+      },
+      {
+        id: "pin",
+        type: "text",
+        header: "Pin",
+        accessorKey: "pin",
+      },
+      {
+        id: "email",
+        type: "text",
+        header: "Email",
+        accessorKey: "email",
+      },
+      {
+        id: "university",
+        type: "text",
+        header: "University",
+        accessorKey: "university",
+      },
+    ],
+  });
+
   // const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
   //   () => getAllHackers()
   // );
@@ -81,6 +117,11 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       initialData: hackers,
     }
   );
+
+  const table = useTable({
+    data: hackersData ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     return undefined;
@@ -124,27 +165,20 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
         </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>
-        <Table
-          limit={8}
-          names={names}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-          columns={columns}
-          data={hackersData ?? []}
-        >
-          <Table.GlobalActions />
+        <Table {...table}>
+          <Table.GlobalActions>
+            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
           <Table.Container>
-            <Table.Actions>
-              <Table.ActionsLeft />
-              <Table.ActionsCenter>
-                <Table.Pagination />
-              </Table.ActionsCenter>
-              <Table.ActionsRight>
-                <Table.Delete />
-              </Table.ActionsRight>
-            </Table.Actions>
-            <Table.Header />
-            <Table.Body />
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              right={<Table.DeleteAction onDelete={onDelete} />}
+            />
+            <Table.Content>
+              <Table.Header />
+              <Table.Body />
+            </Table.Content>
           </Table.Container>
         </Table>
       </Grid>

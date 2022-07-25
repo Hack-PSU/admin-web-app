@@ -7,7 +7,7 @@ import {
   TableCell,
   PaginatedTable,
   ActionRowCell,
-} from "components/Table";
+} from "components/Table2";
 import {
   EventType,
   IGetAllEventsResponse,

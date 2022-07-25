@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { ColumnFilter } from "components/Table/filters/types";
+import { ColumnFilter } from "components/Table2/filters/types";
 import { EvaIcon, Input } from "components/base";
 import { FilterType } from "react-table";
 import { matchSorter } from "match-sorter";

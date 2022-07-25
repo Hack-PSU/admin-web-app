@@ -11,6 +11,7 @@ export const GlobalSearch: FC = () => {
     setGlobalFilter,
     getState,
     options: { meta },
+    getColumn,
   } = useTableContext();
   const { globalFilter } = getState();
 
@@ -21,7 +22,11 @@ export const GlobalSearch: FC = () => {
     const texts = _.chain(meta?.columnType)
       .map((config, columnId) => {
         if (config.type === "text" || config.type === "input") {
-          return _.toLower(meta?.columnType[columnId].name ?? columnId);
+          const header = getColumn(columnId).columnDef.header;
+          if (typeof header === "string") {
+            return _.toLower(header);
+          }
+          return _.toLower(columnId);
         }
       })
       .value();
@@ -41,7 +46,7 @@ export const GlobalSearch: FC = () => {
   useEffect(() => {
     // Debounce setting global filter
     const timeout = setTimeout(() => {
-      setGlobalFilter(value || undefined);
+      setGlobalFilter(value ? String(value) : undefined);
     }, 500);
 
     return () => clearTimeout(timeout);
@@ -64,6 +69,7 @@ export const GlobalSearch: FC = () => {
         sx={{
           width: "100%",
           py: theme.spacing(0.8),
+          backgroundColor: "common.white",
         }}
         placeholder={placeholder}
       />

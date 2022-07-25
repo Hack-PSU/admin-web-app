@@ -1,10 +1,10 @@
 import { FC } from "react";
-import { HeaderGroup } from "react-table";
 import { Box, Grid, useTheme } from "@mui/material";
 import { EvaIcon } from "components/base";
 
 interface ISortColumnProps {
-  header: HeaderGroup;
+  isSorted: boolean;
+  isSortedDesc: boolean;
 }
 
 const ArrowUp: FC<{ fill: string }> = ({ fill }) => (
@@ -48,7 +48,10 @@ const Defs = () => (
   </defs>
 );
 
-const SortColumn: FC<ISortColumnProps> = ({ header }) => {
+export const SortColumn: FC<ISortColumnProps> = ({
+  isSorted,
+  isSortedDesc,
+}) => {
   const theme = useTheme();
 
   return (
@@ -62,14 +65,14 @@ const SortColumn: FC<ISortColumnProps> = ({ header }) => {
       >
         <ArrowUp
           fill={
-            header.isSorted && !header.isSortedDesc
+            isSorted && !isSortedDesc
               ? "url(#paint0_linear_273_1443)"
               : theme.palette.header.light
           }
         />
         <ArrowDown
           fill={
-            header.isSorted && header.isSortedDesc
+            isSorted && isSortedDesc
               ? "url(#paint0_linear_269_1491)"
               : theme.palette.header.light
           }
@@ -79,5 +82,3 @@ const SortColumn: FC<ISortColumnProps> = ({ header }) => {
     </Grid>
   );
 };
-
-export default SortColumn;

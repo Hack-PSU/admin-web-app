@@ -4,3 +4,4 @@ export { default as DefaultInputCell } from "./DefaultInputCell";
 export { default as DefaultHeaderCell } from "./DefaultHeaderCell";
 export { default as DefaultRowSelectionCell } from "./DefaultRowSelectionCell";
 export { default as DefaultRow } from "./DefaultRow";
+export { default as DefaultActionCell } from "./DefaultActionCell";

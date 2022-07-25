@@ -2,13 +2,13 @@ import { FC, useState } from "react";
 import DefaultCell from "./DefaultCell";
 import { ControlledInput } from "components/base";
 import { ControlledInputProps } from "types/components";
-import { GridProps } from "@mui/material";
+import { TableCellProps } from "@mui/material";
+import { BaseCellProps } from "./types";
 
-interface IDefaultInputCellProps extends ControlledInputProps {
-  cellProps?: GridProps;
-}
+type DefaultInputCellProps = ControlledInputProps & BaseCellProps<any>;
 
-const DefaultInputCell: FC<IDefaultInputCellProps> = ({
+const DefaultInputCell: FC<DefaultInputCellProps> = ({
+  column,
   cellProps,
   ...props
 }) => {
@@ -16,6 +16,7 @@ const DefaultInputCell: FC<IDefaultInputCellProps> = ({
 
   return (
     <DefaultCell
+      column={column}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       {...cellProps}

@@ -1,14 +1,17 @@
 export type ColumnType = "input" | "text" | "custom";
 
+export type ColumnFormatterMeta = {
+  [key: string]: (value: unknown) => string;
+};
+
 export type ColumnTypeMeta = {
   [key: string]:
     | {
         type: "text" | "custom";
-        name: string;
       }
     | {
         type: "input";
-        name: string;
+        inputName: string;
         placeholder: string;
       };
 };

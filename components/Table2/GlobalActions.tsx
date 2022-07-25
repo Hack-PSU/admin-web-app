@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from "react";
 import { Grid } from "@mui/material";
-import GlobalFilter from "components/Table/filters/GlobalFilter";
+import GlobalFilter from "components/Table2/filters/GlobalFilter";
 import {
   UseGlobalFiltersInstanceProps,
   UseGlobalFiltersState,
