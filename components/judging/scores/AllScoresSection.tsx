@@ -1,14 +1,17 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { UseScoreResultsReturn } from "components/judging";
-import { Grid, Typography } from "@mui/material";
-import { Table, useColumnDef, useTable } from "components/Table";
+import { Box, Grid, Typography } from "@mui/material";
+import { RenderSubRows, Table, useColumnDef, useTable } from "components/Table";
+import ScoreBreakdown from "components/judging/scores/ScoreBreakdown";
+import { EvaIcon } from "components/base";
 
 type AllScoresSectionProps = Pick<UseScoreResultsReturn, "allData">;
+type AllScoresEntity = AllScoresSectionProps["allData"][number];
 
 const formatScore = (value: unknown) => Number(value).toFixed(2);
 
 const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
-  const defs = useColumnDef<AllScoresSectionProps["allData"][number]>({
+  const defs = useColumnDef<AllScoresEntity>({
     columns: [
       {
         id: "project",
@@ -41,7 +44,6 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
         id: "growth",
         type: "text",
         header: "Growth",
-        // size: 20,
         format: formatScore,
         accessorKey: "growth",
       },
@@ -83,9 +85,15 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
     ],
   });
 
+  const renderSubRows: RenderSubRows<AllScoresEntity> = useCallback(
+    (row) => <ScoreBreakdown row={row} />,
+    []
+  );
+
   const table = useTable({
     data: allData,
     useExpanded: true,
+    renderSubRows,
     ...defs,
   });
 
@@ -103,6 +111,18 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
         <Typography variant="h4" sx={{ fontWeight: 800 }}>
           All Scores
         </Typography>
+      </Grid>
+      <Grid container item alignItems="center" spacing={1}>
+        <Grid item>
+          <Box mt={0.3}>
+            <EvaIcon name={"alert-circle-outline"} />
+          </Box>
+        </Grid>
+        <Grid item>
+          <Typography variant="subtitle1">
+            Expand each row to see score breakdowns
+          </Typography>
+        </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>

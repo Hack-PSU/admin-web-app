@@ -9,7 +9,6 @@ import {
   useTheme,
   TableHead,
   Collapse,
-  Box,
   darken,
 } from "@mui/material";
 import { WithChildren } from "types/common";
@@ -27,7 +26,7 @@ const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
 export const useTableContext = () => useContext(TableContext);
 
 type TableProps<TData extends RowData> = BaseTable<TData> & {
-  renderSubRows?: (rows: any[]) => React.ReactNode;
+  renderSubRows?: (row: TData) => React.ReactNode;
 };
 
 type TableActionsProps = {
@@ -194,6 +193,7 @@ const Body: FC = () => {
     getRowModel,
     options: { meta },
     getAllColumns,
+    renderSubRows,
   } = useTableContext();
 
   return (
@@ -233,6 +233,7 @@ const Body: FC = () => {
           </DefaultRow>
           {meta?.rowType === "expand" && (
             <DefaultRow
+              key={`${row.id}-${index + 1}`}
               sx={{
                 padding: theme.spacing(0),
               }}
@@ -246,20 +247,8 @@ const Body: FC = () => {
                   },
                 }}
               >
-                <Collapse
-                  key={`${row.id}-${index}`}
-                  in={row.getIsExpanded()}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <Box
-                    sx={{
-                      backgroundColor: "common.black",
-                      height: "150px",
-                      width: "100%",
-                    }}
-                  />
-                  {/*{renderSubRows && renderSubRows(meta?.getExpandRows(row))}*/}
+                <Collapse in={row.getIsExpanded()} timeout="auto" unmountOnExit>
+                  {renderSubRows && renderSubRows(row.original)}
                 </Collapse>
               </DefaultCell>
             </DefaultRow>

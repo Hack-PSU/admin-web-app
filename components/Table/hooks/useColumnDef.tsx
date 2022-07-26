@@ -7,7 +7,6 @@ import {
   DefaultTextCell,
 } from "../defaults";
 import _ from "lodash";
-import { Checkbox } from "@mui/material";
 
 type TableColumnDef<TData extends RowData> = ColumnDef<TData> & {
   type: ColumnType;

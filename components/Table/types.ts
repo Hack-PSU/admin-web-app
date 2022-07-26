@@ -1,3 +1,6 @@
+import React from "react";
+import { RowData } from "@tanstack/react-table";
+
 export type ColumnType = "input" | "text" | "custom";
 
 export type ColumnFormatterMeta = {
@@ -15,3 +18,7 @@ export type ColumnTypeMeta = {
         placeholder: string;
       };
 };
+
+export type RenderSubRows<TData extends RowData> = (
+  row: TData
+) => React.ReactNode;

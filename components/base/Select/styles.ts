@@ -53,7 +53,7 @@ export const selectStyles: <
     },
     padding: theme.spacing(1.3, 2),
     borderRadius: "5px",
-    ":not(:first-child)": {
+    ":not(:first-of-type)": {
       marginTop: theme.spacing(0.8),
     },
     fontWeight: 500,

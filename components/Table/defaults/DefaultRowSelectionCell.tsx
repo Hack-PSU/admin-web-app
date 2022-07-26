@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Checkbox, CheckboxProps, TableCellProps } from "@mui/material";
+import { Checkbox, CheckboxProps } from "@mui/material";
 import DefaultCell from "./DefaultCell";
 import { BaseCellProps } from "./types";
 

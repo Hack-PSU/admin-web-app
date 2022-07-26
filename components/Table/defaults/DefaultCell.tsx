@@ -1,19 +1,11 @@
 import { FC } from "react";
 import { WithChildren } from "types/common";
-import { TableCell, TableCellProps, useTheme } from "@mui/material";
-import { BaseCellProps } from "./types";
+import { TableCell, useTheme } from "@mui/material";
+import { BaseCellProps, DefaultCellProps } from "./types";
 
-type DefaultCellProps = TableCellProps &
-  BaseCellProps<any> & {
-    disableDefault?: boolean;
-  };
-
-const DefaultCell: FC<WithChildren<DefaultCellProps>> = ({
-  disableDefault,
-  column,
-  children,
-  ...props
-}) => {
+const DefaultCell: FC<
+  WithChildren<DefaultCellProps & Omit<BaseCellProps<any>, "cellProps">>
+> = ({ disableDefault, column, children, ...props }) => {
   const theme = useTheme();
 
   return (
@@ -22,8 +14,8 @@ const DefaultCell: FC<WithChildren<DefaultCellProps>> = ({
       sx={{
         border: "none",
         padding: theme.spacing(1.5, 2, 1.5, 0),
-        ":first-child": {
-          padding: theme.spacing(1.5, 2, 1.5, 1.5),
+        ":first-of-type": {
+          pl: theme.spacing(1.5),
         },
         my: "auto",
         ...(!disableDefault

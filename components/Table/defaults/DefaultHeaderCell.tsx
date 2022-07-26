@@ -22,7 +22,7 @@ const DefaultHeaderCell: FC<WithChildren<IDefaultHeaderCellProps>> = ({
 }) => {
   return (
     <DefaultCell column={column} component={"th"} {...cellProps}>
-      <Grid container>
+      <Grid container flexWrap={"nowrap"}>
         <Grid item>
           <TextCell
             variant="body1"

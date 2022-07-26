@@ -19,6 +19,7 @@ import { Grid, Typography } from "@mui/material";
 const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
 
 const ScoresPage: NextPage = () => {
+  // TODO: MUST fetch from organizers to ensure judges don't come out null
   const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
     fetch(getAllHackers)
   );

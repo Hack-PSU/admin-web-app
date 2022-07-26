@@ -12,6 +12,7 @@ const DefaultRow: FC<WithChildren<TableRowProps>> = ({
     <TableRow
       {...props}
       sx={{
+        backgroundColor: "common.white",
         borderBottom: `2px solid ${theme.palette.border.light}`,
         ...props.sx,
       }}

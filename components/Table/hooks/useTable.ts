@@ -1,3 +1,4 @@
+import React from "react";
 import {
   FilterFn,
   getCoreRowModel,
@@ -10,7 +11,7 @@ import {
   TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
-import { ColumnTypeMeta, ColumnFormatterMeta } from "../types";
+import { ColumnTypeMeta, ColumnFormatterMeta, RenderSubRows } from "../types";
 import { rankItem } from "@tanstack/match-sorter-utils";
 
 declare module "@tanstack/react-table" {
@@ -19,7 +20,6 @@ declare module "@tanstack/react-table" {
     formatter: ColumnFormatterMeta;
     columnType: ColumnTypeMeta;
     rowType: "data" | "expand";
-    getExpandRows: (row: any) => any[];
   }
 }
 
@@ -41,10 +41,11 @@ type UseTableOptions<TData extends RowData> = Omit<
   // Its key must be the column id for that cell
   formatter: ColumnFormatterMeta;
   columnType: ColumnTypeMeta;
-  getSubRows?: (row: any) => any[];
+  renderSubRows?: RenderSubRows<TData>;
 };
 
-type UseTableReturn<TData extends RowData> = Table<TData>;
+type UseTableReturn<TData extends RowData> = Table<TData> &
+  Pick<UseTableOptions<TData>, "renderSubRows">;
 
 const globalFilterFn: FilterFn<any> = (row, columnId, filterValue, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), filterValue);
@@ -66,16 +67,15 @@ export function useTable<TData extends RowData>(
     useFilter = true,
     formatter,
     columnType,
-    getSubRows,
+    renderSubRows,
     ...tableOptions
   } = options;
 
-  return useReactTable<TData>({
+  const table = useReactTable<TData>({
     ...tableOptions,
     meta: {
       ...tableOptions.meta,
       rowType: useExpanded ? "expand" : "data",
-      getExpandRows: getSubRows ?? (() => []),
       formatter: formatter ?? {},
       columnType,
     },
@@ -87,4 +87,9 @@ export function useTable<TData extends RowData>(
     getFilteredRowModel: useFilter ? getFilteredRowModel() : undefined,
     getPaginationRowModel: usePagination ? getPaginationRowModel() : undefined,
   });
+
+  return {
+    ...table,
+    renderSubRows,
+  };
 }

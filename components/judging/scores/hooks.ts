@@ -15,10 +15,9 @@ export type ResolvedData = Omit<IScoreEntity, "project_id" | "judge"> & {
 };
 
 type AllResolvedData = ResolvedData & {
-  breakdown: Omit<IScoreEntity, "project_id" | "judge"> &
-    {
-      judgeName: string;
-    }[];
+  breakdown: (Omit<IScoreEntity, "project_id" | "judge"> & {
+    judgeName: string;
+  })[];
 };
 
 export type UseScoreResultsReturn = {
@@ -59,6 +58,8 @@ export function useScoreResults(
           acc[curr.uid] = curr.project;
           return acc;
         }, {} as { [key: number]: string });
+
+      console.log(scores);
 
       return scores
         .map(({ project_id, ...d }) => ({
