@@ -15,6 +15,7 @@
   "dependencies": {
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@hookform/devtools": "^4.2.2",
     "@hookform/resolvers": "^2.8.10",
     "@mui/icons-material": "^5.8.0",
     "@mui/lab": "^5.0.0-alpha.89",
@@ -54,7 +55,7 @@
     "react-dom": "18.1.0",
     "react-dropzone": "^14.2.1",
     "react-eva-icons": "^0.0.8",
-    "react-hook-form": "^7.31.2",
+    "react-hook-form": "^7.33.1",
     "react-query": "^3.39.0",
     "react-select": "^5.3.2",
     "react-spring": "^9.5.0",

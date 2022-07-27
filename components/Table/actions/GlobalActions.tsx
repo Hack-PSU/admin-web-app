@@ -27,8 +27,11 @@ export const GlobalSearch: FC = () => {
             return _.toLower(header);
           }
           return _.toLower(columnId);
+        } else {
+          return null;
         }
       })
+      .filter(Boolean)
       .value();
 
     if (texts.length === 1) {
@@ -41,7 +44,7 @@ export const GlobalSearch: FC = () => {
     texts.splice(texts.length - 1, 1, `or ${lastText}`);
 
     return `Search by ${texts.join(", ")}`;
-  }, [meta?.columnType]);
+  }, [getColumn, meta?.columnType]);
 
   useEffect(() => {
     // Debounce setting global filter

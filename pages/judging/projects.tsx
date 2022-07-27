@@ -1,12 +1,10 @@
 import React from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton } from "components/base";
-import { Table } from "components/Table";
+import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider, useModalContext } from "components/context";
-import { useColumnBuilder, useTableState } from "common/hooks";
 import { useQuery } from "react-query";
 import { fetch, getAllProjects, QueryKeys } from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
@@ -55,18 +53,20 @@ const ManageProjectsPage: NextPage = () => {
     }
   );
 
-  const { columns, names } = useColumnBuilder<{ uid: number; name: string }>(
-    (builder) =>
-      builder.addColumn("Name", {
+  const defs = useColumnDef<{ uid: number; name: string }>({
+    columns: [
+      {
         id: "name",
         type: "text",
-        accessor: (row) => row.name,
-      })
-  );
+        header: "Name",
+        accessorKey: "name",
+      },
+    ],
+  });
 
-  const { states, onRowSelected } = useTableState({
-    data: allProjects,
-    getKey: (item) => String(item.uid),
+  const table = useTable({
+    data: allProjects ?? [],
+    ...defs,
   });
 
   const onRefresh = () => {
@@ -117,29 +117,20 @@ const ManageProjectsPage: NextPage = () => {
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
-          <Table
-            limit={8}
-            names={names}
-            onRefresh={onRefresh}
-            onDelete={onDelete}
-            columns={columns}
-            data={allProjects ?? []}
-            onSelectRows={onRowSelected}
-            {...states}
-          >
-            <Table.GlobalActions />
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
             <Table.Container>
-              <Table.Actions>
-                <Table.ActionsLeft />
-                <Table.ActionsCenter>
-                  <Table.Pagination />
-                </Table.ActionsCenter>
-                <Table.ActionsRight>
-                  <Table.Delete />
-                </Table.ActionsRight>
-              </Table.Actions>
-              <Table.Header />
-              <Table.Body />
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content>
+                <Table.Header />
+                <Table.Body />
+              </Table.Content>
             </Table.Container>
           </Table>
         </Grid>

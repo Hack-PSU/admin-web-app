@@ -1,5 +1,5 @@
 export interface ICheckoutItemEntity {
-  uid?: number;
+  uid: number;
   name: string;
   quantity: number;
 }

@@ -122,7 +122,13 @@ const Actions: FC<TableActionsProps> = ({ left, center, right }) => {
 
 const Content: FC<WithChildren> = ({ children }) => {
   return (
-    <TableContainer sx={{ width: "100%" }}>
+    <TableContainer
+      sx={{
+        width: "100%",
+        borderBottomLeftRadius: "10px",
+        borderBottomRightRadius: "10px",
+      }}
+    >
       <MuiTable sx={{ width: "100%" }}>{children}</MuiTable>
     </TableContainer>
   );

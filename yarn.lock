@@ -384,7 +384,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.8.1":
+"@emotion/react@npm:^11.1.5, @emotion/react@npm:^11.8.1":
   version: 11.9.3
   resolution: "@emotion/react@npm:11.9.3"
   dependencies:
@@ -466,6 +466,28 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 67150fa788785c34e285b90acecc91fe7a63babceaefbeffd053bed0fa31f72a05bfeeb9d15620766e543e007b9ccac2e836812eec2e791f962ec4e52731ae4c
+  languageName: node
+  linkType: hard
+
+"@emotion/styled@npm:^11.3.0":
+  version: 11.9.3
+  resolution: "@emotion/styled@npm:11.9.3"
+  dependencies:
+    "@babel/runtime": ^7.13.10
+    "@emotion/babel-plugin": ^11.7.1
+    "@emotion/is-prop-valid": ^1.1.3
+    "@emotion/serialize": ^1.0.4
+    "@emotion/utils": ^1.1.0
+  peerDependencies:
+    "@babel/core": ^7.0.0
+    "@emotion/react": ^11.0.0-rc.0
+    react: ">=16.8.0"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    "@types/react":
+      optional: true
+  checksum: 16d9ef8c5840b13ec47f91f9963b64ec8a94197fe99bb3bd4e9f7404a09bb65a333e9ab6590af97c0090360816db70e8c920731198c3a30fbb2c2cfd5e8d8a65
   languageName: node
   linkType: hard
 
@@ -1037,6 +1059,25 @@ __metadata:
   bin:
     proto-loader-gen-types: build/bin/proto-loader-gen-types.js
   checksum: 19bb53811e650e9a975cafa1e0cb084870235cff957695a38a8429c4a71435d584740c1d780fb51882ff4d4863cb9c81393d4dc25c55f5078be283f5ea5289a9
+  languageName: node
+  linkType: hard
+
+"@hookform/devtools@npm:^4.2.2":
+  version: 4.2.2
+  resolution: "@hookform/devtools@npm:4.2.2"
+  dependencies:
+    "@emotion/react": ^11.1.5
+    "@emotion/styled": ^11.3.0
+    "@types/lodash": ^4.14.168
+    little-state-machine: ^4.1.0
+    lodash: ^4.17.21
+    react-simple-animate: ^3.3.12
+    use-deep-compare-effect: ^1.8.1
+    uuid: ^8.3.2
+  peerDependencies:
+    react: ">=17.0.2"
+    react-dom: ">=17.0.2"
+  checksum: ba66205da7a68029b1f5cab7f590cb1a53cbf51c09afdfbccab25acd3d5f2a6f713f8766e969a64e7f29374523ed81d5c350761ade70d52e8db2b9bd114c8bd9
   languageName: node
   linkType: hard
 
@@ -1949,7 +1990,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4.14.172, @types/lodash@npm:^4.14.175":
+"@types/lodash@npm:^4.14.168, @types/lodash@npm:^4.14.172, @types/lodash@npm:^4.14.175":
   version: 4.14.182
   resolution: "@types/lodash@npm:4.14.182"
   checksum: 7dd137aa9dbabd632408bd37009d984655164fa1ecc3f2b6eb94afe35bf0a5852cbab6183148d883e9c73a958b7fec9a9bcf7c8e45d41195add6a18c34958209
@@ -2521,6 +2562,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11
     "@emotion/styled": ^11
+    "@hookform/devtools": ^4.2.2
     "@hookform/resolvers": ^2.8.10
     "@mui/icons-material": ^5.8.0
     "@mui/lab": ^5.0.0-alpha.89
@@ -2576,7 +2618,7 @@ __metadata:
     react-dom: 18.1.0
     react-dropzone: ^14.2.1
     react-eva-icons: ^0.0.8
-    react-hook-form: ^7.31.2
+    react-hook-form: ^7.33.1
     react-query: ^3.39.0
     react-select: ^5.3.2
     react-spring: ^9.5.0
@@ -3383,6 +3425,13 @@ __metadata:
   version: 1.0.0
   resolution: "delayed-stream@npm:1.0.0"
   checksum: 46fe6e83e2cb1d85ba50bd52803c68be9bd953282fa7096f51fc29edd5d67ff84ff753c51966061e5ba7cb5e47ef6d36a91924eddb7f3f3483b1c560f77a0020
+  languageName: node
+  linkType: hard
+
+"dequal@npm:^2.0.2":
+  version: 2.0.3
+  resolution: "dequal@npm:2.0.3"
+  checksum: 8679b850e1a3d0ebbc46ee780d5df7b478c23f335887464023a631d1b9af051ad4a6595a44220f9ff8ff95a8ddccf019b5ad778a976fd7bbf77383d36f412f90
   languageName: node
   linkType: hard
 
@@ -4806,6 +4855,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"little-state-machine@npm:^4.1.0":
+  version: 4.4.1
+  resolution: "little-state-machine@npm:4.4.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 62c801f8569ccc6777e062eb3d2db5ff296d569e23b8532224e17c0748295b20fbe14a2e8d874fc2f346cbf610c41c0bdadeaee6211c6aed37f6a2b6b37281c9
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^2.0.0":
   version: 2.0.0
   resolution: "locate-path@npm:2.0.0"
@@ -5595,12 +5653,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.31.2":
-  version: 7.31.2
-  resolution: "react-hook-form@npm:7.31.2"
+"react-hook-form@npm:^7.33.1":
+  version: 7.33.1
+  resolution: "react-hook-form@npm:7.33.1"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18
-  checksum: 8a6b0ab7cb893adfbdec6340c6e4c5a702e34948659f67d37dde918ad3f6c1e6f3245e29030453482698dc33b6a48b7bc10d449ecec27997e41794ba5ccd8611
+  checksum: ec8f938b5af32148956edc9a87b6a0a99cc305617925608961cf4352ad1a786daea9fdc4d15106aea2821937d27367a69ab525882f07c0bb7ea45fba5dbf8ff2
   languageName: node
   linkType: hard
 
@@ -5675,6 +5733,15 @@ __metadata:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: c8c0ecd75704098ef1010fba4df68bcc5e7d76ffcd6d3bac40bc3017758a9c035a887fa82ead9105dc719c14e04c4164d8b7a8e8fa61d0ed39e4bdf48ee3bf1c
+  languageName: node
+  linkType: hard
+
+"react-simple-animate@npm:^3.3.12":
+  version: 3.5.0
+  resolution: "react-simple-animate@npm:3.5.0"
+  peerDependencies:
+    react-dom: ^16.8.0 || ^17 || ^18
+  checksum: 8c8fbae4cb389e1f46ed6a4d0d9c2e4c92ce64e419b9815e47cdc3a1f411c068e3a0121a54a6df71330c62ef058d8ef903e7061da2f1bf54e9ccf56d8211fdc9
   languageName: node
   linkType: hard
 
@@ -6466,6 +6533,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-deep-compare-effect@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "use-deep-compare-effect@npm:1.8.1"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+    dequal: ^2.0.2
+  peerDependencies:
+    react: ">=16.13"
+  checksum: 2b9b6291df3f772f44d259b352e5d998963ccee0db2efeb76bb05525d928064aeeb69bb0dee5a5e428fea7cf3db67c097a770ebd30caa080662b565f6ef02b2e
+  languageName: node
+  linkType: hard
+
 "use-immer@npm:^0.7.0":
   version: 0.7.0
   resolution: "use-immer@npm:0.7.0"
@@ -6489,6 +6568,15 @@ __metadata:
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
   checksum: 474acf1146cb2701fe3b074892217553dfcf9a031280919ba1b8d651a068c9b15d863b7303cb15bd00a862b498e6cf4ad7b4a08fb134edd5a6f7641681cb54a2
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 

@@ -35,37 +35,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder<{
-    name: string;
-    pin: number;
-    email: string;
-    university: string;
-  }>((builder) =>
-    builder
-      .addColumn("Name", {
-        maxWidth: 120,
-        type: "text",
-        filterType: "input",
-      })
-      .addColumn("Pin", {
-        maxWidth: 80,
-        minWidth: 50,
-        width: 50,
-        type: "text",
-        filterType: "hide",
-      })
-      .addColumn("Email", {
-        minWidth: 150,
-        maxWidth: 250,
-        type: "text",
-        filterType: "input",
-      })
-      .addColumn("University", {
-        type: "text",
-        filterType: "input",
-      })
-  );
-
   const defs = useColumnDef<HackerEntity>({
     columns: [
       {
@@ -94,10 +63,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       },
     ],
   });
-
-  // const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
-  //   () => getAllHackers()
-  // );
 
   const { data: hackersData } = useQuery(
     QueryKeys.hacker.findAll(),

@@ -1,5 +1,12 @@
 import { NextPage } from "next";
-import React, { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import {
@@ -134,12 +141,19 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         placeholder: "Enter a location",
         accessorKey: "name",
         header: "Name",
+        size: 300,
       },
       {
         id: "actions",
         type: "custom",
+        header: "",
         cell: ({ row }) => (
           <DefaultActionCell
+            cellProps={{
+              sx: {
+                width: "8%",
+              },
+            }}
             items={[
               {
                 icon: "refresh-outline",

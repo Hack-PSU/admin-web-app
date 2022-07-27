@@ -25,18 +25,8 @@ import { NonEmptySelectArray } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import _ from "lodash";
 
-type DataRow = {
-  uid: string;
-  name: string;
-  users: number;
-};
-
-type RowDataType = Omit<DataRow, "uid"> & {
-  uid: number;
-};
-
 interface IAssignExtraCreditClassModalProps {
-  selectedRows?: RowDataType[];
+  selectedRows: Record<string, boolean>;
 }
 
 const schema = object({
@@ -91,11 +81,11 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
 
   const selectItems: IOption[] = useMemo(() => {
     if (allUsers && selectedRows) {
-      const selectedClasses = selectedRows.map((s) => s.uid);
-      const assignedHackers = _.chain(allAssignments)
+      const selectedClasses = Object.keys(selectedRows);
+      const hackersAssignedAllSelectedClasses = _.chain(allAssignments)
         .groupBy("user_uid")
         .pickBy((assignment) => {
-          const userAssignments = _.map(assignment, "class_uid");
+          const userAssignments = _.map(assignment, (a) => String(a.class_uid));
           // check if all selectedClasses are already assigned
           // return true if user has all selectedClasses
           return _.every(selectedClasses, (classUid) =>
@@ -106,7 +96,7 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
         .value();
 
       return allUsers
-        .filter((u) => !assignedHackers.includes(u.uid))
+        .filter((u) => !hackersAssignedAllSelectedClasses.includes(u.uid))
         .map((u) => ({
           label: `${u.name} [${u.pin}]`,
           value: u.uid,
@@ -120,12 +110,14 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
       if (selectedRows) {
         const selectedHackers = data.hackers.map((h) => h.value);
         const assignedHackers = _.groupBy(allAssignments, "user_uid");
-        const selectedClasses = _.map(selectedRows, "uid");
+        const selectedClasses = Object.keys(selectedRows);
 
-        // returns an object where they key is the userUid and the value is an
+        // returns an object where the key is the userUid and the value is an
         // array of classes not yet assigned to the hacker
         const mutateHackers = selectedHackers.reduce((acc, curr) => {
-          const userAssignments = _.map(assignedHackers[curr], "class_uid");
+          const userAssignments = _.map(assignedHackers[curr], (a) =>
+            String(a.class_uid)
+          );
           // gather assignments not yet assigned to hacker
           const remainingAssignments = _.filter(
             selectedClasses,
@@ -191,11 +183,7 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
           >
             <Grid item>
               <Box mt={2}>
-                <SaveButton
-                  isDirty={true}
-                  loading={isLoading}
-                  onClick={onClickSubmit}
-                >
+                <SaveButton loading={isLoading} onClick={onClickSubmit}>
                   Submit
                 </SaveButton>
               </Box>

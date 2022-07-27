@@ -6,7 +6,7 @@ import {
 } from "types/components";
 import { alpha, Box, InputBase, styled } from "@mui/material";
 import InputLabel from "components/base/Input/InputLabel";
-import { useController } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   padding: theme.spacing(0.8, 1.8),
@@ -71,32 +71,53 @@ export const ControlledInput: FC<ControlledInputProps> = ({
   placeholder,
   ...props
 }) => {
-  const {
-    field: { onChange, onBlur, value },
-    fieldState: { error },
-  } = useController({ name, rules, defaultValue: defaultValue ?? "" });
+  // const {
+  //   field: { onChange, onBlur, value, ref },
+  //   fieldState: { error },
+  // } = useController({ name, rules, defaultValue: defaultValue ?? "" });
 
   if (Component) {
     return (
-      <Component
-        placeholder={placeholder}
-        onChange={onChange}
-        onBlur={onBlur}
-        value={value}
-        error={error?.message ?? ""}
-        {...props}
+      <Controller
+        render={({
+          field: { onChange, onBlur, value },
+          fieldState: { error },
+        }) => (
+          <Component
+            placeholder={placeholder}
+            onChange={onChange}
+            onBlur={onBlur}
+            value={value}
+            error={error?.message ?? ""}
+            {...props}
+          />
+        )}
+        name={name}
+        rules={rules}
+        defaultValue={defaultValue}
       />
     );
   }
 
   return (
-    <Input
-      placeholder={placeholder}
-      onChange={onChange}
-      onBlur={onBlur}
-      value={value}
-      error={!!error?.message ?? undefined}
-      {...props}
+    <Controller
+      name={name}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({
+        field: { onChange, onBlur, value, ref },
+        fieldState: { error },
+      }) => (
+        <Input
+          placeholder={placeholder}
+          error={!!error?.message ?? undefined}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          ref={ref}
+          {...props}
+        />
+      )}
     />
   );
 };
