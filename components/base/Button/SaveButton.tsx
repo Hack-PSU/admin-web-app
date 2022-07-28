@@ -13,15 +13,11 @@ import { LoadingButton, LoadingButtonProps } from "@mui/lab";
 export interface ISaveButtonProps
   extends Omit<LoadingButtonProps, "ref" | "touchRippleRef"> {
   textProps?: Omit<TypographyProps, "children" | "variant" | "ref">;
-  isDirty?: boolean;
-  progressColor?: string;
 }
 
 const SaveButton: FC<ISaveButtonProps> = ({
-  isDirty,
   textProps,
   children,
-  progressColor,
   ...props
 }) => {
   const theme = useTheme();
@@ -29,7 +25,7 @@ const SaveButton: FC<ISaveButtonProps> = ({
   return (
     <LoadingButton
       loadingPosition={"start"}
-      disabled={!isDirty}
+      disabled={props.loading}
       sx={{
         textTransform: "none",
         color: "common.black",
@@ -40,22 +36,15 @@ const SaveButton: FC<ISaveButtonProps> = ({
         fontSize: theme.typography.pxToRem(16),
         width: "100%",
         borderRadius: "15px",
-        backgroundColor: isDirty ? "common.black" : "transparent",
-        border: isDirty
-          ? `2px solid transparent`
-          : `2px solid ${theme.palette.common.black}`,
+        backgroundColor: "common.black",
+        border: `2px solid transparent`,
         ":hover": {
-          backgroundColor: isDirty
-            ? lighten(theme.palette.common.black, 0.05)
-            : undefined,
+          backgroundColor: lighten(theme.palette.common.black, 0.05),
         },
         ...(props.sx ?? {}),
       }}
       loadingIndicator={
-        <CircularProgress
-          size="1.2rem"
-          sx={{ ml: 1, color: progressColor ?? "common.white" }}
-        />
+        <CircularProgress size="1.2rem" sx={{ ml: 1, color: "common.white" }} />
       }
       {...props}
     >
@@ -68,7 +57,7 @@ const SaveButton: FC<ISaveButtonProps> = ({
           fontWeight: "bold",
           color: "common.black",
           textTransform: "none",
-          color: isDirty ? "common.white" : "common.black",
+          color: "common.white",
           lineHeight: "1.3rem",
           ...(textProps ? textProps.sx : {}),
         }}

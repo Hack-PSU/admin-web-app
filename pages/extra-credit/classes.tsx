@@ -1,37 +1,24 @@
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import {
-  Box,
-  darken,
-  Grid,
-  lighten,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { Button, EvaIcon, GradientButton, SaveButton } from "components/base";
-import { ActionRowCell, Table, InputCell } from "components/Table";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Box, Grid, lighten, Typography, useTheme } from "@mui/material";
+import { Button, EvaIcon, GradientButton } from "components/base";
+import { Table, useColumnDef, useTable } from "components/Table";
+import { FormProvider, useForm } from "react-hook-form";
 import { useColumnBuilder, useTableState } from "common/hooks";
 import { useQuery } from "react-query";
-import { fetch, QueryKeys } from "api";
 import {
+  fetch,
+  QueryKeys,
   getAllExtraCreditAssignments,
   getAllExtraCreditClasses,
-} from "api/extra_credit";
+} from "api";
 import { ModalProvider, useModalContext } from "components/context";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
 import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
 
 type DataRow = {
-  uid: string;
+  uid: number;
   name: string;
   users: number;
 };
@@ -92,6 +79,8 @@ const AssignClassButton: FC<{ hasSelections: boolean }> = ({
 };
 
 const ExtraCreditClassesPage: NextPage = () => {
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+
   const { columns, names } = useColumnBuilder<DataRow>(
     (builder) =>
       builder
@@ -143,6 +132,23 @@ const ExtraCreditClassesPage: NextPage = () => {
     // })
   );
 
+  const defs = useColumnDef<DataRow>({
+    columns: [
+      {
+        id: "name",
+        type: "text",
+        accessorKey: "name",
+        header: "Name",
+      },
+      {
+        id: "hackers",
+        type: "text",
+        accessorKey: "users",
+        header: "Hackers",
+      },
+    ],
+  });
+
   const { data: allAssignments } = useQuery(
     QueryKeys.extraCreditAssignment.findAll(),
     () =>
@@ -189,13 +195,15 @@ const ExtraCreditClassesPage: NextPage = () => {
     }
   }, [allClasses]);
 
-  const { getSelectedRows, onRowSelected, states } = useTableState({
-    data: allClasses,
-    getKey: (item) => String(item.uid),
+  const table = useTable<DataRow>({
+    data: allClasses ?? [],
+    state: {
+      rowSelection,
+    },
+    getRowId: (row) => String(row.uid),
+    onRowSelectionChange: setRowSelection,
+    ...defs,
   });
-
-  const selectedRows = useMemo(() => getSelectedRows(), [getSelectedRows]);
-  const hasSelections = useMemo(() => selectedRows.length > 0, [selectedRows]);
 
   const methods = useForm({
     defaultValues,
@@ -219,15 +227,15 @@ const ExtraCreditClassesPage: NextPage = () => {
   return (
     <ModalProvider>
       <AddExtraCreditClassModal />
-      <AssignExtraCreditClassModal selectedRows={selectedRows} />
+      <AssignExtraCreditClassModal selectedRows={rowSelection} />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
-          <Grid item xs={9.7}>
+          <Grid item xs={10}>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               Manage Classes
             </Typography>
           </Grid>
-          <Grid item xs={2.3}>
+          <Grid item xs={2}>
             <AddNewClassButton />
           </Grid>
         </Grid>
@@ -252,35 +260,24 @@ const ExtraCreditClassesPage: NextPage = () => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <AssignClassButton hasSelections={hasSelections} />
+            <AssignClassButton hasSelections={table.getIsSomeRowsSelected()} />
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
-          <Table
-            limit={8}
-            names={names}
-            onRefresh={onRefresh}
-            onDelete={onDelete}
-            columns={columns}
-            data={allClasses ?? []}
-            onSelectRows={onRowSelected}
-            {...states}
-          >
-            <Table.GlobalActions />
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
             <Table.Container>
-              <Table.Actions>
-                <Table.ActionsLeft />
-                <Table.ActionsCenter>
-                  <Table.Pagination />
-                </Table.ActionsCenter>
-                <Table.ActionsRight>
-                  <Table.Delete />
-                </Table.ActionsRight>
-              </Table.Actions>
-              <Table.Header />
-              <FormProvider {...methods}>
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content>
+                <Table.Header />
                 <Table.Body />
-              </FormProvider>
+              </Table.Content>
             </Table.Container>
           </Table>
         </Grid>

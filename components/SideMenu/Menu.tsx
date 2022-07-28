@@ -51,11 +51,6 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
         <MenuItem icon={"people-outline"} label={"Hackers"} to={"/hackers"} />
         <MenuItem icon={"calendar-outline"} label={"Events"} to={"/events"} />
         <MenuItem icon={"pin-outline"} label={"Locations"} to={"/locations"} />
-        {/*<MenuItem*/}
-        {/*  icon={"award-outline"}*/}
-        {/*  label={"Extra Credit"}*/}
-        {/*  to={"/extra-credit"}*/}
-        {/*/>*/}
         <CollapsibleMenuItem
           nestedItems={[
             { label: "Manage Classes", to: "/extra-credit/classes" },
@@ -74,17 +69,25 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           label={"Item Checkout"}
           icon={"shopping-cart-outline"}
         />
-        <MenuItem
-          icon={"bar-chart-2-outline"}
-          label={"Analytics"}
-          to={"/analytics"}
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Scores", to: "/judging/scores" },
+            { label: "Manage Projects", to: "/judging/projects" },
+          ]}
+          to={"/judging"}
+          label={"Judging"}
+          icon={"star-outline"}
         />
         <MenuItem
           icon={"gift-outline"}
           label={"Sponsorship"}
           to={"/sponsorship"}
         />
-        <MenuItem icon={"star-outline"} label={"Judging"} to={"/judging"} />
+        <MenuItem
+          icon={"bar-chart-2-outline"}
+          label={"Analytics"}
+          to={"/analytics"}
+        />
       </List>
     </Drawer>
   );

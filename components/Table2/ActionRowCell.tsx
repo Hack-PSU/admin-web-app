@@ -1,7 +1,7 @@
-import React, { FC } from "react";
+import React from "react";
 import { IconButton, useTheme } from "@mui/material";
 import { EvaIcon } from "components/base";
-import { TableCell } from "components/Table/index";
+import { TableCell } from "components/Table2/index";
 import { Cell } from "react-table";
 
 interface IActionRowCellProps<T extends object> {

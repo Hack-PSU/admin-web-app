@@ -6,7 +6,7 @@ import {
   withServerSideProps,
 } from "common/HOCs";
 import { useColumnBuilder } from "common/hooks";
-import { Table } from "components/Table";
+import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { useQuery } from "react-query";
 import { AuthPermission } from "types/context";
@@ -24,44 +24,45 @@ interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
 }
 
+type HackerEntity = {
+  name: string;
+  pin: number;
+  email: string;
+  university: string;
+};
+
 const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder<{
-    name: string;
-    pin: number;
-    email: string;
-    university: string;
-  }>((builder) =>
-    builder
-      .addColumn("Name", {
-        maxWidth: 120,
+  const defs = useColumnDef<HackerEntity>({
+    columns: [
+      {
+        id: "name",
         type: "text",
-        filterType: "input",
-      })
-      .addColumn("Pin", {
-        maxWidth: 80,
-        minWidth: 50,
-        width: 50,
+        header: "Name",
+        accessorKey: "name",
+      },
+      {
+        id: "pin",
         type: "text",
-        filterType: "hide",
-      })
-      .addColumn("Email", {
-        minWidth: 150,
-        maxWidth: 250,
+        header: "Pin",
+        accessorKey: "pin",
+      },
+      {
+        id: "email",
         type: "text",
-        filterType: "input",
-      })
-      .addColumn("University", {
+        header: "Email",
+        accessorKey: "email",
+      },
+      {
+        id: "university",
         type: "text",
-        filterType: "input",
-      })
-  );
-
-  // const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
-  //   () => getAllHackers()
-  // );
+        header: "University",
+        accessorKey: "university",
+      },
+    ],
+  });
 
   const { data: hackersData } = useQuery(
     QueryKeys.hacker.findAll(),
@@ -81,6 +82,11 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       initialData: hackers,
     }
   );
+
+  const table = useTable({
+    data: hackersData ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     return undefined;
@@ -124,29 +130,20 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
         </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>
-        <Table
-          limit={8}
-          names={names}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-          columns={columns}
-          data={hackersData ?? []}
-        >
-          <Table.GlobalActions />
+        <Table {...table}>
+          <Table.GlobalActions>
+            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
           <Table.Container>
-            <Table.Actions>
-              <Table.ActionsLeft>
-                <Table.Filter />
-              </Table.ActionsLeft>
-              <Table.ActionsCenter>
-                <Table.Pagination />
-              </Table.ActionsCenter>
-              <Table.ActionsRight>
-                <Table.Delete />
-              </Table.ActionsRight>
-            </Table.Actions>
-            <Table.Header />
-            <Table.Body />
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              right={<Table.DeleteAction onDelete={onDelete} />}
+            />
+            <Table.Content>
+              <Table.Header />
+              <Table.Body />
+            </Table.Content>
           </Table.Container>
         </Table>
       </Grid>

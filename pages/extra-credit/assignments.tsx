@@ -4,22 +4,23 @@ import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal"
 import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
 import { Box, Grid, Typography } from "@mui/material";
 import { EvaIcon } from "components/base";
-import { Table } from "components/Table";
-import { FormProvider } from "react-hook-form";
+import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider } from "components/context";
 import React from "react";
 import { useQuery } from "react-query";
-import { fetch, getAllHackers, QueryKeys } from "api";
 import {
+  fetch,
+  getAllHackers,
+  QueryKeys,
   getAllExtraCreditAssignments,
   getAllExtraCreditClasses,
-} from "api/extra_credit";
+} from "api";
 import { useColumnBuilder, useTableState } from "common/hooks";
 
 type DataRow = {
   uid: number;
   userName: string;
-  className: string;
+  className?: string;
 };
 
 const ExtraCreditAssignments: NextPage = () => {
@@ -54,19 +55,27 @@ const ExtraCreditAssignments: NextPage = () => {
     }
   );
 
-  const { columns, names } = useColumnBuilder<DataRow>((builder) =>
-    builder
-      .addColumn("Hacker", {
+  const defs = useColumnDef<DataRow>({
+    columns: [
+      {
         id: "hacker",
         type: "text",
-        accessor: (row) => row.userName,
-      })
-      .addColumn("Class", {
+        header: "Hacker",
+        accessorKey: "userName",
+      },
+      {
         id: "class",
         type: "text",
-        accessor: (row) => row.className,
-      })
-  );
+        header: "Class",
+        accessorKey: "className",
+      },
+    ],
+  });
+
+  const table = useTable({
+    data: allAssignments ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     return null;
@@ -76,17 +85,12 @@ const ExtraCreditAssignments: NextPage = () => {
     return null;
   };
 
-  const { states, onRowSelected } = useTableState({
-    data: allAssignments,
-    getKey: (item) => String(item.uid),
-  });
-
   return (
     <ModalProvider>
       <AddExtraCreditClassModal />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
-          <Grid item xs={9.7}>
+          <Grid item xs={10}>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               Manage Assignments
             </Typography>
@@ -112,34 +116,22 @@ const ExtraCreditAssignments: NextPage = () => {
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={2}>
-            {/*<AssignClassButton hasSelections={hasSelections} />*/}
-          </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
-          <Table
-            limit={8}
-            names={names}
-            onRefresh={onRefresh}
-            onDelete={onDelete}
-            columns={columns}
-            data={allAssignments ?? []}
-            onSelectRows={onRowSelected}
-            {...states}
-          >
-            <Table.GlobalActions />
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
             <Table.Container>
-              <Table.Actions>
-                <Table.ActionsLeft />
-                <Table.ActionsCenter>
-                  <Table.Pagination />
-                </Table.ActionsCenter>
-                <Table.ActionsRight>
-                  <Table.Delete />
-                </Table.ActionsRight>
-              </Table.Actions>
-              <Table.Header />
-              <Table.Body />
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content>
+                <Table.Header />
+                <Table.Body />
+              </Table.Content>
             </Table.Container>
           </Table>
         </Grid>

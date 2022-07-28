@@ -13,10 +13,7 @@ import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "react-query";
 import { CreateEntity, fetch, QueryKeys } from "api";
-import {
-  createExtraCreditClass,
-  IExtraCreditClassCreateEntity,
-} from "api/extra_credit";
+import { createExtraCreditClass, IExtraCreditClassCreateEntity } from "api";
 
 const schema = object({
   name: NonEmptyString,

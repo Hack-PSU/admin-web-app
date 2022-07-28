@@ -1,9 +1,15 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
-import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
 import {
   fetch,
@@ -13,9 +19,20 @@ import {
   QueryKeys,
 } from "api";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { ActionRowCell, Table, TableCell } from "components/Table";
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
-import InputCell from "components/Table/InputCell";
+import {
+  DefaultActionCell,
+  DefaultInputCell,
+  Table,
+  useColumnDef,
+  useTable,
+} from "components/Table";
+import {
+  useForm,
+  FormProvider,
+  useFormContext,
+  useFormState,
+  FormState,
+} from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewItemModal from "components/modal/AddNewItemModal";
 
@@ -49,6 +66,7 @@ const AddNewItemButton: FC = () => {
 
 const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
   const queryClient = useQueryClient();
+  // const [isDirty, setIsDirty] = useState(false);
   const currentInputKey = useRef<{ key: string }>({ key: "" });
 
   const { data: itemsData, refetch } = useQuery(
@@ -99,14 +117,22 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     defaultValues,
   });
 
-  const { formState, reset, handleSubmit } = methods;
-  const { dirtyFields } = formState;
+  const { formState, reset, handleSubmit, resetField } = methods;
 
   useEffect(() => {
     reset({ ...defaultValues });
   }, [defaultValues, reset]);
 
-  const onClickSave = () => {
+  // useEffect(() => {
+  //   const subscription = watch((data, { name }) => {
+  //     console.log(name, getFieldState(name, formState));
+  //   });
+  //
+  //   return subscription.unsubscribe;
+  // }, [watch, getFieldState]);
+
+  const onClickSave = useCallback(() => {
+    const { dirtyFields } = formState;
     handleSubmit(async (data) => {
       const editedFields = Object.keys(dirtyFields).filter(
         (field) => dirtyFields[field].name || dirtyFields[field].quantity
@@ -124,81 +150,69 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
         )
       );
     })();
-  };
+  }, [formState, handleSubmit, mutateAsync]);
 
-  const { columns, names } = useColumnBuilder<{
-    uid: string;
+  const defs = useColumnDef<{
+    uid: number;
     name: string;
-    quantity: string;
-  }>((builder) =>
-    builder
-      .addColumn("Name", {
+    quantity: number;
+  }>({
+    columns: [
+      {
         id: "name",
-        accessor: (row) => row.name,
-        type: "text",
-        minWidth: 150,
-        Header: () => <Box pl={1.8}>Name</Box>,
-        Cell: ({ cell, row }) => (
-          <InputCell
-            key={row.original.uid}
-            cell={cell}
-            name={`${row.original.uid}.name`}
-            placeholder={"Enter an item name"}
-            onFocus={() => {
-              currentInputKey.current.key = `${row.original.uid}.name`;
-            }}
-            autoFocus={
-              `${row.original.uid}.name` === currentInputKey.current.key
-            }
-          />
-        ),
-      })
-      .addColumn("Quantity", {
+        type: "input",
+        inputName: "name",
+        placeholder: "Enter an item name",
+        header: "Name",
+        accessorKey: "name",
+      },
+      {
         id: "quantity",
-        // maxWidth: 100,
-        // minWidth: 80,
-        Header: () => <Box pl={1.8}>Quantity</Box>,
-        accessor: (row) => row.quantity,
-        type: "text",
-        Cell: ({ cell, row }) => (
-          <InputCell
-            type="number"
+        type: "input",
+        inputName: "quantity",
+        placeholder: "Enter a quantity",
+        header: "Quantity",
+        accessorKey: "quantity",
+        cell: ({ row }) => (
+          <DefaultInputCell
             key={row.original.uid}
-            cell={cell}
+            type={"number"}
             name={`${row.original.uid}.quantity`}
             placeholder={"Enter a quantity"}
-            onFocus={() => {
-              currentInputKey.current.key = `${row.original.uid}.quantity`;
-            }}
-            autoFocus={
-              `${row.original.uid}.quantity` === currentInputKey.current.key
-            }
           />
         ),
-      })
-      .addColumn("Actions", {
+      },
+      {
         id: "actions",
         type: "custom",
-        width: 5,
-        maxWidth: 15,
-        disableSortBy: true,
-        hideHeader: true,
-        Cell: ({ cell, row }) => {
-          const { resetField } = useFormContext();
+        header: "",
+        cell: ({ row }) => (
+          <DefaultActionCell
+            cellProps={{
+              sx: {
+                width: "8%",
+              },
+            }}
+            items={[
+              {
+                icon: "refresh-outline",
+                onClick: () => {
+                  resetField(`${row.original.uid}.name`);
+                  resetField(`${row.original.uid}.quantity`);
+                },
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+  });
 
-          return (
-            <ActionRowCell
-              cell={cell}
-              icon={"refresh-outline"}
-              onClickAction={() => {
-                resetField(`${row.original.uid}.name`);
-                resetField(`${row.original.uid}.quantity`);
-              }}
-            />
-          );
-        },
-      })
-  );
+  const table = useTable({
+    data: itemsData ?? [],
+    getRowId: (row) => String(row.uid),
+    ...defs,
+  });
 
   const onRefresh = () => {
     void refetch();
@@ -243,42 +257,28 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton
-              isDirty={methods.formState.isDirty}
-              onClick={onClickSave}
-              loading={isLoading}
-              progressColor={
-                methods.formState.isDirty ? "common.white" : "common.black"
-              }
-            >
+            <SaveButton onClick={onClickSave} loading={isLoading}>
               Save
             </SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
-          <Table
-            limit={8}
-            names={names}
-            onRefresh={onRefresh}
-            onDelete={onDelete}
-            columns={columns}
-            data={itemsData ?? []}
-          >
-            <Table.GlobalActions />
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
             <Table.Container>
-              <Table.Actions>
-                <Table.ActionsLeft />
-                <Table.ActionsCenter>
-                  <Table.Pagination />
-                </Table.ActionsCenter>
-                <Table.ActionsRight>
-                  <Table.Delete />
-                </Table.ActionsRight>
-              </Table.Actions>
-              <Table.Header />
-              <FormProvider {...methods}>
-                <Table.Body />
-              </FormProvider>
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content>
+                <Table.Header />
+                <FormProvider {...methods}>
+                  <Table.Body />
+                </FormProvider>
+              </Table.Content>
             </Table.Container>
           </Table>
         </Grid>
