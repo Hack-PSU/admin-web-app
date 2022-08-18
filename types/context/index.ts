@@ -1,7 +1,5 @@
 import { Auth, User } from "@firebase/auth";
 import { JwtPayload } from "jwt-decode";
-import { PaginatedQueryFn } from "types/hooks";
-import { IGetAllEventsResponse, IGetAllHackersResponse } from "types/api";
 
 export interface IFirebaseProviderProps {
   auth: Auth;
@@ -35,13 +33,4 @@ export interface IFirebaseProviderHooks {
   resolveAuthState(user?: User): Promise<void>;
   loginWithEmailAndPassword(email: string, password: string): Promise<void>;
   logout(): Promise<void>;
-}
-
-export interface IApiProviderProps {
-  baseURL: string;
-}
-
-export interface IApiProviderHooks {
-  getAllHackers: PaginatedQueryFn<IGetAllHackersResponse[]>;
-  getAllEvents: PaginatedQueryFn<IGetAllEventsResponse[]>;
 }

@@ -1,8 +1,6 @@
 import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
-import { TableCell, PaginatedTable, ActionRowCell } from "components/Table2";
 import {
   EventType,
   IGetAllEventsResponse,

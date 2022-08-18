@@ -83,7 +83,6 @@ const AddExtraCreditClassModal: FC = () => {
             <Grid item>
               <Box mt={2}>
                 <MenuButton
-                  isDirty={methods.formState.isDirty}
                   loading={isLoading}
                   menuItems={[
                     {
@@ -92,9 +91,6 @@ const AddExtraCreditClassModal: FC = () => {
                     },
                   ]}
                   onClick={handleSubmit}
-                  progressColor={
-                    methods.formState.isDirty ? "common.black" : "common.white"
-                  }
                 >
                   Submit
                 </MenuButton>

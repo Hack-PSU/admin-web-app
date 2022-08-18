@@ -29,8 +29,6 @@ import {
 } from "components/Table";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
-import InputCell from "components/Table2/InputCell";
-import { ActionRowCell } from "components/Table2";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewLocationModal from "components/modal/AddNewLocationModal";
 

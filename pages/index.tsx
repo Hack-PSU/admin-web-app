@@ -14,6 +14,7 @@ import { useColumnDef, useTable, Table } from "components/Table";
 import { useQuery } from "react-query";
 import { fetch, getAllLocations, QueryKeys } from "api";
 import { useEffect, useMemo } from "react";
+import { useFirebase } from "components/context";
 
 type LocationEntity = {
   name: string;
@@ -73,6 +74,8 @@ const Home: NextPage = () => {
     ...defs,
   });
 
+  const { logout } = useFirebase();
+
   return (
     <Grid container justifyContent="center" alignItems="center">
       <Grid item sx={{ width: "100%" }}>
@@ -97,6 +100,13 @@ const Home: NextPage = () => {
   );
 };
 
-export const getServerSideProps = withServerSideProps();
+export const getServerSideProps = withServerSideProps(() => {
+  return {
+    redirect: {
+      destination: "/hackers",
+      permanent: false,
+    },
+  };
+});
 
 export default withDefaultLayout(Home);

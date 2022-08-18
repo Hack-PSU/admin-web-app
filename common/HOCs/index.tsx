@@ -39,7 +39,9 @@ export function withServerSideProps<TProps>(
   getServerSideProps?: (
     context: GetServerSidePropsContext,
     token: string
-  ) => Promise<GetServerSidePropsResult<TProps>>
+  ) =>
+    | Promise<GetServerSidePropsResult<TProps>>
+    | GetServerSidePropsResult<TProps>
 ) {
   return async (ctx: GetServerSidePropsContext) => {
     const cookies = nookies.get(ctx);
