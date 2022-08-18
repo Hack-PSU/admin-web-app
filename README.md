@@ -168,7 +168,7 @@ folder over importing directly from MaterialUI. These components follow default 
 implementations of the component. If you end up overriding too much of the default properties, then you can consider
 importing from the MaterialUI or similar.
 
-### Table
+### Table (Deprecated for API v2)
 
 When implementing a table, it would almost always be a `PaginatedTable`.
 Rendering a table will always occur on the client-side (ie. not server-side rendered) since
