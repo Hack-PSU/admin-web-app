@@ -2628,7 +2628,7 @@ __metadata:
     typescript: 4.6.4
     use-immer: ^0.7.0
     yup: ^0.32.11
-    zustand: ^4.0.0-rc.1
+    zustand: ^4.1.0
   languageName: unknown
   linkType: soft
 
@@ -6487,7 +6487,7 @@ __metadata:
 
 "typescript@patch:typescript@4.6.4#~builtin<compat/typescript>":
   version: 4.6.4
-  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"
+  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=f456af"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -6555,12 +6555,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:1.1.0":
-  version: 1.1.0
-  resolution: "use-sync-external-store@npm:1.1.0"
+"use-sync-external-store@npm:1.2.0":
+  version: 1.2.0
+  resolution: "use-sync-external-store@npm:1.2.0"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 8993a0b642f91d7fcdbb02b7b3ac984bd3af4769686f38291fe7fcfe73dfb73d6c64d20dfb7e5e7fbf5a6da8f5392d6f8e5b00c243a04975595946e82c02b883
+  checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
   languageName: node
   linkType: hard
 
@@ -6771,11 +6771,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:^4.0.0-rc.1":
-  version: 4.0.0-rc.1
-  resolution: "zustand@npm:4.0.0-rc.1"
+"zustand@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "zustand@npm:4.1.0"
   dependencies:
-    use-sync-external-store: 1.1.0
+    use-sync-external-store: 1.2.0
   peerDependencies:
     immer: ">=9.0"
     react: ">=16.8"
@@ -6784,6 +6784,6 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: c88ae96286229b3c463cf7989c860fcde8ec9cf885eb50a0e0eaf9642388d407a854e5e07b9f80676454732bf15e1c7645201cff21fd9feacd5df8bbd62fcd46
+  checksum: 83de9cc386aeb311892328f1b32f4b5b96ff44ba319db60e42e54ca80619551aafd340d2dad4db908b0dbc00807764f688e0eb6ee4a8fa71c1ec2626e944163e
   languageName: node
   linkType: hard

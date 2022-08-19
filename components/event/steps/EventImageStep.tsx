@@ -8,12 +8,11 @@ import {
 import { useForm, FormProvider } from "react-hook-form";
 import { Grid } from "@mui/material";
 import EventDropzoneItem from "components/event/forms/EventDropzoneItem";
-import { useEventDispatch, useEventStore } from "common/store";
+import { useEventStore } from "common/store";
 import { EventType } from "api";
 
 const EventImageStep: FC = () => {
-  const { eventImage, eventType } = useEventStore();
-  const dispatch = useEventDispatch();
+  const { eventImage, eventType, updateImage } = useEventStore();
 
   const { nextStep, gotoStep, previousStep, active } = useStepper(
     3,
@@ -29,9 +28,7 @@ const EventImageStep: FC = () => {
   const handleNext = () => {
     methods.handleSubmit((data) => {
       if (data.eventImage.length > 0) {
-        dispatch("UPDATE_IMAGE", {
-          eventImage: data.eventImage[0],
-        });
+        updateImage(data.eventImage[0]);
         nextStep();
       } else {
         // mark current step as skipped

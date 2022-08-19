@@ -10,10 +10,9 @@ import {
   resolveError,
 } from "api";
 import { DateTime } from "luxon";
-import { Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton } from "components/base";
+import { Grid, Typography, useTheme } from "@mui/material";
+import { GradientButton } from "components/base";
 import { useQuery } from "react-query";
-import { Cell } from "react-table";
 import { useRouter } from "next/router";
 import {
   DefaultActionCell,
