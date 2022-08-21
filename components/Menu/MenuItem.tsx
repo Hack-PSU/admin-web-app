@@ -5,10 +5,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  styled,
   useTheme,
 } from "@mui/material";
-import MenuItemIcon from "components/SideMenu/MenuItemIcon";
+import MenuItemIcon from "./MenuItemIcon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { EvaIcon } from "components/base";

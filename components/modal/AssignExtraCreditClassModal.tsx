@@ -9,7 +9,7 @@ import {
 } from "components/base";
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Grid, Typography } from "@mui/material";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CreateEntity,
   fetch,

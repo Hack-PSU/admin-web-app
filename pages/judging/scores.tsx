@@ -1,7 +1,7 @@
 import React from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   getAllHackers,

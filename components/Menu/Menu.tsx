@@ -1,8 +1,12 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Drawer, Grid, List, styled, Typography } from "@mui/material";
-import MenuItem, { CollapsibleMenuItem } from "components/SideMenu/MenuItem";
+import MenuItem, { CollapsibleMenuItem } from "./MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
+import { useQuery } from "@tanstack/react-query";
+import { fetch, getAllHackathons, IHackathonEntity, QueryKeys } from "api";
+import _ from "lodash";
+import { DateTime } from "luxon";
 
 const DrawerHeader = styled(Grid)(({ theme }) => ({
   alignItems: "center",
@@ -17,6 +21,44 @@ interface IMenuProps {
 }
 
 const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
+  const { data: allHackathons } = useQuery(
+    QueryKeys.hackathon.findAll(),
+    () => fetch(getAllHackathons),
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
+
+  const activeHackathon = useMemo(() => {
+    if (allHackathons) {
+      const activeHackathons = _.filter(allHackathons, "active");
+      if (activeHackathons.length > 0) {
+        return activeHackathons[0];
+      }
+    }
+    return {} as IHackathonEntity;
+  }, [allHackathons]);
+
+  const formatHackathon = useCallback((hackathon: IHackathonEntity) => {
+    const startTime = DateTime.fromMillis(Number(hackathon.start_time));
+
+    const springMonths = ["January", "February", "March", "April", "May"];
+    const summerMonths = ["June", "July"];
+    const fallMonths = ["August", "September", "October", "November"];
+
+    // For Spring
+    if (springMonths.includes(startTime.monthLong)) {
+      return `Spring ${startTime.year}`;
+    } else if (fallMonths.includes(startTime.monthLong)) {
+      return `Fall ${startTime.year}`;
+    } else if (summerMonths.includes(startTime.monthLong)) {
+      return `Summer ${startTime.year}`;
+    }
+
+    return "Hackathon";
+  }, []);
+
   return (
     <Drawer
       variant="persistent"
@@ -43,7 +85,7 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
         </Grid>
         <Grid item>
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Fall 2021
+            {formatHackathon(activeHackathon)}
           </Typography>
         </Grid>
       </DrawerHeader>
@@ -87,6 +129,11 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           icon={"bar-chart-2-outline"}
           label={"Analytics"}
           to={"/analytics"}
+        />
+        <MenuItem
+          icon={"settings-2"}
+          to={"/settings/members"}
+          label={"Settings"}
         />
       </List>
     </Drawer>

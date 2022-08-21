@@ -21,7 +21,7 @@ import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 // @ts-ignore
 import isEmail from "is-email";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllAvailableItems, getAllHackers, QueryKeys } from "api";
 import { IOption } from "types/components";
 

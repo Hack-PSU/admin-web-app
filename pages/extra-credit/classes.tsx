@@ -5,7 +5,7 @@ import { Box, Grid, lighten, Typography, useTheme } from "@mui/material";
 import { Button, EvaIcon, GradientButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { useForm } from "react-hook-form";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   QueryKeys,

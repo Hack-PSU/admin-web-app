@@ -13,7 +13,7 @@ import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { useRouter } from "next/router";
 import { useColumnBuilder } from "common/hooks";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ModalProvider, useModalContext } from "components/context";
 import AddCheckoutModal from "components/modal/AddCheckoutModal";
 

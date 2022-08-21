@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography, useTheme } from "@mui/material";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllHackathons, getAllHackers, QueryKeys } from "api";
 import _ from "lodash";
 import { Pie } from "components/Charts";

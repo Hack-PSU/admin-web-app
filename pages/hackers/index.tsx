@@ -5,10 +5,9 @@ import {
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base";
 import { useRouter } from "next/router";

@@ -113,10 +113,8 @@ const RichText: FC<IRichTextProps> = ({
     (url) => {
       let link = url;
 
-      if (!link.includes("http://")) {
-        if (!link.includes("https://")) {
-          link = `https://${url}`;
-        }
+      if (!link.includes("http://") && !link.includes("https://")) {
+        link = `https://${url}`;
       }
 
       const contentState = editorState.getCurrentContent();

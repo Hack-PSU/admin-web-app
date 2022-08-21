@@ -6,7 +6,7 @@ import { EvaIcon } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider } from "components/context";
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   getAllHackers,

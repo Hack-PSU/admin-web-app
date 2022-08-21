@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import { WithChildren } from "types/common";
-import Menu from "components/SideMenu/Menu";
+import { Menu } from "components/Menu";
 
 const DefaultLayout: FC<WithChildren> = ({ children }) => {
   const theme = useTheme();

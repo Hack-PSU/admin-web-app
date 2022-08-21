@@ -11,7 +11,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { object } from "superstruct";
 import { NonEmptyNumber, NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createCheckoutItem,
   CreateEntity,
