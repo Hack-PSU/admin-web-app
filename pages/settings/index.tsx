@@ -5,7 +5,7 @@ const Settings: NextPageLayout = () => {
   return <></>;
 };
 
-export const getServerSideProps = withServerSideProps((props) => {
+export const getServerSideProps = withServerSideProps(() => {
   return {
     redirect: {
       destination: "/settings/members",

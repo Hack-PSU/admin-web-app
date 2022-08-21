@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography, useTheme } from "@mui/material";
@@ -9,11 +9,13 @@ import { Pie } from "components/Charts";
 import { ChartContainer, RegistrationBarLine } from "components/analytics";
 import { ParentSizeModern } from "@visx/responsive";
 import { DateTime } from "luxon";
+import { useSnackbar } from "notistack";
 
 const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
 
 const AnalyticsPage: NextPage = () => {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
     fetch(() =>

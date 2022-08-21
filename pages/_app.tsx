@@ -10,6 +10,8 @@ import { auth } from "common/config";
 import { AppPropsLayout } from "types/common";
 import { Root } from "components/base";
 import Head from "next/head";
+import { SnackbarProvider } from "notistack";
+import { SuccessSnackbar, ErrorSnackbar } from "components/snackbar";
 
 const client = new QueryClient();
 
@@ -22,14 +24,25 @@ function MyApp({ Component, pageProps }: AppPropsLayout) {
         <title>HackPSU Admin</title>
       </Head>
       <ThemeProvider theme={theme}>
-        <FirebaseProvider auth={auth}>
-          <QueryClientProvider client={client} contextSharing>
-            <Root>
-              {getLayout(<Component {...pageProps} />)}
-              <ReactQueryDevtools initialIsOpen={false} />
-            </Root>
-          </QueryClientProvider>
-        </FirebaseProvider>
+        <SnackbarProvider
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          Components={{
+            success: SuccessSnackbar,
+            error: ErrorSnackbar,
+          }}
+        >
+          <FirebaseProvider auth={auth}>
+            <QueryClientProvider client={client}>
+              <Root>
+                {getLayout(<Component {...pageProps} />)}
+                <ReactQueryDevtools initialIsOpen={false} />
+              </Root>
+            </QueryClientProvider>
+          </FirebaseProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </>
   );

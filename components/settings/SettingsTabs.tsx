@@ -1,5 +1,13 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
-import { Box, styled, Tab, Tabs, TabProps, TabsProps } from "@mui/material";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  styled,
+  Tab,
+  Tabs,
+  TabProps,
+  TabsProps,
+  Grid,
+} from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -45,9 +53,15 @@ const SettingsTabs: FC<{ children: React.ReactNode }> = ({ children }) => {
     SettingsRoute.MEMBERS
   );
 
-  useEffect(() => {
-    setSelected(_.last(router.asPath.split("/")) as SettingsRoute);
+  const currentTab = useMemo(() => {
+    return _.last(router.asPath.split("/")) as SettingsRoute;
   }, [router]);
+
+  useEffect(() => {
+    if (selected !== currentTab) {
+      setSelected(currentTab);
+    }
+  }, [currentTab, selected]);
 
   const onChangeTab: TabsProps["onChange"] = useCallback(
     (event: React.SyntheticEvent, newValue: SettingsRoute) => {
@@ -70,7 +84,9 @@ const SettingsTabs: FC<{ children: React.ReactNode }> = ({ children }) => {
           <StyledTab label={"Hackathons"} value={SettingsRoute.HACKATHONS} />
         </StyledTabs>
       </Box>
-      {children}
+      <Grid item pt={2}>
+        {children}
+      </Grid>
     </>
   );
 };

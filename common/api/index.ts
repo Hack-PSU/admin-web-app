@@ -31,5 +31,6 @@ export * from "./hacker";
 export * from "./location";
 export * from "./extra_credit";
 export * from "./judging";
+export * from "./organizer";
 export * from "./types";
 export * from "./utils";
