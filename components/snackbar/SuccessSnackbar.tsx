@@ -25,6 +25,7 @@ const SuccessSnackbar = forwardRef<HTMLDivElement, CustomContentProps>(
               xs={10}
               alignItems={"center"}
               columnSpacing={1}
+              flexWrap={"nowrap"}
             >
               <Grid item pt={0.3}>
                 <EvaIcon

@@ -130,11 +130,7 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           label={"Analytics"}
           to={"/analytics"}
         />
-        <MenuItem
-          icon={"settings-2"}
-          to={"/settings/members"}
-          label={"Settings"}
-        />
+        <MenuItem icon={"settings-2"} to={"/settings"} label={"Settings"} />
       </List>
     </Drawer>
   );

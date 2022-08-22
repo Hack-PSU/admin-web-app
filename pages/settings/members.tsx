@@ -2,16 +2,25 @@ import { useCallback, useEffect, useMemo } from "react";
 import { NextPage } from "next";
 import { withSettingsLayout } from "components/settings";
 import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
-import { useQuery } from "@tanstack/react-query";
-import { fetch, QueryKeys, getAllOrganizers } from "api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  fetch,
+  QueryKeys,
+  getAllOrganizers,
+  MutateEntity,
+  IOrganizerEntity,
+  updateOrganizer,
+} from "api";
 import { ControlledSelect } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { IOption } from "types/components";
+import { useSnackbar } from "notistack";
+import _ from "lodash";
 
 type OrganizerEntity = {
   uid: string;
   name: string;
-  permission?: string;
+  permission: IOption;
   email: string;
 };
 
@@ -39,38 +48,117 @@ const PermissionOptions: IOption[] = [
 ];
 
 const SettingsMembers: NextPage = () => {
+  const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
+
   const { data: allOrganizers, refetch } = useQuery(
     QueryKeys.organizer.findAll(),
     () => fetch(getAllOrganizers),
     {
       select: (data) => {
         if (data) {
-          return data.map((d) => ({
-            uid: d.uid,
-            name: `${d.firstname} ${d.lastname}`,
-            email: d.email,
-            permission: d.permission ?? "2",
-          }));
+          return data.map((d) => {
+            const permission = PermissionOptions.find(
+              (p) => p.value === d.permission
+            );
+            return {
+              uid: d.uid,
+              name: `${d.firstname} ${d.lastname}`,
+              email: d.email,
+              permission: permission ?? { value: "2", label: "Team Member" },
+            };
+          });
         }
       },
     }
   );
 
+  const { mutateAsync } = useMutation(
+    QueryKeys.organizer.updateOne(),
+    ({ entity }: MutateEntity<IOrganizerEntity>) =>
+      fetch(() => updateOrganizer(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.organizer.all);
+        enqueueSnackbar("Successfully updated organizer", {
+          variant: "success",
+        });
+      },
+    }
+  );
+
+  const data = useMemo(() => {
+    return [
+      {
+        uid: "FHBbkIw88qZBaxSmQxmdtSURsto1",
+        email: "admin@email.com",
+        name: "Admin Admin",
+        permission: { value: "4", label: "Tech-Exec" },
+      },
+    ];
+  }, []);
+
   const defaultValues = useMemo(() => {
-    if (allOrganizers) {
-      return allOrganizers.reduce((acc, curr) => {
-        acc[curr.uid] = curr;
+    if (data) {
+      return data.reduce((acc, curr) => {
+        const permission = PermissionOptions.find(
+          (p) => p.value === curr.permission.value
+        );
+
+        acc[curr.uid] = {
+          ...curr,
+          permission: { value: "2", label: "Team Member" },
+        };
+
+        if (permission) {
+          acc[curr.uid].permission = permission;
+        }
+
         return acc;
       }, {} as { [key: string]: OrganizerEntity });
     }
     return {};
-  }, [allOrganizers]);
+  }, [data]);
 
   const methods = useForm({
     defaultValues,
   });
 
-  const { reset } = methods;
+  const { reset, watch } = methods;
+
+  const submitOrganizerUpdate = useCallback(
+    async (entities: Partial<IOrganizerEntity>[]) => {
+      await Promise.all(_.map(entities, (entity) => mutateAsync({ entity })));
+    },
+    [mutateAsync]
+  );
+
+  useEffect(() => {
+    const subscription = watch((data, info) => {
+      if (info.type === "change") {
+        const entities = _.chain(data)
+          .pickBy((value, uid) => {
+            if (value && value.permission) {
+              return (
+                defaultValues[uid].permission?.value !== value.permission?.value
+              );
+            }
+            return false;
+          })
+          .map((value, uid) => ({
+            uid: uid,
+            permission: value?.permission?.value ?? "2",
+          }))
+          .value();
+
+        if (entities) {
+          void submitOrganizerUpdate(entities);
+        }
+      }
+    });
+
+    return subscription.unsubscribe;
+  }, [defaultValues, submitOrganizerUpdate, watch]);
 
   useEffect(() => {
     reset({ ...defaultValues });
@@ -109,8 +197,6 @@ const SettingsMembers: NextPage = () => {
     ],
   });
 
-  const data = useMemo(() => allOrganizers || [], [allOrganizers]);
-
   const table = useTable({
     ...defs,
     getRowId: (row) => row.uid,
@@ -126,26 +212,24 @@ const SettingsMembers: NextPage = () => {
   }, []);
 
   return (
-    <>
-      <Table {...table}>
-        <Table.GlobalActions>
-          <Table.GlobalRefresh onRefresh={onRefresh} />
-          <Table.GlobalPageSize />
-        </Table.GlobalActions>
-        <Table.Container>
-          <Table.Actions
-            center={<Table.PaginationAction />}
-            right={<Table.DeleteAction onDelete={onDelete} />}
-          />
-          <Table.Content>
-            <Table.Header />
-            <FormProvider {...methods}>
-              <Table.Body />
-            </FormProvider>
-          </Table.Content>
-        </Table.Container>
-      </Table>
-    </>
+    <Table {...table}>
+      <Table.GlobalActions>
+        <Table.GlobalRefresh onRefresh={onRefresh} />
+        <Table.GlobalPageSize />
+      </Table.GlobalActions>
+      <Table.Container>
+        <Table.Actions
+          center={<Table.PaginationAction />}
+          right={<Table.DeleteAction onDelete={onDelete} />}
+        />
+        <Table.Content overflowVisible>
+          <Table.Header />
+          <FormProvider {...methods}>
+            <Table.Body />
+          </FormProvider>
+        </Table.Content>
+      </Table.Container>
+    </Table>
   );
 };
 

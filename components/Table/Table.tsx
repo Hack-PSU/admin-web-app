@@ -46,7 +46,7 @@ interface ITableComponent {
   Actions: FC<TableActionsProps>;
   PaginationAction: typeof PaginationAction;
   DeleteAction: typeof DeleteAction;
-  Content: FC<WithChildren>;
+  Content: FC<WithChildren<{ overflowVisible?: boolean }>>;
   Header: FC;
   Body: FC;
 }
@@ -120,13 +120,17 @@ const Actions: FC<TableActionsProps> = ({ left, center, right }) => {
   );
 };
 
-const Content: FC<WithChildren> = ({ children }) => {
+const Content: FC<WithChildren<{ overflowVisible?: boolean }>> = ({
+  overflowVisible,
+  children,
+}) => {
   return (
     <TableContainer
       sx={{
         width: "100%",
         borderBottomLeftRadius: "10px",
         borderBottomRightRadius: "10px",
+        ...(overflowVisible ? { overflow: "visible" } : {}),
       }}
     >
       <MuiTable sx={{ width: "100%" }}>{children}</MuiTable>

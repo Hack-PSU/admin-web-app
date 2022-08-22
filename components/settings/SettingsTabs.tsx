@@ -16,6 +16,7 @@ enum SettingsRoute {
   MEMBERS = "members",
   DEVICES = "devices",
   HACKATHONS = "hackathons",
+  PROFILE = "profile",
 }
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -82,6 +83,7 @@ const SettingsTabs: FC<{ children: React.ReactNode }> = ({ children }) => {
           <StyledTab label={"Members"} value={SettingsRoute.MEMBERS} />
           <StyledTab label={"Devices"} value={SettingsRoute.DEVICES} />
           <StyledTab label={"Hackathons"} value={SettingsRoute.HACKATHONS} />
+          <StyledTab label={"Profile"} value={SettingsRoute.PROFILE} />
         </StyledTabs>
       </Box>
       <Grid item pt={2}>
