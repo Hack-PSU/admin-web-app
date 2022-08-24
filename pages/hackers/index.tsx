@@ -77,7 +77,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           }));
         }
       },
-      keepPreviousData: true,
       initialData: hackers,
     }
   );

@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllHackathons, IHackathonEntity, QueryKeys } from "api";
 import _ from "lodash";
 import { DateTime } from "luxon";
+import { useHackathonStore } from "common/store";
 
 const DrawerHeader = styled(Grid)(({ theme }) => ({
   alignItems: "center",
@@ -21,6 +22,9 @@ interface IMenuProps {
 }
 
 const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
+  const { activeHackathon: hackathon, updateActiveHackathon } =
+    useHackathonStore();
+
   const { data: allHackathons } = useQuery(
     QueryKeys.hackathon.findAll(),
     () => fetch(getAllHackathons),
@@ -34,11 +38,15 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
     if (allHackathons) {
       const activeHackathons = _.filter(allHackathons, "active");
       if (activeHackathons.length > 0) {
+        if (hackathon === null) {
+          updateActiveHackathon(activeHackathons[0]);
+        }
+
         return activeHackathons[0];
       }
     }
     return {} as IHackathonEntity;
-  }, [allHackathons]);
+  }, [allHackathons, hackathon, updateActiveHackathon]);
 
   const formatHackathon = useCallback((hackathon: IHackathonEntity) => {
     const startTime = DateTime.fromMillis(Number(hackathon.start_time));
