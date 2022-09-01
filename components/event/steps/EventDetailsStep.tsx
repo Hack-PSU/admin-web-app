@@ -44,7 +44,6 @@ const EventDetailsStep: FC = () => {
   } = useEventStore();
 
   const methods = useForm({
-    // @ts-ignore
     resolver: superstructResolver(schema),
     defaultValues: {
       eventName,
