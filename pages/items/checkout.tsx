@@ -10,10 +10,8 @@ import {
 } from "api";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
-import { ActionRowCell, PaginatedTable } from "components/Table";
-import { useRouter } from "next/router";
-import { useColumnBuilder } from "common/hooks";
-import { useQuery } from "react-query";
+import { Table, useColumnDef, useTable } from "components/Table";
+import { useQuery } from "@tanstack/react-query";
 import { ModalProvider, useModalContext } from "components/context";
 import AddCheckoutModal from "components/modal/AddCheckoutModal";
 
@@ -46,8 +44,6 @@ const AddCheckoutButton: FC = () => {
 };
 
 const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
-  const router = useRouter();
-
   const { data: itemsData, refetch } = useQuery(
     QueryKeys.checkoutItem.findAll(),
     () => fetch(getAllCheckoutItems),
@@ -66,44 +62,31 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
     }
   );
 
-  const { columns, names } = useColumnBuilder<{
-    uid: string;
+  const defs = useColumnDef<{
+    uid: number;
     userName: string;
     itemName: string;
-    quantity: number;
-  }>((builder) =>
-    builder
-      .addColumn("User Name", {
+  }>({
+    columns: [
+      {
         id: "userName",
-        accessor: (row) => row.userName,
         type: "text",
-      })
-      .addColumn("Item Name", {
+        header: "Hacker",
+        accessorKey: "userName",
+      },
+      {
         id: "itemName",
-        accessor: (row) => row.itemName,
         type: "text",
-      })
-      .addColumn("Quantity", {
-        id: "quantity",
-        accessor: (row) => row.quantity,
-        type: "text",
-      })
-      .addColumn("Actions", {
-        id: "actions",
-        type: "custom",
-        hideHeader: true,
-        disableSortBy: true,
-        Cell: ({ cell, row }) => (
-          <ActionRowCell
-            cell={cell}
-            icon={"edit-outline"}
-            onClickAction={() =>
-              router.push(`/items/checkout/${row.original.uid}`)
-            }
-          />
-        ),
-      })
-  );
+        header: "Item",
+        accessorKey: "itemName",
+      },
+    ],
+  });
+
+  const table = useTable({
+    data: itemsData ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     void refetch();
@@ -148,25 +131,26 @@ const CheckoutPage: NextPage<ICheckoutPageProps> = ({ items }) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton
-            // isDirty={methods.formState.isDirty}
-            // onClick={onClickSave}
-            // loading={isLoading}
-            // progressColor={methods.formState.isDirty ? "common.white" : "common.black"}
-            >
-              Save
-            </SaveButton>
+            <SaveButton>Save</SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
-          <PaginatedTable
-            limit={8}
-            columns={columns}
-            names={names}
-            data={itemsData ?? []}
-            onRefresh={onRefresh}
-            onDelete={onDelete}
-          />
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
+            <Table.Container>
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content>
+                <Table.Header />
+                <Table.Body />
+              </Table.Content>
+            </Table.Container>
+          </Table>
         </Grid>
       </Grid>
     </ModalProvider>

@@ -7,8 +7,13 @@ export const selectStyles: <
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
 >(
   theme: Theme,
-  error?: boolean
-) => StylesConfig<TOption, TIsMulti, TGroup> = (theme, error) => ({
+  error?: boolean,
+  shouldOverlap?: boolean
+) => StylesConfig<TOption, TIsMulti, TGroup> = (
+  theme,
+  error,
+  shouldOverlap
+) => ({
   placeholder: (provided) => ({
     ...provided,
     color: alpha(theme.palette.border.dark, 0.8),
@@ -53,7 +58,7 @@ export const selectStyles: <
     },
     padding: theme.spacing(1.3, 2),
     borderRadius: "5px",
-    ":not(:first-child)": {
+    ":not(:first-of-type)": {
       marginTop: theme.spacing(0.8),
     },
     fontWeight: 500,
@@ -68,5 +73,6 @@ export const selectStyles: <
     borderRadius: "15px",
     overflow: "hidden",
     zIndex: 99,
+    ...(shouldOverlap ? { position: "fixed" } : {}),
   }),
 });

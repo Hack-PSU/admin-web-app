@@ -1,0 +1,147 @@
+import { FC, useCallback, useMemo } from "react";
+import { Drawer, Grid, List, styled, Typography } from "@mui/material";
+import MenuItem, { CollapsibleMenuItem } from "./MenuItem";
+import Image from "next/image";
+import Logo from "assets/images/logo.svg";
+import { useQuery } from "@tanstack/react-query";
+import { fetch, getAllHackathons, IHackathonEntity, QueryKeys } from "api";
+import _ from "lodash";
+import { DateTime } from "luxon";
+import { useHackathonStore } from "common/store";
+
+const DrawerHeader = styled(Grid)(({ theme }) => ({
+  alignItems: "center",
+  justifyContent: "flex-start",
+  padding: theme.spacing(3.5, 3, 1),
+}));
+
+interface IMenuProps {
+  open: boolean;
+  shouldClose: boolean;
+  handleClose(): void;
+}
+
+const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
+  const { activeHackathon: hackathon, updateActiveHackathon } =
+    useHackathonStore();
+
+  const { data: allHackathons } = useQuery(
+    QueryKeys.hackathon.findAll(),
+    () => fetch(getAllHackathons),
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
+
+  const activeHackathon = useMemo(() => {
+    if (allHackathons) {
+      const activeHackathons = _.filter(allHackathons, "active");
+      if (activeHackathons.length > 0) {
+        if (hackathon === null) {
+          updateActiveHackathon(activeHackathons[0]);
+        }
+
+        return activeHackathons[0];
+      }
+    }
+    return {} as IHackathonEntity;
+  }, [allHackathons, hackathon, updateActiveHackathon]);
+
+  const formatHackathon = useCallback((hackathon: IHackathonEntity) => {
+    const startTime = DateTime.fromMillis(Number(hackathon.start_time));
+
+    const springMonths = ["January", "February", "March", "April", "May"];
+    const summerMonths = ["June", "July"];
+    const fallMonths = ["August", "September", "October", "November"];
+
+    // For Spring
+    if (springMonths.includes(startTime.monthLong)) {
+      return `Spring ${startTime.year}`;
+    } else if (fallMonths.includes(startTime.monthLong)) {
+      return `Fall ${startTime.year}`;
+    } else if (summerMonths.includes(startTime.monthLong)) {
+      return `Summer ${startTime.year}`;
+    }
+
+    return "Hackathon";
+  }, []);
+
+  return (
+    <Drawer
+      variant="persistent"
+      open={open}
+      onClose={handleClose}
+      ModalProps={{
+        keepMounted: shouldClose,
+      }}
+      sx={{
+        backgroundColor: "background.light",
+        width: "20%",
+      }}
+      PaperProps={{
+        sx: {
+          width: "20%",
+          borderRight: "none",
+          backgroundColor: "background.light",
+        },
+      }}
+    >
+      <DrawerHeader container>
+        <Grid item sx={{ mr: 1.5 }}>
+          <Image src={Logo} alt="hackpsu-logo" width={55} height={55} />
+        </Grid>
+        <Grid item>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {formatHackathon(activeHackathon)}
+          </Typography>
+        </Grid>
+      </DrawerHeader>
+      <List>
+        <MenuItem icon={"people-outline"} label={"Hackers"} to={"/hackers"} />
+        <MenuItem icon={"calendar-outline"} label={"Events"} to={"/events"} />
+        <MenuItem icon={"pin-outline"} label={"Locations"} to={"/locations"} />
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Manage Classes", to: "/extra-credit/classes" },
+            { label: "Manage Assignments", to: "/extra-credit/assignments" },
+          ]}
+          to={"/extra-credit"}
+          label={"Extra Credit"}
+          icon={"award-outline"}
+        />
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Manage Items", to: "/items/manage" },
+            { label: "Checkout", to: "/items/checkout" },
+          ]}
+          to={"/items"}
+          label={"Item Checkout"}
+          icon={"shopping-cart-outline"}
+        />
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Scores", to: "/judging/scores" },
+            { label: "Manage Projects", to: "/judging/projects" },
+          ]}
+          to={"/judging"}
+          label={"Judging"}
+          icon={"star-outline"}
+        />
+        <MenuItem
+          icon={"gift-outline"}
+          label={"Sponsorship"}
+          to={"/sponsorship"}
+        />
+        <MenuItem
+          icon={"bar-chart-2-outline"}
+          label={"Analytics"}
+          to={"/analytics"}
+        />
+        <MenuItem icon={"settings-2"} to={"/settings"} label={"Settings"} />
+      </List>
+    </Drawer>
+  );
+};
+
+export default Menu;

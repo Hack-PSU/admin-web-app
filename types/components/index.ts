@@ -78,6 +78,7 @@ export type SelectProps<
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
 > = Omit<Props<TOption, TIsMulti, TGroup>, "styles"> & {
   error?: boolean;
+  allowOverlap?: boolean;
 };
 
 export type LabelledSelectProps<

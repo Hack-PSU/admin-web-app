@@ -1,13 +1,6 @@
 import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
-import {
-  DefaultCell,
-  TableCell,
-  PaginatedTable,
-  ActionRowCell,
-} from "components/Table";
 import {
   EventType,
   IGetAllEventsResponse,
@@ -17,11 +10,18 @@ import {
   resolveError,
 } from "api";
 import { DateTime } from "luxon";
-import { Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton } from "components/base";
-import { useQuery } from "react-query";
-import { Cell } from "react-table";
+import { Grid, Typography, useTheme } from "@mui/material";
+import { GradientButton } from "components/base";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import {
+  DefaultActionCell,
+  DefaultCell,
+  Table,
+  TextCell,
+  useColumnDef,
+  useTable,
+} from "components/Table";
 
 interface IEventsProps {
   events: IGetAllEventsResponse[];
@@ -37,40 +37,26 @@ type EventRowValues = Pick<
   | "uid"
 >;
 
-const DateTimeCell: FC<{ cell: Cell<EventRowValues> }> = ({ cell }) => {
-  const theme = useTheme();
-
+const DateTimeCell: FC<{ date: number }> = ({ date }) => {
   return (
-    <Grid
-      container
-      item
-      sx={{
-        padding: theme.spacing(0, 2, 0, 0),
-        flexDirection: "column",
-      }}
-      {...cell.getCellProps()}
-    >
-      <Grid item>
-        <DefaultCell
-          sx={{
-            fontWeight: 600,
-            color: "common.black",
-          }}
-        >
-          {DateTime.fromMillis(cell.value).toLocaleString(DateTime.DATE_SHORT)}
-        </DefaultCell>
-      </Grid>
-      <Grid item>
-        <DefaultCell
-          sx={{
-            fontWeight: 500,
-            color: "table.header",
-          }}
-        >
-          {DateTime.fromMillis(cell.value).toLocaleString(DateTime.TIME_SIMPLE)}
-        </DefaultCell>
-      </Grid>
-    </Grid>
+    <DefaultCell>
+      <TextCell
+        sx={{
+          fontWeight: 600,
+          color: "common.black",
+        }}
+      >
+        {DateTime.fromMillis(date).toLocaleString(DateTime.DATE_SHORT)}
+      </TextCell>
+      <TextCell
+        sx={{
+          fontWeight: 500,
+          color: "header.light",
+        }}
+      >
+        {DateTime.fromMillis(date).toLocaleString(DateTime.TIME_SIMPLE)}
+      </TextCell>
+    </DefaultCell>
   );
 };
 
@@ -78,72 +64,72 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder<EventRowValues>((builder) =>
-    builder
-      .addColumn("Name", {
+  const defs = useColumnDef<EventRowValues>({
+    columns: [
+      {
         id: "name",
         type: "text",
-        filterType: "input",
-        accessor: (row) => row.event_title,
-        maxWidth: 120,
-      })
-      .addColumn("Location", {
+        header: "Name",
+        accessorKey: "event_title",
+      },
+      {
         id: "location",
         type: "text",
-        filterType: "input",
-        accessor: (row) => row.location_name,
-        minWidth: 150,
-      })
-      .addColumn("Start Date", {
+        header: "Location",
+        accessorKey: "location_name",
+      },
+      {
         id: "startDate",
-        type: "date",
-        filterType: "date",
-        accessor: (row) => row.event_start_time,
-        maxWidth: 100,
-        width: 100,
-        Cell: ({ cell }) => <DateTimeCell cell={cell} />,
-      })
-      .addColumn("End Date", {
-        id: "endDate",
-        filterType: "date",
-        type: "date",
-        accessor: (row) => row.event_end_time,
-        width: 100,
-        Cell: ({ cell }) => <DateTimeCell cell={cell} />,
-      })
-      .addColumn("Type", {
-        id: "type",
-        filterType: "checkbox",
         type: "text",
-        accessor: (row) => row.event_type,
-        width: 100,
-        Cell: ({ cell }) => {
-          return (
-            <TableCell {...cell.getCellProps()}>
-              {cell.value === EventType.FOOD && "FOOD"}
-              {cell.value === EventType.WORKSHOP && "WORKSHOP"}
-              {cell.value === EventType.ACTIVITY && "ACTIVITY"}
-            </TableCell>
-          );
+        header: "Start Date",
+        accessorKey: "event_start_time",
+        cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
+      },
+      {
+        id: "endDate",
+        type: "text",
+        header: "End Date",
+        accessorKey: "event_end_time",
+        cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
+      },
+      {
+        id: "type",
+        type: "text",
+        header: "Type",
+        accessorKey: "event_type",
+        format: (value) => {
+          switch (value as EventType) {
+            case EventType.WORKSHOP:
+              return "Workshop";
+            case EventType.FOOD:
+              return "Food";
+            case EventType.ACTIVITY:
+              return "Activity";
+          }
         },
-      })
-      .addColumn("Actions", {
+      },
+      {
         id: "actions",
-        filterType: "hide",
         type: "custom",
-        hideHeader: true,
-        disableSortBy: true,
-        width: 20,
-        accessor: (row) => row.uid,
-        Cell: ({ cell, row }) => (
-          <ActionRowCell
-            cell={cell}
-            icon={"edit-outline"}
-            onClickAction={() => router.push(`/events/${row.original.uid}`)}
+        header: "",
+        cell: ({ row }) => (
+          <DefaultActionCell
+            cellProps={{
+              sx: {
+                width: "8%",
+              },
+            }}
+            items={[
+              {
+                icon: "edit-outline",
+                onClick: () => router.push(`/events/${row.original.uid}`),
+              },
+            ]}
           />
         ),
-      })
-  );
+      },
+    ],
+  });
 
   const { data: eventsData } = useQuery(
     QueryKeys.event.findAll(),
@@ -166,6 +152,11 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       },
     }
   );
+
+  const table = useTable({
+    data: eventsData ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     return undefined;
@@ -203,14 +194,22 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         </Grid>
       </Grid>
       <Grid item sx={{ width: "100%" }}>
-        <PaginatedTable
-          limit={8}
-          columns={columns}
-          names={names}
-          data={eventsData ?? []}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-        />
+        <Table {...table}>
+          <Table.GlobalActions>
+            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
+          <Table.Container>
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              right={<Table.DeleteAction onDelete={onDelete} />}
+            />
+            <Table.Content>
+              <Table.Header />
+              <Table.Body />
+            </Table.Content>
+          </Table.Container>
+        </Table>
       </Grid>
     </Grid>
   );

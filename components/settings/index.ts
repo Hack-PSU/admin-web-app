@@ -1,0 +1,1 @@
+export { withSettingsLayout } from "./withSettingsLayout";

@@ -1,4 +1,4 @@
-import { UseQueryOptions, UseQueryResult } from "react-query";
+import { UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
 import { UseControllerReturn } from "react-hook-form";
 import { ColumnWithLooseAccessor, UseTableOptions } from "react-table";
 
@@ -117,3 +117,22 @@ export type UseServerSidePaginationReturn<TData> = UseQueryResult<
   TData,
   unknown
 > & {};
+
+export type UseTableStateOptions<T extends object> = {
+  data?: T[];
+  getKey: (item: T) => string;
+};
+
+type TableStates<T extends object> = Pick<
+  UseTableOptions<T>,
+  "initialState" | "getRowId"
+>;
+
+export type UseTableStateReturn<T extends object> = {
+  getSelectedRows: () => T[];
+  selectedRowIds: Record<string, boolean>;
+  onRowSelected: (rows: Record<string, boolean>) => void;
+  states: TableStates<T>;
+  selectedRows: T[];
+  hasSelections: boolean;
+};

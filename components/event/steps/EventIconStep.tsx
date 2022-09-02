@@ -8,11 +8,10 @@ import {
 import { Grid } from "@mui/material";
 import EventDropzoneItem from "components/event/forms/EventDropzoneItem";
 import { useForm, FormProvider } from "react-hook-form";
-import { useEventDispatch, useEventStore } from "common/store";
+import { useEventStore } from "common/store";
 
 const EventIconStep: FC = () => {
-  const { eventIcon } = useEventStore();
-  const dispatch = useEventDispatch();
+  const { eventIcon, updateIcon } = useEventStore();
 
   const { nextStep, previousStep, active, gotoStep } = useStepper(
     4,
@@ -29,9 +28,7 @@ const EventIconStep: FC = () => {
   const handleNext = () => {
     methods.handleSubmit((data, errors) => {
       if (data.eventIcon.length > 0) {
-        dispatch("UPDATE_ICON", {
-          eventIcon: data.eventIcon[0],
-        });
+        updateIcon(data.eventIcon[0]);
         nextStep();
       } else {
         gotoStep(5, 4);

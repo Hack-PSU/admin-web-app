@@ -5,10 +5,9 @@ import {
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
-import { Table } from "components/Table";
+import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
@@ -19,49 +18,51 @@ import {
   QueryKeys,
   resolveError,
 } from "api";
+import PageHeader from "components/Menu/PageHeader";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
 }
 
+type HackerEntity = {
+  name: string;
+  pin: number;
+  email: string;
+  university: string;
+};
+
 const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   const theme = useTheme();
   const router = useRouter();
 
-  const { columns, names } = useColumnBuilder<{
-    name: string;
-    pin: number;
-    email: string;
-    university: string;
-  }>((builder) =>
-    builder
-      .addColumn("Name", {
-        maxWidth: 120,
+  const defs = useColumnDef<HackerEntity>({
+    columns: [
+      {
+        id: "name",
         type: "text",
-        filterType: "input",
-      })
-      .addColumn("Pin", {
-        maxWidth: 80,
-        minWidth: 50,
-        width: 50,
+        header: "Name",
+        accessorKey: "name",
+      },
+      {
+        id: "pin",
         type: "text",
-        filterType: "hide",
-      })
-      .addColumn("Email", {
-        minWidth: 150,
-        maxWidth: 250,
+        header: "Pin",
+        accessorKey: "pin",
+      },
+      {
+        id: "email",
         type: "text",
-        filterType: "input",
-      })
-      .addColumn("University", {
+        header: "Email",
+        accessorKey: "email",
+      },
+      {
+        id: "university",
         type: "text",
-        filterType: "input",
-      })
-  );
-
-  // const { request: getHackers } = useQueryResolver<IGetAllHackersResponse[]>(
-  //   () => getAllHackers()
-  // );
+        header: "University",
+        accessorKey: "university",
+      },
+    ],
+  });
 
   const { data: hackersData } = useQuery(
     QueryKeys.hacker.findAll(),
@@ -77,10 +78,14 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           }));
         }
       },
-      keepPreviousData: true,
       initialData: hackers,
     }
   );
+
+  const table = useTable({
+    data: hackersData ?? [],
+    ...defs,
+  });
 
   const onRefresh = () => {
     return undefined;
@@ -92,19 +97,9 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
   return (
     <Grid container gap={1.5}>
-      <Grid
-        container
-        item
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ width: "100%" }}
-      >
-        <Grid item xs={10}>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Hackers
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
+      <PageHeader
+        header={"Hackers"}
+        right={
           <GradientButton
             variant="text"
             sx={{
@@ -121,32 +116,54 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           >
             Add a Hacker
           </GradientButton>
-        </Grid>
-      </Grid>
+        }
+      />
+      {/*<Grid*/}
+      {/*  container*/}
+      {/*  item*/}
+      {/*  justifyContent="space-between"*/}
+      {/*  alignItems="center"*/}
+      {/*  sx={{ width: "100%" }}*/}
+      {/*>*/}
+      {/*  <Grid item xs={10}>*/}
+      {/*    <Typography variant="h4" sx={{ fontWeight: 700 }}>*/}
+      {/*      Hackers*/}
+      {/*    </Typography>*/}
+      {/*  </Grid>*/}
+      {/*  <Grid item xs={2}>*/}
+      {/*    <GradientButton*/}
+      {/*      variant="text"*/}
+      {/*      sx={{*/}
+      {/*        width: "100%",*/}
+      {/*        padding: theme.spacing(1, 3.5),*/}
+      {/*      }}*/}
+      {/*      textProps={{*/}
+      {/*        sx: {*/}
+      {/*          lineHeight: "1.8rem",*/}
+      {/*          color: "common.white",*/}
+      {/*        },*/}
+      {/*      }}*/}
+      {/*      onClick={() => router.push("/hackers/new")}*/}
+      {/*    >*/}
+      {/*      Add a Hacker*/}
+      {/*    </GradientButton>*/}
+      {/*  </Grid>*/}
+      {/*</Grid>*/}
       <Grid item sx={{ width: "100%" }}>
-        <Table
-          limit={8}
-          names={names}
-          onRefresh={onRefresh}
-          onDelete={onDelete}
-          columns={columns}
-          data={hackersData ?? []}
-        >
-          <Table.GlobalActions />
+        <Table {...table}>
+          <Table.GlobalActions>
+            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
           <Table.Container>
-            <Table.Actions>
-              <Table.ActionsLeft>
-                <Table.Filter />
-              </Table.ActionsLeft>
-              <Table.ActionsCenter>
-                <Table.Pagination />
-              </Table.ActionsCenter>
-              <Table.ActionsRight>
-                <Table.Delete />
-              </Table.ActionsRight>
-            </Table.Actions>
-            <Table.Header />
-            <Table.Body />
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              right={<Table.DeleteAction onDelete={onDelete} />}
+            />
+            <Table.Content>
+              <Table.Header />
+              <Table.Body />
+            </Table.Content>
           </Table.Container>
         </Table>
       </Grid>

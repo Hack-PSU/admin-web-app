@@ -21,21 +21,17 @@ export type CreateMutationByIdReturn<
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
 
-export type CreateQueryReturn<TResponse, TParam extends object = {}> = (
+export type CreateQueryReturn<TResponse, TParam = {}> = (
   params?: TParam,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
-export type CreateMutationReturn<
-  TEntity,
-  TResponse = TEntity,
-  TParam extends object = {}
-> = (
+export type CreateMutationReturn<TEntity, TResponse = TEntity, TParam = {}> = (
   entity: TEntity,
-  param?: TParam,
+  params?: TParam,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
 
-export function createQuery<TResponse, TParam extends object = {}>(
+export function createQuery<TResponse, TParam = {}>(
   url: string
 ): CreateQueryReturn<TResponse, TParam> {
   return (params, token) =>
@@ -56,7 +52,7 @@ export function createQuery<TResponse, TParam extends object = {}>(
     });
 }
 
-export function createMutation<TEntity, TResponse, TParam extends object = {}>(
+export function createMutation<TEntity, TResponse, TParam = {}>(
   url: string,
   method: Method = "POST"
 ): CreateMutationReturn<TEntity, TResponse, TParam> {

@@ -9,7 +9,7 @@ import {
 } from "components/base";
 import { useForm, FormProvider } from "react-hook-form";
 import { ISelectItem } from "types/components";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   CreateEntity,
   createLocation,

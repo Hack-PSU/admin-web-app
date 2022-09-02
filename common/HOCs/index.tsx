@@ -10,7 +10,6 @@ import UnauthorizedError from "components/base/Error/UnauthorizedError";
 import { DefaultLayout } from "components/layout";
 import { NextPageLayout } from "types/common";
 import nookies from "nookies";
-import { AxiosError } from "axios";
 
 export function withProtectedRoute(
   Component: NextPage | NextPageLayout,
@@ -40,7 +39,9 @@ export function withServerSideProps<TProps>(
   getServerSideProps?: (
     context: GetServerSidePropsContext,
     token: string
-  ) => Promise<GetServerSidePropsResult<TProps>>
+  ) =>
+    | Promise<GetServerSidePropsResult<TProps>>
+    | GetServerSidePropsResult<TProps>
 ) {
   return async (ctx: GetServerSidePropsContext) => {
     const cookies = nookies.get(ctx);

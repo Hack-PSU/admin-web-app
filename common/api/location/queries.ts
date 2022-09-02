@@ -5,7 +5,7 @@ import {
   CreateQueryReturn,
 } from "api/utils";
 import { ILocationEntity, ILocationUpdateEntity } from "./entity";
-import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
+import { QueryAction, QueryScope } from "api/types";
 
 /**
  * Get All Locations

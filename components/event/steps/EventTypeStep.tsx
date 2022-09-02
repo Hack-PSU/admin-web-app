@@ -6,7 +6,7 @@ import { EventType } from "api";
 import { useForm, FormProvider } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { assert, enums, object, string } from "superstruct";
-import { useEventDispatch, useEventStore } from "common/store";
+import { useEventStore } from "common/store";
 
 const options = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -22,8 +22,7 @@ const schema = object({
 });
 
 const EventTypeStep: FC = () => {
-  const { eventType } = useEventStore();
-  const dispatch = useEventDispatch();
+  const { eventType, updateType } = useEventStore();
 
   const methods = useForm({
     resolver: superstructResolver(schema),
@@ -38,11 +37,11 @@ const EventTypeStep: FC = () => {
     methods
       .handleSubmit((data, error) => {
         if (data.type) {
-          dispatch("UPDATE_TYPE", { type: data.type });
+          updateType(data.type);
         }
       })()
       .then(() => nextStep());
-  }, [dispatch, methods, nextStep]);
+  }, [updateType, methods, nextStep]);
 
   return (
     <FormProvider {...methods}>

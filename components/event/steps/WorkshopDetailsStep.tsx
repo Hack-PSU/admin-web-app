@@ -13,7 +13,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { array, object, optional, string } from "superstruct";
 import { NonEmptySelect, NonEmptySelectArray } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
-import { useEventDispatch, useEventStore } from "common/store";
+import { useEventStore } from "common/store";
 import { IOption } from "types/components";
 
 const link = object({
@@ -35,9 +35,13 @@ const options: IOption[] = [
 ];
 
 const WorkshopDetailsStep: FC = () => {
-  const { wsPresenterNames, wsRelevantSkills, wsSkillLevel, wsUrls } =
-    useEventStore();
-  const dispatch = useEventDispatch();
+  const {
+    wsPresenterNames,
+    wsRelevantSkills,
+    wsSkillLevel,
+    wsUrls,
+    updateWorkshop,
+  } = useEventStore();
 
   const methods = useForm({
     resolver: superstructResolver(schema),
@@ -58,7 +62,7 @@ const WorkshopDetailsStep: FC = () => {
   const handleNext = () => {
     methods.handleSubmit((data, errors) => {
       if (!errors) {
-        dispatch("UPDATE_WORKSHOP", {
+        updateWorkshop({
           wsPresenterNames: data.wsPresenterNames,
           wsSkillLevel: data.wsSkillLevel,
           wsRelevantSkills: data.wsRelevantSkills,

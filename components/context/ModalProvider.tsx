@@ -1,16 +1,13 @@
 import {
   createContext,
   FC,
-  Reducer,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useReducer,
 } from "react";
 import { WithChildren } from "types/common";
 import { useImmer } from "use-immer";
-import produce from "immer";
 
 type ModalHooks = {
   show: boolean;

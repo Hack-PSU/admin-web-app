@@ -27,6 +27,7 @@ import jwtDecode from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
 import { initApi, resetApi } from "api/axios";
+import { useRouter } from "next/router";
 
 const FirebaseContext = createContext<IFirebaseProviderHooks>(
   {} as IFirebaseProviderHooks
@@ -36,6 +37,8 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   auth,
   children,
 }) => {
+  const router = useRouter();
+
   const [user, setUser] = useState<User | undefined>(undefined);
   const [token, setToken] = useState<string>("");
   const [permission, setPermission] = useState<AuthPermission>(
@@ -131,10 +134,14 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   const logout = useCallback(async () => {
     try {
       await signOut(auth);
+      setToken("");
+      setIsAuthenticated(false);
+
+      await router.push("/login");
     } catch (e) {
       console.error(e);
     }
-  }, [auth]);
+  }, [auth, router]);
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (user) => {

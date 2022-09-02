@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import { useModal } from "components/context";
 import {
   Button,
@@ -21,6 +21,9 @@ import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 // @ts-ignore
 import isEmail from "is-email";
+import { useQuery } from "@tanstack/react-query";
+import { fetch, getAllAvailableItems, getAllHackers, QueryKeys } from "api";
+import { IOption } from "types/components";
 
 const schema = object({
   checkoutItem: NonEmptySelect,
@@ -43,6 +46,43 @@ const AddCheckoutModal: FC = () => {
     resolver: superstructResolver(schema),
   });
 
+  const { data: availableItems } = useQuery(
+    QueryKeys.manageItems.findAll(),
+    () => fetch(getAllAvailableItems),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            uid: d.uid,
+            name: d.name,
+          }));
+        }
+      },
+    }
+  );
+
+  const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
+    fetch(getAllHackers)
+  );
+
+  const itemsOptions = useMemo(() => {
+    if (availableItems) {
+      return availableItems.map((item) => ({
+        value: item.uid,
+        label: item.name,
+      }));
+    }
+  }, [availableItems]);
+
+  const userOptions = useMemo(() => {
+    if (allUsers) {
+      return allUsers.map((u) => ({
+        value: u.uid,
+        label: `${u.firstname} ${u.lastname} [${u.pin}]`,
+      }));
+    }
+  }, [allUsers]);
+
   const onSubmit = () => {
     methods.handleSubmit((data) => {
       console.log(data);
@@ -55,34 +95,25 @@ const AddCheckoutModal: FC = () => {
         <Modal.Header>Create Checkout Request</Modal.Header>
         <Modal.Body>
           <Grid container item spacing={1} justifyContent="center">
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <ControlledSelect
                 name={"checkoutItem"}
                 as={LabelledSelect}
                 id={"checkout-items"}
                 label={"Item"}
+                options={itemsOptions}
                 placeholder={"Select an item"}
                 showError
               />
             </Grid>
-            <Grid item xs={6}>
-              <ControlledInput
-                name={"quantity"}
-                placeholder={"Enter a quantity"}
-                type="number"
-                as={LabelledInput}
-                id={"quantity"}
-                label={"Quantity"}
-                showError
-              />
-            </Grid>
             <Grid item xs={12}>
-              <ControlledInput
+              <ControlledSelect
                 name={"userInfo"}
                 placeholder={"Enter user pin or email"}
-                as={LabelledInput}
+                as={LabelledSelect}
                 id={"user-info"}
                 label={"User"}
+                options={userOptions}
                 showError
               />
             </Grid>
