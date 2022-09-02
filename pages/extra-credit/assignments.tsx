@@ -1,13 +1,12 @@
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
-import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
 import { Box, Grid, Typography } from "@mui/material";
 import { EvaIcon } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider } from "components/context";
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   getAllHackers,
@@ -15,7 +14,6 @@ import {
   getAllExtraCreditAssignments,
   getAllExtraCreditClasses,
 } from "api";
-import { useColumnBuilder, useTableState } from "common/hooks";
 
 type DataRow = {
   uid: number;

@@ -4,9 +4,8 @@ import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, lighten, Typography, useTheme } from "@mui/material";
 import { Button, EvaIcon, GradientButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
-import { FormProvider, useForm } from "react-hook-form";
-import { useColumnBuilder, useTableState } from "common/hooks";
-import { useQuery } from "react-query";
+import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   QueryKeys,
@@ -80,57 +79,6 @@ const AssignClassButton: FC<{ hasSelections: boolean }> = ({
 
 const ExtraCreditClassesPage: NextPage = () => {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-
-  const { columns, names } = useColumnBuilder<DataRow>(
-    (builder) =>
-      builder
-        .addColumn("Name", {
-          id: "name",
-          type: "text",
-          width: 200,
-          accessor: (row) => row.name,
-          // Header: () => <Box ml={1.8}>Name</Box>,
-          // Cell: ({ cell, row }) => {
-          //   return (
-          //     <InputCell
-          //       cell={cell}
-          //       name={`${row.original.uid}.name`}
-          //       placeholder={"Enter class name"}
-          //       onFocus={() => {
-          //         currentInputKey.current = row.original.uid;
-          //       }}
-          //       autoFocus={row.original.uid === currentInputKey.current}
-          //     />
-          //   );
-          // },
-        })
-        .addColumn("Hackers", {
-          id: "hackers",
-          type: "text",
-          width: 120,
-          accessor: (row) => row.users,
-        })
-    // .addColumn("Actions", {
-    //   id: "action",
-    //   type: "custom",
-    //   width: 20,
-    //   disableSortBy: true,
-    //   hideHeader: true,
-    //   Cell: ({ cell, row }) => {
-    //     const { resetField } = useFormContext();
-    //
-    //     return (
-    //       <ActionRowCell
-    //         cell={cell}
-    //         icon={"refresh-outline"}
-    //         onClickAction={() => {
-    //           resetField(`${row.original.uid}.name`);
-    //         }}
-    //       />
-    //     );
-    //   },
-    // })
-  );
 
   const defs = useColumnDef<DataRow>({
     columns: [

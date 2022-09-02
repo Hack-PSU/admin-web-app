@@ -1,19 +1,12 @@
 import type { NextPage } from "next";
-import {
-  withProtectedRoute,
-  withDefaultLayout,
-  withServerSideProps,
-} from "common/HOCs";
-import { AuthPermission } from "types/context";
+import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Grid } from "@mui/material";
-import { ControlledSelect, Input, Select } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
-import { DatePicker, TimePicker } from "components/base/Pickers";
-import { useDateTime } from "common/hooks";
 import { useColumnDef, useTable, Table } from "components/Table";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllLocations, QueryKeys } from "api";
 import { useEffect, useMemo } from "react";
+import { useFirebase } from "components/context";
 
 type LocationEntity = {
   name: string;
@@ -73,6 +66,8 @@ const Home: NextPage = () => {
     ...defs,
   });
 
+  const { logout } = useFirebase();
+
   return (
     <Grid container justifyContent="center" alignItems="center">
       <Grid item sx={{ width: "100%" }}>
@@ -97,6 +92,13 @@ const Home: NextPage = () => {
   );
 };
 
-export const getServerSideProps = withServerSideProps();
+export const getServerSideProps = withServerSideProps(() => {
+  return {
+    redirect: {
+      destination: "/hackers",
+      permanent: false,
+    },
+  };
+});
 
 export default withDefaultLayout(Home);

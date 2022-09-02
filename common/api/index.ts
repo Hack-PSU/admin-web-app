@@ -8,6 +8,7 @@ import {
   ExtraCreditClassKeys,
 } from "./extra_credit";
 import { JudgingProjectQueryKeys, JudgingScoreQueryKeys } from "api/judging";
+import { OrganizerQueryKeys } from "api/organizer";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -20,6 +21,7 @@ export const QueryKeys = {
   extraCreditAssignment: ExtraCreditAssignmentKeys,
   judgingProject: JudgingProjectQueryKeys,
   judgingScore: JudgingScoreQueryKeys,
+  organizer: OrganizerQueryKeys,
 };
 
 export * from "./checkout_item";
@@ -29,5 +31,6 @@ export * from "./hacker";
 export * from "./location";
 export * from "./extra_credit";
 export * from "./judging";
+export * from "./organizer";
 export * from "./types";
 export * from "./utils";

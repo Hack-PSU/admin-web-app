@@ -1,8 +1,6 @@
 import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
-import { TableCell, PaginatedTable, ActionRowCell } from "components/Table2";
 import {
   EventType,
   IGetAllEventsResponse,
@@ -12,10 +10,9 @@ import {
   resolveError,
 } from "api";
 import { DateTime } from "luxon";
-import { Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton } from "components/base";
-import { useQuery } from "react-query";
-import { Cell } from "react-table";
+import { Grid, Typography, useTheme } from "@mui/material";
+import { GradientButton } from "components/base";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import {
   DefaultActionCell,

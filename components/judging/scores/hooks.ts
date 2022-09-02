@@ -59,8 +59,6 @@ export function useScoreResults(
           return acc;
         }, {} as { [key: number]: string });
 
-      console.log(scores);
-
       return scores
         .map(({ project_id, ...d }) => ({
           projectName: projectsById[project_id],

@@ -13,7 +13,7 @@ import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
 import { useForm, FormProvider } from "react-hook-form";
 import { EventType } from "api";
-import { useEventDispatch, useEventStore } from "common/store";
+import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
@@ -34,12 +34,16 @@ const schema = object({
 });
 
 const EventDetailsStep: FC = () => {
-  const { eventType, eventName, eventLocation, eventDescription, eventDate } =
-    useEventStore();
-  const dispatch = useEventDispatch();
+  const {
+    eventType,
+    eventName,
+    eventLocation,
+    eventDescription,
+    eventDate,
+    updateDetails,
+  } = useEventStore();
 
   const methods = useForm({
-    // @ts-ignore
     resolver: superstructResolver(schema),
     defaultValues: {
       eventName,
@@ -57,7 +61,7 @@ const EventDetailsStep: FC = () => {
   const handleNext = () => {
     methods.handleSubmit((data, errors) => {
       if (!errors) {
-        dispatch("UPDATE_DETAILS", {
+        updateDetails({
           eventName: data.eventName,
           eventLocation: data.eventLocation,
           eventDescription: data.eventDescription,

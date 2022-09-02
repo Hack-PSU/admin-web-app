@@ -19,8 +19,7 @@ import {
   resolveError,
   updateLocation,
 } from "api";
-import { useColumnBuilder } from "common/hooks";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DefaultActionCell,
   Table,
@@ -28,9 +27,7 @@ import {
   useTable,
 } from "components/Table";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
-import InputCell from "components/Table2/InputCell";
-import { ActionRowCell } from "components/Table2";
+import { useForm, FormProvider } from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewLocationModal from "components/modal/AddNewLocationModal";
 

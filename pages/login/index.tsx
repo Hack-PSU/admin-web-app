@@ -3,7 +3,7 @@ import { darken, Grid, styled, Typography, useTheme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import { LoginForm } from "components/login";
 import { useFirebase } from "components/context";
-import { Button } from "components/base";
+import { Button, GradientButton } from "components/base";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import Image from "next/image";
@@ -14,12 +14,13 @@ const Container = styled(Grid)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  height: "80vh",
+  height: "100vh",
+  backgroundColor: theme.palette.background.light,
 }));
 
 const LoginContainer = styled(Grid)(({ theme }) => ({
   width: "35%",
-  boxShadow: theme.shadows[1],
+  boxShadow: theme.shadows[2],
   backgroundColor: "common.white",
   flexDirection: "column",
   alignItems: "center",
@@ -45,7 +46,7 @@ const Login: NextPage = () => {
       if (return_to) {
         void router.push(String(return_to));
       } else {
-        void router.push("/");
+        void router.push("/hackers");
       }
     }
   }, [router, isAuthenticated]);
@@ -59,7 +60,7 @@ const Login: NextPage = () => {
           </Grid>
           <LoginForm />
           <Grid item sx={{ width: "80%" }}>
-            <Button
+            <GradientButton
               onClick={handleSubmit}
               sx={{
                 mt: 1.5,
@@ -78,7 +79,7 @@ const Login: NextPage = () => {
               }}
             >
               Submit
-            </Button>
+            </GradientButton>
           </Grid>
         </LoginContainer>
       </Container>

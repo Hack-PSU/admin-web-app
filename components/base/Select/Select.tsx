@@ -14,11 +14,11 @@ function Select<
   TOption,
   TIsMulti extends boolean = false,
   TGroup extends GroupBase<TOption> = GroupBase<TOption>
->({ error, ...props }: SelectProps<TOption, TIsMulti, TGroup>) {
+>({ error, allowOverlap, ...props }: SelectProps<TOption, TIsMulti, TGroup>) {
   const theme = useTheme();
 
   const customStyles: StylesConfig<TOption, TIsMulti, TGroup> = useMemo(
-    () => selectStyles(theme, !!error),
+    () => selectStyles(theme, !!error, allowOverlap),
     [theme, error]
   );
 

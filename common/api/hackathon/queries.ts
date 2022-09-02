@@ -75,9 +75,13 @@ export const HackathonKeys = {
     [
       { ...HackathonKeys.all[0], action: QueryAction.query, scope: id },
     ] as const,
-  update: (id: string | number) =>
+  updateOne: () =>
     [
-      { ...HackathonKeys.all[0], action: QueryAction.update, scope: id },
+      {
+        ...HackathonKeys.all[0],
+        action: QueryAction.update,
+        scope: QueryScope.ID,
+      },
     ] as const,
   delete: (id: string | number) =>
     [

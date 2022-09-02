@@ -5,10 +5,9 @@ import {
   withDefaultLayout,
   withServerSideProps,
 } from "common/HOCs";
-import { useColumnBuilder } from "common/hooks";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, Typography, useTheme } from "@mui/material";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
@@ -19,6 +18,7 @@ import {
   QueryKeys,
   resolveError,
 } from "api";
+import PageHeader from "components/Menu/PageHeader";
 
 interface IHackersPageProps {
   hackers: IGetAllHackersResponse[];
@@ -78,7 +78,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           }));
         }
       },
-      keepPreviousData: true,
       initialData: hackers,
     }
   );
@@ -98,19 +97,9 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
   return (
     <Grid container gap={1.5}>
-      <Grid
-        container
-        item
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ width: "100%" }}
-      >
-        <Grid item xs={10}>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Hackers
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
+      <PageHeader
+        header={"Hackers"}
+        right={
           <GradientButton
             variant="text"
             sx={{
@@ -127,8 +116,39 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
           >
             Add a Hacker
           </GradientButton>
-        </Grid>
-      </Grid>
+        }
+      />
+      {/*<Grid*/}
+      {/*  container*/}
+      {/*  item*/}
+      {/*  justifyContent="space-between"*/}
+      {/*  alignItems="center"*/}
+      {/*  sx={{ width: "100%" }}*/}
+      {/*>*/}
+      {/*  <Grid item xs={10}>*/}
+      {/*    <Typography variant="h4" sx={{ fontWeight: 700 }}>*/}
+      {/*      Hackers*/}
+      {/*    </Typography>*/}
+      {/*  </Grid>*/}
+      {/*  <Grid item xs={2}>*/}
+      {/*    <GradientButton*/}
+      {/*      variant="text"*/}
+      {/*      sx={{*/}
+      {/*        width: "100%",*/}
+      {/*        padding: theme.spacing(1, 3.5),*/}
+      {/*      }}*/}
+      {/*      textProps={{*/}
+      {/*        sx: {*/}
+      {/*          lineHeight: "1.8rem",*/}
+      {/*          color: "common.white",*/}
+      {/*        },*/}
+      {/*      }}*/}
+      {/*      onClick={() => router.push("/hackers/new")}*/}
+      {/*    >*/}
+      {/*      Add a Hacker*/}
+      {/*    </GradientButton>*/}
+      {/*  </Grid>*/}
+      {/*</Grid>*/}
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
           <Table.GlobalActions>

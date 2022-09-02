@@ -11,7 +11,7 @@ import { Box, Grid } from "@mui/material";
 import { object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateEntity, fetch, QueryKeys } from "api";
 import { createExtraCreditClass, IExtraCreditClassCreateEntity } from "api";
 
@@ -83,7 +83,6 @@ const AddExtraCreditClassModal: FC = () => {
             <Grid item>
               <Box mt={2}>
                 <MenuButton
-                  isDirty={methods.formState.isDirty}
                   loading={isLoading}
                   menuItems={[
                     {
@@ -92,9 +91,6 @@ const AddExtraCreditClassModal: FC = () => {
                     },
                   ]}
                   onClick={handleSubmit}
-                  progressColor={
-                    methods.formState.isDirty ? "common.black" : "common.white"
-                  }
                 >
                   Submit
                 </MenuButton>

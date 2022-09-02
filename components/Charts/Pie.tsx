@@ -7,10 +7,10 @@ import { schemeTableau10 } from "d3-scale-chromatic";
 import { scaleOrdinal } from "@visx/scale";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
 import _ from "lodash";
+import { Grid, Typography } from "@mui/material";
 
 // @ts-expect-error no typedefs
 import Color from "colorjs.io";
-import { Grid, Typography } from "@mui/material";
 
 interface IPieProps<TData> extends PieProps<TData> {
   // units are in px

@@ -1,16 +1,15 @@
 import React, { FC, useEffect } from "react";
 import { withDefaultLayout } from "common/HOCs";
-import { useForm, FormProvider } from "react-hook-form";
 import { Grid, Typography } from "@mui/material";
 import EventFormStepper from "components/event/steps/EventFormStepper";
-import { useEventDispatch } from "common/store";
+import { useEventStore } from "common/store";
 
 const EventSteps: FC = () => {
-  const dispatch = useEventDispatch();
+  const { clear } = useEventStore();
 
   useEffect(() => {
-    dispatch("CLEAR");
-  }, [dispatch]);
+    clear();
+  }, [clear]);
 
   return (
     <Grid container flexDirection="column" sx={{ paddingBottom: 2 }}>

@@ -5,7 +5,7 @@ import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider, useModalContext } from "components/context";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllProjects, QueryKeys } from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
 
