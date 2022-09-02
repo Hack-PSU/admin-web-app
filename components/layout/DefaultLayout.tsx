@@ -26,7 +26,7 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
   const [open, setOpen] = useState<boolean>(true);
 
   const toggleDrawer = useCallback((open?: boolean) => {
-    if (open) {
+    if (open !== undefined) {
       setOpen(open);
     } else {
       setOpen((open) => !open);
