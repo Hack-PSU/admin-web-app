@@ -1,4 +1,11 @@
-import React, { createContext, FC, useContext } from "react";
+import React, {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+} from "react";
 import { flexRender, RowData, Table as BaseTable } from "@tanstack/react-table";
 import {
   TableContainer,
@@ -10,6 +17,8 @@ import {
   TableHead,
   Collapse,
   darken,
+  Box,
+  TableCell,
 } from "@mui/material";
 import { WithChildren } from "types/common";
 import {
@@ -21,12 +30,20 @@ import {
   SortColumn,
 } from "./actions";
 import { DefaultCell, DefaultHeaderCell, DefaultRow } from "./defaults";
-
-const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
-export const useTableContext = () => useContext(TableContext);
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  OnDragEndResponder,
+} from "react-beautiful-dnd";
+import { reorderItems } from "components/Table/utils";
+import DefaultDragHandleCell from "components/Table/defaults/DefaultDragHandleCell";
 
 type TableProps<TData extends RowData> = BaseTable<TData> & {
   renderSubRows?: (row: TData) => React.ReactNode;
+  isDraggable?: boolean;
+  onDragEnd?: OnDragEndResponder;
+  getDraggableOrder?: (Item: TData) => number;
 };
 
 type TableActionsProps = {
@@ -51,13 +68,31 @@ interface ITableComponent {
   Body: FC;
 }
 
+const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
+export const useTableContext = () => useContext(TableContext);
+
 const Table: ITableComponent = ({ children, ...props }) => {
+  const onDragEnd: OnDragEndResponder = useCallback(
+    (result, provided) => {
+      if (props.isDraggable) {
+        if (!props.onDragEnd) {
+          throw Error("onDragEnd required for draggable table");
+        } else {
+          props.onDragEnd(result, provided);
+        }
+      }
+    },
+    [props]
+  );
+
   return (
-    <TableContext.Provider value={props as TableProps<any>}>
-      <Grid container gap={1.5} flexDirection={"column"}>
-        {children}
-      </Grid>
-    </TableContext.Provider>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <TableContext.Provider value={props as TableProps<any>}>
+        <Grid container gap={1.5} flexDirection={"column"}>
+          {children}
+        </Grid>
+      </TableContext.Provider>
+    </DragDropContext>
   );
 };
 
@@ -139,7 +174,7 @@ const Content: FC<WithChildren<{ overflowVisible?: boolean }>> = ({
 };
 
 const Header: FC = () => {
-  const { getHeaderGroups } = useTableContext();
+  const { getHeaderGroups, isDraggable } = useTableContext();
   const theme = useTheme();
 
   return (
@@ -152,6 +187,9 @@ const Header: FC = () => {
             borderBottom: `2px solid ${theme.palette.border.light}`,
           }}
         >
+          {isDraggable ? (
+            <TableCell sx={{ p: 0, width: "1px" }} size={"small"} />
+          ) : null}
           {headerGroup.headers.map((header) => {
             if (header.id === "select") {
               return flexRender(header.column.columnDef.header, {
@@ -165,16 +203,20 @@ const Header: FC = () => {
                 column={header.column}
                 cellProps={{
                   sx: {
-                    cursor: "pointer",
+                    cursor:
+                      !isDraggable && header.column.getCanSort()
+                        ? "pointer"
+                        : undefined,
                     userSelect: "none",
                   },
-                  onClick: header.column.getCanSort()
-                    ? header.column.getToggleSortingHandler()
-                    : undefined,
+                  onClick:
+                    !isDraggable && header.column.getCanSort()
+                      ? header.column.getToggleSortingHandler()
+                      : undefined,
                 }}
                 key={header.id}
                 after={
-                  header.column.getCanSort() ? (
+                  !isDraggable && header.column.getCanSort() ? (
                     <Grid item sx={{ ml: 1.5, mt: 0.3 }}>
                       <SortColumn
                         isSorted={!!header.column.getIsSorted()}
@@ -204,68 +246,99 @@ const Body: FC = () => {
     options: { meta },
     getAllColumns,
     renderSubRows,
+    isDraggable,
+    getDraggableOrder,
+    getState,
   } = useTableContext();
 
   return (
-    <TableBody>
-      {getRowModel().rows.map((row, index) => (
-        <>
-          <DefaultRow
-            key={`${row.id}-${index}`}
-            sx={{
-              padding: theme.spacing(1.5),
-              ":last-of-type": {
-                borderBottom: 0,
-              },
-              ...(meta?.rowType === "expand"
-                ? {
-                    borderBottom: 0,
-                    cursor: "pointer",
-                    ":hover": {
-                      backgroundColor: darken(theme.palette.common.white, 0.05),
-                    },
-                    transition: "background-color 200ms ease-in-out",
-                  }
-                : {}),
-            }}
-            onClick={
-              meta?.rowType === "expand"
-                ? () => row.toggleExpanded()
-                : undefined
-            }
-          >
-            {row.getVisibleCells().map((cell) =>
-              flexRender(cell.column.columnDef.cell, {
-                ...cell.getContext(),
-                key: cell.id,
-              })
-            )}
-          </DefaultRow>
-          {meta?.rowType === "expand" && (
-            <DefaultRow
-              key={`${row.id}-${index + 1}`}
-              sx={{
-                padding: theme.spacing(0),
-              }}
+    <Droppable droppableId={"droppable"}>
+      {(provided) => (
+        <TableBody ref={provided.innerRef} {...provided.droppableProps}>
+          {getRowModel().rows.map((row, index) => (
+            <Draggable
+              key={`draggable-${index}`}
+              draggableId={row.id}
+              index={getDraggableOrder?.(row.original) ?? index}
+              isDragDisabled={!isDraggable}
             >
-              <DefaultCell
-                disableDefault
-                colSpan={getAllColumns().length}
-                sx={{
-                  ":first-child": {
-                    padding: 0,
-                  },
-                }}
-              >
-                <Collapse in={row.getIsExpanded()} timeout="auto" unmountOnExit>
-                  {renderSubRows && renderSubRows(row.original)}
-                </Collapse>
-              </DefaultCell>
-            </DefaultRow>
-          )}
-        </>
-      ))}
-    </TableBody>
+              {({ draggableProps, dragHandleProps, innerRef }) => (
+                <>
+                  <DefaultRow
+                    ref={innerRef}
+                    key={`${row.id}-${index}`}
+                    sx={{
+                      ":last-of-type": {
+                        borderBottom: 0,
+                      },
+                      position: "relative",
+                      ...(meta?.rowType === "expand"
+                        ? {
+                            borderBottom: 0,
+                            cursor: "pointer",
+                            ":hover": {
+                              backgroundColor: darken(
+                                theme.palette.common.white,
+                                0.05
+                              ),
+                            },
+                            transition: "background-color 200ms ease-in-out",
+                          }
+                        : {}),
+                    }}
+                    onClick={
+                      meta?.rowType === "expand"
+                        ? () => row.toggleExpanded()
+                        : undefined
+                    }
+                    {...draggableProps}
+                  >
+                    {isDraggable ? (
+                      <DefaultDragHandleCell
+                        dragHandleProps={dragHandleProps}
+                      />
+                    ) : null}
+                    {row.getVisibleCells().map((cell) =>
+                      flexRender(cell.column.columnDef.cell, {
+                        ...cell.getContext(),
+                        key: cell.id,
+                      })
+                    )}
+                  </DefaultRow>
+                  {meta?.rowType === "expand" && (
+                    <DefaultRow
+                      key={`${row.id}-${index + 1}`}
+                      sx={{
+                        padding: theme.spacing(0),
+                      }}
+                    >
+                      <DefaultCell
+                        disableDefault
+                        colSpan={getAllColumns().length}
+                        sx={{
+                          ":first-child": {
+                            padding: 0,
+                          },
+                        }}
+                      >
+                        <Collapse
+                          in={row.getIsExpanded()}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          {renderSubRows && renderSubRows(row.original)}
+                        </Collapse>
+                      </DefaultCell>
+                    </DefaultRow>
+                  )}
+                </>
+              )}
+            </Draggable>
+          ))}
+          {provided.placeholder}
+        </TableBody>
+      )}
+    </Droppable>
   );
 };
 

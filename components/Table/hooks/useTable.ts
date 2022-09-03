@@ -1,4 +1,3 @@
-import React from "react";
 import {
   FilterFn,
   getCoreRowModel,
@@ -13,6 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { ColumnTypeMeta, ColumnFormatterMeta, RenderSubRows } from "../types";
 import { rankItem } from "@tanstack/match-sorter-utils";
+import { OnDragEndResponder } from "react-beautiful-dnd";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line
@@ -37,15 +37,22 @@ type UseTableOptions<TData extends RowData> = Omit<
   useExpanded?: boolean;
   useFilter?: boolean;
   useSorted?: boolean;
+  useDraggable?: boolean;
   // formatter can be used to format a cell's value.
   // Its key must be the column id for that cell
   formatter: ColumnFormatterMeta;
   columnType: ColumnTypeMeta;
   renderSubRows?: RenderSubRows<TData>;
+  onDragEnd?: OnDragEndResponder;
+  getDraggableOrder?: (item: TData) => number;
 };
 
 type UseTableReturn<TData extends RowData> = Table<TData> &
-  Pick<UseTableOptions<TData>, "renderSubRows">;
+  Pick<UseTableOptions<TData>, "renderSubRows"> & {
+    isDraggable: boolean;
+    onDragEnd?: OnDragEndResponder;
+    getDraggableOrder?: (item: TData) => number;
+  };
 
 const globalFilterFn: FilterFn<any> = (row, columnId, filterValue, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), filterValue);
@@ -68,6 +75,9 @@ export function useTable<TData extends RowData>(
     formatter,
     columnType,
     renderSubRows,
+    useDraggable,
+    onDragEnd,
+    getDraggableOrder,
     ...tableOptions
   } = options;
 
@@ -91,5 +101,8 @@ export function useTable<TData extends RowData>(
   return {
     ...table,
     renderSubRows,
+    isDraggable: useDraggable ?? false,
+    onDragEnd,
+    getDraggableOrder,
   };
 }
