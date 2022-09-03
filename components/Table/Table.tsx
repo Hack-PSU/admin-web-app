@@ -248,7 +248,6 @@ const Body: FC = () => {
     renderSubRows,
     isDraggable,
     getDraggableOrder,
-    getState,
   } = useTableContext();
 
   return (
