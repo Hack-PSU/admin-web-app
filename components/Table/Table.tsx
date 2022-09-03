@@ -3,6 +3,7 @@ import React, {
   FC,
   useCallback,
   useContext,
+  useEffect,
   useId,
 } from "react";
 import { flexRender, RowData, Table as BaseTable } from "@tanstack/react-table";
@@ -41,8 +42,8 @@ import DefaultDragHandleCell from "components/Table/defaults/DefaultDragHandleCe
 type TableProps<TData extends RowData> = BaseTable<TData> & {
   renderSubRows?: (row: TData) => React.ReactNode;
   isDraggable?: boolean;
-  getOrderKey?: (item: TData) => number;
   onDragEnd?: OnDragEndResponder;
+  getDraggableOrder?: (Item: TData) => number;
 };
 
 type TableActionsProps = {
@@ -202,16 +203,20 @@ const Header: FC = () => {
                 column={header.column}
                 cellProps={{
                   sx: {
-                    cursor: "pointer",
+                    cursor:
+                      !isDraggable && header.column.getCanSort()
+                        ? "pointer"
+                        : undefined,
                     userSelect: "none",
                   },
-                  onClick: header.column.getCanSort()
-                    ? header.column.getToggleSortingHandler()
-                    : undefined,
+                  onClick:
+                    !isDraggable && header.column.getCanSort()
+                      ? header.column.getToggleSortingHandler()
+                      : undefined,
                 }}
                 key={header.id}
                 after={
-                  header.column.getCanSort() ? (
+                  !isDraggable && header.column.getCanSort() ? (
                     <Grid item sx={{ ml: 1.5, mt: 0.3 }}>
                       <SortColumn
                         isSorted={!!header.column.getIsSorted()}
@@ -242,6 +247,8 @@ const Body: FC = () => {
     getAllColumns,
     renderSubRows,
     isDraggable,
+    getDraggableOrder,
+    getState,
   } = useTableContext();
 
   return (
@@ -250,9 +257,9 @@ const Body: FC = () => {
         <TableBody ref={provided.innerRef} {...provided.droppableProps}>
           {getRowModel().rows.map((row, index) => (
             <Draggable
-              key={`draggable-${row.id}`}
+              key={`draggable-${index}`}
               draggableId={row.id}
-              index={index}
+              index={getDraggableOrder?.(row.original) ?? index}
               isDragDisabled={!isDraggable}
             >
               {({ draggableProps, dragHandleProps, innerRef }) => (

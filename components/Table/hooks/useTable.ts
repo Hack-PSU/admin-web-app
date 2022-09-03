@@ -44,12 +44,14 @@ type UseTableOptions<TData extends RowData> = Omit<
   columnType: ColumnTypeMeta;
   renderSubRows?: RenderSubRows<TData>;
   onDragEnd?: OnDragEndResponder;
+  getDraggableOrder?: (item: TData) => number;
 };
 
 type UseTableReturn<TData extends RowData> = Table<TData> &
   Pick<UseTableOptions<TData>, "renderSubRows"> & {
     isDraggable: boolean;
     onDragEnd?: OnDragEndResponder;
+    getDraggableOrder?: (item: TData) => number;
   };
 
 const globalFilterFn: FilterFn<any> = (row, columnId, filterValue, addMeta) => {
@@ -75,6 +77,7 @@ export function useTable<TData extends RowData>(
     renderSubRows,
     useDraggable,
     onDragEnd,
+    getDraggableOrder,
     ...tableOptions
   } = options;
 
@@ -100,5 +103,6 @@ export function useTable<TData extends RowData>(
     renderSubRows,
     isDraggable: useDraggable ?? false,
     onDragEnd,
+    getDraggableOrder,
   };
 }

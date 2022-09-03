@@ -7,6 +7,7 @@ import { ModalProvider } from "components/context";
 import { withDefaultLayout } from "common/HOCs";
 import { reorderItems } from "components/Table/utils";
 import PageHeader from "components/Menu/PageHeader";
+import { useImmer } from "use-immer";
 
 enum SponsorLevel {
   BRONZE = "Bronze",
@@ -24,62 +25,63 @@ type Sponsor = {
 const sponsorsData: Sponsor[] = [
   {
     name: "Nittany AI Alliance",
-    order: 1,
+    order: 0,
     level: SponsorLevel.GOLD,
     link: "https://nittanyai.psu.edu/",
   },
   {
     name: "M&T Tech",
-    order: 2,
+    order: 1,
     level: SponsorLevel.GOLD,
     link: "https://www3.mtb.com/techhub/",
   },
   {
     name: "celonis",
-    order: 3,
+    order: 2,
     level: SponsorLevel.GOLD,
     link: "https://www.celonis.com/",
   },
   {
     name: "Penn State Startup Week",
-    order: 4,
+    order: 3,
     level: SponsorLevel.GOLD,
     link: "https://oec.psu.edu/",
   },
   {
     name: "Penn State EECS",
-    order: 5,
+    order: 4,
     level: SponsorLevel.SILVER,
     link: "https://www.eecs.psu.edu/",
   },
   {
     name: "Penn State ICDS",
-    order: 6,
+    order: 5,
     level: SponsorLevel.SILVER,
     link: "https://www.icds.psu.edu/",
   },
   {
     name: "PWC",
-    order: 7,
+    order: 6,
     level: SponsorLevel.SILVER,
     link: "https://www.pwc.com/",
   },
   {
     name: "echo3D",
-    order: 8,
+    order: 7,
     level: SponsorLevel.BRONZE,
     link: "https://www.echo3d.co/",
   },
   {
     name: "Saxbys",
-    order: 9,
+    order: 8,
     level: SponsorLevel.BRONZE,
     link: "https://www.saxbyscoffee.com/",
   },
 ];
 
 const SponsorshipPage: NextPage = () => {
-  const [data, setData] = useState(sponsorsData);
+  // const [data, setData] = useState(sponsorsData);
+  const [data, setData] = useImmer(sponsorsData);
 
   const defs = useColumnDef<Sponsor>({
     columns: [
@@ -114,10 +116,19 @@ const SponsorshipPage: NextPage = () => {
         return;
       }
 
-      setData(
-        reorderItems(data, result.source.index, result.destination.index)
-      );
+      setData((draft) => {
+        if (result.destination) {
+          console.log(result);
+
+          draft[result.source.index].order = result.destination.index;
+          draft[result.destination.index].order = result.source.index;
+
+          const [removed] = draft.splice(result.source.index, 1);
+          draft.splice(result.destination.index, 0, removed);
+        }
+      });
     },
+    getDraggableOrder: (item) => item.order,
   });
 
   const onRefresh = () => {
