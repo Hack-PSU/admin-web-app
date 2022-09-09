@@ -72,21 +72,25 @@ const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
 export const useTableContext = () => useContext(TableContext);
 
 const Table: ITableComponent = ({ children, ...props }) => {
-  const onDragEnd: OnDragEndResponder = useCallback(
-    (result, provided) => {
-      if (props.isDraggable) {
-        if (!props.onDragEnd) {
-          throw Error("onDragEnd required for draggable table");
-        } else {
-          props.onDragEnd(result, provided);
-        }
-      }
-    },
-    [props]
-  );
+  // const onDragEnd: OnDragEndResponder = useCallback(
+  //   (result, provided) => {
+  //     if (props.isDraggable) {
+  //       if (!props.onDragEnd) {
+  //         throw Error("onDragEnd required for draggable table");
+  //       } else {
+  //         props.onDragEnd(result, provided);
+  //       }
+  //     }
+  //   },
+  //   [props]
+  // );
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={
+        props.isDraggable && props.onDragEnd ? props.onDragEnd : () => null
+      }
+    >
       <TableContext.Provider value={props as TableProps<any>}>
         <Grid container gap={1.5} flexDirection={"column"}>
           {children}

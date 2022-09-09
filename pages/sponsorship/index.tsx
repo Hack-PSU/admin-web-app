@@ -8,6 +8,8 @@ import { withDefaultLayout } from "common/HOCs";
 import { reorderItems } from "components/Table/utils";
 import PageHeader from "components/Menu/PageHeader";
 import { useImmer } from "use-immer";
+import { Draft } from "immer";
+import _ from "lodash";
 
 enum SponsorLevel {
   BRONZE = "Bronze",
@@ -83,6 +85,8 @@ const SponsorshipPage: NextPage = () => {
   // const [data, setData] = useState(sponsorsData);
   const [data, setData] = useImmer(sponsorsData);
 
+  console.log(data);
+
   const defs = useColumnDef<Sponsor>({
     columns: [
       {
@@ -118,13 +122,38 @@ const SponsorshipPage: NextPage = () => {
 
       setData((draft) => {
         if (result.destination) {
-          console.log(result);
-
-          draft[result.source.index].order = result.destination.index;
-          draft[result.destination.index].order = result.source.index;
-
+          // perform swap
           const [removed] = draft.splice(result.source.index, 1);
           draft.splice(result.destination.index, 0, removed);
+
+          draft[result.destination.index].order = result.destination.index;
+
+          // range includes indices of moved items in the process excluding
+          // item that was dragged
+          let range: number[];
+
+          // indicates the shift in order depending on direction
+          let offset: number;
+
+          if (result.source.index < result.destination.index) {
+            // move downwards
+            offset = -1; // items move upwards
+            range = _.range(result.source.index, result.destination.index);
+          } else {
+            // move upwards
+            offset = 1; // items move downwards
+
+            // select values 1 after dropped item including item
+            // replacing source
+            range = _.range(
+              result.destination.index + 1,
+              result.source.index + 1
+            );
+          }
+
+          range.forEach((index) => {
+            draft[index].order += offset;
+          });
         }
       });
     },
