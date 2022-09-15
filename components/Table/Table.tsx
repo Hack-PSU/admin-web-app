@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useId,
-} from "react";
+import React, { createContext, FC, useContext } from "react";
 import { flexRender, RowData, Table as BaseTable } from "@tanstack/react-table";
 import {
   TableContainer,
@@ -17,7 +10,6 @@ import {
   TableHead,
   Collapse,
   darken,
-  Box,
   TableCell,
 } from "@mui/material";
 import { WithChildren } from "types/common";
@@ -36,7 +28,6 @@ import {
   Droppable,
   OnDragEndResponder,
 } from "react-beautiful-dnd";
-import { reorderItems } from "components/Table/utils";
 import DefaultDragHandleCell from "components/Table/defaults/DefaultDragHandleCell";
 
 type TableProps<TData extends RowData> = BaseTable<TData> & {
@@ -72,19 +63,6 @@ const TableContext = createContext<TableProps<any>>({} as TableProps<any>);
 export const useTableContext = () => useContext(TableContext);
 
 const Table: ITableComponent = ({ children, ...props }) => {
-  // const onDragEnd: OnDragEndResponder = useCallback(
-  //   (result, provided) => {
-  //     if (props.isDraggable) {
-  //       if (!props.onDragEnd) {
-  //         throw Error("onDragEnd required for draggable table");
-  //       } else {
-  //         props.onDragEnd(result, provided);
-  //       }
-  //     }
-  //   },
-  //   [props]
-  // );
-
   return (
     <DragDropContext
       onDragEnd={
