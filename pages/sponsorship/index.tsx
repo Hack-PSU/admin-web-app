@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import { NextPage } from "next";
-import { Box, Grid, Typography } from "@mui/material";
-import { EvaIcon, SaveButton } from "components/base";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
-import { ModalProvider } from "components/context";
+import { ModalProvider, useModal, useModalContext } from "components/context";
 import { withDefaultLayout } from "common/HOCs";
 import { reorderItems } from "components/Table/utils";
 import PageHeader from "components/Menu/PageHeader";
 import { useImmer } from "use-immer";
 import { Draft } from "immer";
 import _ from "lodash";
+import AddNewSponsorModal from "components/modal/AddNewSponsorModal";
+import { useQuery } from "@tanstack/react-query";
+import { fetch, getAllSponsors, QueryKeys } from "api";
 
 enum SponsorLevel {
   BRONZE = "Bronze",
@@ -20,7 +23,7 @@ enum SponsorLevel {
 type Sponsor = {
   name: string;
   order: number;
-  level: SponsorLevel;
+  level: string;
   link: string;
 };
 
@@ -81,11 +84,53 @@ const sponsorsData: Sponsor[] = [
   },
 ];
 
-const SponsorshipPage: NextPage = () => {
-  // const [data, setData] = useState(sponsorsData);
-  const [data, setData] = useImmer(sponsorsData);
+const AddNewSponsorButton: FC = () => {
+  const theme = useTheme();
 
-  console.log(data);
+  const { showModal } = useModalContext();
+
+  return (
+    <GradientButton
+      variant="text"
+      sx={{
+        width: "100%",
+        padding: theme.spacing(1, 3.5),
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addNewSponsor")}
+    >
+      Add a Sponsor
+    </GradientButton>
+  );
+};
+
+const SponsorshipPage: NextPage = () => {
+  const changedData = useRef<Sponsor[] | null>(null);
+
+  const { data: allSponsors } = useQuery(
+    QueryKeys.sponsorship.findAll(),
+    () => fetch(getAllSponsors),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            uid: d.uid,
+            order: parseInt(d.level),
+            name: d.name,
+            level: d.level,
+            link: "",
+          }));
+        }
+      },
+    }
+  );
+
+  const [data, setData] = useImmer(allSponsors);
 
   const defs = useColumnDef<Sponsor>({
     columns: [
@@ -113,7 +158,7 @@ const SponsorshipPage: NextPage = () => {
   const table = useTable({
     ...defs,
     useDraggable: true,
-    data,
+    data: data ?? [],
     getRowId: (row) => `${row.order}`,
     onDragEnd: (result) => {
       if (!result.destination) {
@@ -121,7 +166,7 @@ const SponsorshipPage: NextPage = () => {
       }
 
       setData((draft) => {
-        if (result.destination) {
+        if (result.destination && draft) {
           // perform swap
           const [removed] = draft.splice(result.source.index, 1);
           draft.splice(result.destination.index, 0, removed);
@@ -151,9 +196,15 @@ const SponsorshipPage: NextPage = () => {
             );
           }
 
+          const entriesChanged: Sponsor[] = [];
+
           range.forEach((index) => {
             draft[index].order += offset;
+            entriesChanged.push({ ...draft[index] });
           });
+
+          entriesChanged.push({ ...draft[result.destination.index] });
+          changedData.current = [...entriesChanged];
         }
       });
     },
@@ -170,19 +221,9 @@ const SponsorshipPage: NextPage = () => {
 
   return (
     <ModalProvider>
-      {/*<AddNewItemModal />*/}
+      <AddNewSponsorModal />
       <Grid container gap={1.5}>
-        <PageHeader header={"Sponsorship"} />
-        {/*<Grid container item justifyContent="space-between" alignItems="center">*/}
-        {/*  <Grid item xs={10}>*/}
-        {/*    <Typography variant="h4" sx={{ fontWeight: 700 }}>*/}
-        {/*      Sponsorship*/}
-        {/*    </Typography>*/}
-        {/*  </Grid>*/}
-        {/*  <Grid item xs={2}>*/}
-        {/*    /!*<AddNewItemButton />*!/*/}
-        {/*  </Grid>*/}
-        {/*</Grid>*/}
+        <PageHeader header={"Sponsorship"} right={<AddNewSponsorButton />} />
         <Grid
           container
           item

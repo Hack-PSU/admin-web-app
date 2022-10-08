@@ -59,7 +59,7 @@ const SettingsMembers: NextPage = () => {
         if (data) {
           return data.map((d) => {
             const permission = PermissionOptions.find(
-              (p) => p.value === d.permission
+              (p) => p.value === d.privilege
             );
             return {
               uid: d.uid,

@@ -9,6 +9,7 @@ import {
 } from "./extra_credit";
 import { JudgingProjectQueryKeys, JudgingScoreQueryKeys } from "api/judging";
 import { OrganizerQueryKeys } from "api/organizer";
+import { SponsorshipQueryKeys } from "api/sponsorship";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -22,6 +23,7 @@ export const QueryKeys = {
   judgingProject: JudgingProjectQueryKeys,
   judgingScore: JudgingScoreQueryKeys,
   organizer: OrganizerQueryKeys,
+  sponsorship: SponsorshipQueryKeys,
 };
 
 export * from "./checkout_item";
@@ -32,5 +34,6 @@ export * from "./location";
 export * from "./extra_credit";
 export * from "./judging";
 export * from "./organizer";
+export * from "./sponsorship";
 export * from "./types";
 export * from "./utils";

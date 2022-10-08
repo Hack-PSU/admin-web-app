@@ -88,7 +88,6 @@ const AddNewJudgingProjectModal: FC = () => {
             <Grid item xs={6}>
               <Box mt={2}>
                 <MenuButton
-                  isDirty={methods.formState.isDirty}
                   loading={isLoading}
                   menuItems={[
                     {
@@ -97,9 +96,6 @@ const AddNewJudgingProjectModal: FC = () => {
                     },
                   ]}
                   onClick={handleSubmit}
-                  progressColor={
-                    methods.formState.isDirty ? "common.black" : "common.white"
-                  }
                 >
                   Submit
                 </MenuButton>

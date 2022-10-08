@@ -1,4 +1,5 @@
 export interface IScoreEntity {
+  uid: number;
   project_id: number;
   judge: string;
   creativity: number;
@@ -6,6 +7,7 @@ export interface IScoreEntity {
   implementation: number;
   clarity: number;
   growth: number;
+  submitted: boolean;
   humanitarian?: number;
   supply_chain?: number;
   environmental?: number;
