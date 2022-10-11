@@ -47,6 +47,17 @@ export const updateOrganizer: CreateMutationReturn<
   IOrganizerEntity
 > = createMutation("/admin/organizer/update");
 
+/**
+ * Updates an organizer's privilege level
+ * @param params (optional)
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Admin-Elevate_user
+ */
+export const updateOrganizerPermissions: CreateMutationReturn<
+  { uid: string; privilege: number },
+  {}
+> = createMutation("/admin/makeadmin");
+
 export const OrganizerQueryKeys = {
   all: [{ entity: "organizer" }] as const,
   findAll: () =>

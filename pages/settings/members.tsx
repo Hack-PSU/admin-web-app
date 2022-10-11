@@ -10,18 +10,26 @@ import {
   MutateEntity,
   IOrganizerEntity,
   updateOrganizer,
+  updateOrganizerPermissions,
+  CreateEntity,
 } from "api";
 import { ControlledSelect } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { IOption } from "types/components";
 import { useSnackbar } from "notistack";
 import _ from "lodash";
+import { useFirebase } from "components/context";
 
 type OrganizerEntity = {
   uid: string;
   name: string;
   permission: IOption;
   email: string;
+};
+
+type UpdateOrganizerEntity = {
+  uid: string;
+  privilege: number;
 };
 
 const PermissionOptions: IOption[] = [
@@ -48,6 +56,8 @@ const PermissionOptions: IOption[] = [
 ];
 
 const SettingsMembers: NextPage = () => {
+  const { user } = useFirebase();
+
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -59,7 +69,7 @@ const SettingsMembers: NextPage = () => {
         if (data) {
           return data.map((d) => {
             const permission = PermissionOptions.find(
-              (p) => p.value === d.permission
+              (p) => p.value === String(d.privilege)
             );
             return {
               uid: d.uid,
@@ -75,8 +85,8 @@ const SettingsMembers: NextPage = () => {
 
   const { mutateAsync } = useMutation(
     QueryKeys.organizer.updateOne(),
-    ({ entity }: MutateEntity<IOrganizerEntity>) =>
-      fetch(() => updateOrganizer(entity)),
+    ({ entity }: CreateEntity<UpdateOrganizerEntity, "">) =>
+      fetch(() => updateOrganizerPermissions(entity)),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.organizer.all);
@@ -84,19 +94,20 @@ const SettingsMembers: NextPage = () => {
           variant: "success",
         });
       },
+      onError: () => {
+        enqueueSnackbar("Error occurred updating organizer", {
+          variant: "error",
+        });
+      },
     }
   );
 
   const data = useMemo(() => {
-    return [
-      {
-        uid: "FHBbkIw88qZBaxSmQxmdtSURsto1",
-        email: "admin@email.com",
-        name: "Admin Admin",
-        permission: { value: "4", label: "Tech-Exec" },
-      },
-    ];
-  }, []);
+    if (user && allOrganizers) {
+      return _.filter(allOrganizers, (o) => o.uid !== user.uid);
+    }
+    return [];
+  }, [allOrganizers, user]);
 
   const defaultValues = useMemo(() => {
     if (data) {
@@ -127,7 +138,7 @@ const SettingsMembers: NextPage = () => {
   const { reset, watch } = methods;
 
   const submitOrganizerUpdate = useCallback(
-    async (entities: Partial<IOrganizerEntity>[]) => {
+    async (entities: UpdateOrganizerEntity[]) => {
       await Promise.all(_.map(entities, (entity) => mutateAsync({ entity })));
     },
     [mutateAsync]
@@ -136,7 +147,7 @@ const SettingsMembers: NextPage = () => {
   useEffect(() => {
     const subscription = watch((data, info) => {
       if (info.type === "change") {
-        const entities = _.chain(data)
+        const entities: UpdateOrganizerEntity[] = _.chain(data)
           .pickBy((value, uid) => {
             if (value && value.permission) {
               return (
@@ -147,7 +158,7 @@ const SettingsMembers: NextPage = () => {
           })
           .map((value, uid) => ({
             uid: uid,
-            permission: value?.permission?.value ?? "2",
+            privilege: parseInt(value?.permission?.value ?? "2"),
           }))
           .value();
 

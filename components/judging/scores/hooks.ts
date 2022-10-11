@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from "react";
-import { IGetAllHackersResponse, IProjectEntity, IScoreEntity } from "api";
+import { IOrganizerEntity, IProjectEntity, IScoreEntity } from "api";
 import _ from "lodash";
 
 type UseScoreResultsOptions = {
   projects?: IProjectEntity[];
-  users?: IGetAllHackersResponse[];
+  users?: IOrganizerEntity[];
   filterProject?: (project: IProjectEntity) => boolean;
   scores?: IScoreEntity[];
 };
@@ -120,8 +120,10 @@ export function useScoreResults(
     const scoresByProject = getScoresByProject();
 
     if (users && scoresByProject && scores && scores.length > 0) {
+      // get a dictionary of key: project, value: list of score breakdowns
       const usersByProject = _.chain(scoresByProject)
         .map((scores, project) => {
+          // get a breakdown of judges and corresponding scores
           const judges: AllResolvedData["breakdown"] = _.chain(scores)
             .map(({ judge, projectName, ...score }) => {
               const user = users.find((u) => u.email === judge);

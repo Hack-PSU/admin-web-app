@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetch,
   getAllHackathons,
-  getAllHackers,
+  getAllOrganizers,
   getAllProjects,
   getAllScores,
   QueryKeys,
@@ -26,8 +26,8 @@ const ScoresPage: NextPage = () => {
     useHackathonStore();
 
   // TODO: MUST fetch from organizers to ensure judges don't come out null
-  const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
-    fetch(getAllHackers)
+  const { data: allUsers } = useQuery(QueryKeys.organizer.findAll(), () =>
+    fetch(getAllOrganizers)
   );
 
   const { data: allProjects } = useQuery(
