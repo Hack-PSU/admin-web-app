@@ -8,13 +8,11 @@ import {
   Modal,
 } from "components/base";
 import { useForm, FormProvider } from "react-hook-form";
-import { ISelectItem } from "types/components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   CreateEntity,
   createLocation,
   fetch,
-  ILocationEntity,
   ILocationUpdateEntity,
   QueryKeys,
 } from "api";
@@ -90,7 +88,6 @@ const AddNewLocationModal: FC = () => {
             <Grid item xs={6}>
               <Box mt={2}>
                 <MenuButton
-                  isDirty={methods.formState.isDirty}
                   loading={isLoading}
                   menuItems={[
                     {
@@ -99,9 +96,6 @@ const AddNewLocationModal: FC = () => {
                     },
                   ]}
                   onClick={handleSubmit}
-                  progressColor={
-                    methods.formState.isDirty ? "common.black" : "common.white"
-                  }
                 >
                   Submit
                 </MenuButton>

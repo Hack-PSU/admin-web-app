@@ -130,7 +130,7 @@ const SponsorshipPage: NextPage = () => {
     }
   );
 
-  const [data, setData] = useImmer(allSponsors);
+  const [data, setData] = useImmer(allSponsors ?? []);
 
   const defs = useColumnDef<Sponsor>({
     columns: [
@@ -158,7 +158,7 @@ const SponsorshipPage: NextPage = () => {
   const table = useTable({
     ...defs,
     useDraggable: true,
-    data: data ?? [],
+    data,
     getRowId: (row) => `${row.order}`,
     onDragEnd: (result) => {
       if (!result.destination) {

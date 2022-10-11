@@ -187,7 +187,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
                 color: "common.white",
               },
             }}
-            onClick={() => router.push("/events/steps")}
+            onClick={() => router.push("/events/new")}
           >
             Add an Event
           </GradientButton>
