@@ -1,88 +1,94 @@
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useCallback, useEffect, useRef } from "react";
 import { NextPage } from "next";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
-import { ModalProvider, useModal, useModalContext } from "components/context";
+import { ModalProvider, useModalContext } from "components/context";
 import { withDefaultLayout } from "common/HOCs";
-import { reorderItems } from "components/Table/utils";
 import PageHeader from "components/Menu/PageHeader";
 import { useImmer } from "use-immer";
-import { Draft } from "immer";
 import _ from "lodash";
 import AddNewSponsorModal from "components/modal/AddNewSponsorModal";
-import { useQuery } from "@tanstack/react-query";
-import { fetch, getAllSponsors, QueryKeys } from "api";
-
-enum SponsorLevel {
-  BRONZE = "Bronze",
-  SILVER = "Silver",
-  GOLD = "Gold",
-}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  fetch,
+  getAllSponsors,
+  ISponsorshipEntity,
+  QueryKeys,
+  updateSponsorBatch,
+} from "api";
+import { useSnackbar } from "notistack";
 
 type Sponsor = {
+  uid: number;
   name: string;
   order: number;
   level: string;
   link: string;
 };
 
-const sponsorsData: Sponsor[] = [
-  {
-    name: "Nittany AI Alliance",
-    order: 0,
-    level: SponsorLevel.GOLD,
-    link: "https://nittanyai.psu.edu/",
-  },
-  {
-    name: "M&T Tech",
-    order: 1,
-    level: SponsorLevel.GOLD,
-    link: "https://www3.mtb.com/techhub/",
-  },
-  {
-    name: "celonis",
-    order: 2,
-    level: SponsorLevel.GOLD,
-    link: "https://www.celonis.com/",
-  },
-  {
-    name: "Penn State Startup Week",
-    order: 3,
-    level: SponsorLevel.GOLD,
-    link: "https://oec.psu.edu/",
-  },
-  {
-    name: "Penn State EECS",
-    order: 4,
-    level: SponsorLevel.SILVER,
-    link: "https://www.eecs.psu.edu/",
-  },
-  {
-    name: "Penn State ICDS",
-    order: 5,
-    level: SponsorLevel.SILVER,
-    link: "https://www.icds.psu.edu/",
-  },
-  {
-    name: "PWC",
-    order: 6,
-    level: SponsorLevel.SILVER,
-    link: "https://www.pwc.com/",
-  },
-  {
-    name: "echo3D",
-    order: 7,
-    level: SponsorLevel.BRONZE,
-    link: "https://www.echo3d.co/",
-  },
-  {
-    name: "Saxbys",
-    order: 8,
-    level: SponsorLevel.BRONZE,
-    link: "https://www.saxbyscoffee.com/",
-  },
-];
+type MutateSponsors = {
+  entity: {
+    sponsors: Partial<ISponsorshipEntity>[];
+  };
+};
+
+// const sponsorsData: Sponsor[] = [
+//   {
+//     name: "Nittany AI Alliance",
+//     order: 0,
+//     level: SponsorLevel.GOLD,
+//     link: "https://nittanyai.psu.edu/",
+//   },
+//   {
+//     name: "M&T Tech",
+//     order: 1,
+//     level: SponsorLevel.GOLD,
+//     link: "https://www3.mtb.com/techhub/",
+//   },
+//   {
+//     name: "celonis",
+//     order: 2,
+//     level: SponsorLevel.GOLD,
+//     link: "https://www.celonis.com/",
+//   },
+//   {
+//     name: "Penn State Startup Week",
+//     order: 3,
+//     level: SponsorLevel.GOLD,
+//     link: "https://oec.psu.edu/",
+//   },
+//   {
+//     name: "Penn State EECS",
+//     order: 4,
+//     level: SponsorLevel.SILVER,
+//     link: "https://www.eecs.psu.edu/",
+//   },
+//   {
+//     name: "Penn State ICDS",
+//     order: 5,
+//     level: SponsorLevel.SILVER,
+//     link: "https://www.icds.psu.edu/",
+//   },
+//   {
+//     name: "PWC",
+//     order: 6,
+//     level: SponsorLevel.SILVER,
+//     link: "https://www.pwc.com/",
+//   },
+//   {
+//     name: "echo3D",
+//     order: 7,
+//     level: SponsorLevel.BRONZE,
+//     link: "https://www.echo3d.co/",
+//   },
+//   {
+//     name: "Saxbys",
+//     order: 8,
+//     level: SponsorLevel.BRONZE,
+//     link: "https://www.saxbyscoffee.com/",
+//   },
+// ];
 
 const AddNewSponsorButton: FC = () => {
   const theme = useTheme();
@@ -110,7 +116,10 @@ const AddNewSponsorButton: FC = () => {
 };
 
 const SponsorshipPage: NextPage = () => {
-  const changedData = useRef<Sponsor[] | null>(null);
+  const queryClient = useQueryClient();
+  const originalData = useRef<{ [key: number]: Sponsor } | null>(null);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const { data: allSponsors } = useQuery(
     QueryKeys.sponsorship.findAll(),
@@ -118,19 +127,34 @@ const SponsorshipPage: NextPage = () => {
     {
       select: (data) => {
         if (data) {
-          return data.map((d) => ({
-            uid: d.uid,
-            order: parseInt(d.level),
-            name: d.name,
-            level: d.level,
-            link: "",
-          }));
+          return _.chain(data)
+            .map((d) => ({
+              uid: d.uid,
+              order: d.order,
+              name: d.name,
+              level: d.level,
+              link: d.website_link ?? "",
+            }))
+            .sortBy("order")
+            .value();
         }
       },
     }
   );
 
-  const [data, setData] = useImmer(allSponsors ?? []);
+  const { mutateAsync } = useMutation(
+    ({ entity }: MutateSponsors) => fetch(() => updateSponsorBatch(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.sponsorship.all);
+        enqueueSnackbar("Successfully updated sponsors", {
+          variant: "success",
+        });
+      },
+    }
+  );
+
+  const [data, setData] = useImmer<Sponsor[]>(allSponsors ?? []);
 
   const defs = useColumnDef<Sponsor>({
     columns: [
@@ -145,6 +169,8 @@ const SponsorshipPage: NextPage = () => {
         type: "text",
         header: "Level",
         accessorKey: "level",
+        format: (value) =>
+          String(value).charAt(0).toUpperCase() + String(value).slice(1),
       },
       {
         id: "link",
@@ -196,15 +222,9 @@ const SponsorshipPage: NextPage = () => {
             );
           }
 
-          const entriesChanged: Sponsor[] = [];
-
           range.forEach((index) => {
             draft[index].order += offset;
-            entriesChanged.push({ ...draft[index] });
           });
-
-          entriesChanged.push({ ...draft[result.destination.index] });
-          changedData.current = [...entriesChanged];
         }
       });
     },
@@ -218,6 +238,42 @@ const SponsorshipPage: NextPage = () => {
   const onDelete = () => {
     return null;
   };
+
+  const onClickSave = useCallback(async () => {
+    const origData = originalData.current;
+    if (origData) {
+      const changedData = _.filter(
+        data,
+        (d) => d.order !== origData[d.uid].order
+      );
+      await mutateAsync({
+        entity: {
+          sponsors: changedData,
+        },
+      });
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (allSponsors) {
+      const initialData = _.chain(allSponsors)
+        .sortBy("order")
+        .map((data, i) => ({
+          ...data,
+          order: i,
+        }))
+        .value();
+      setData(initialData);
+      originalData.current = _.reduce(
+        initialData,
+        (acc, curr) => {
+          acc[curr.uid] = curr;
+          return acc;
+        },
+        {} as { [key: number]: Sponsor }
+      );
+    }
+  }, [allSponsors, setData]);
 
   return (
     <ModalProvider>
@@ -246,12 +302,13 @@ const SponsorshipPage: NextPage = () => {
           </Grid>
           <Grid item xs={2}>
             <SaveButton
-            // isDirty={methods.formState.isDirty}
-            // onClick={onClickSave}
-            // loading={isLoading}
-            // progressColor={
-            //   methods.formState.isDirty ? "common.white" : "common.black"
-            // }
+              // isDirty={methods.formState.isDirty}
+              // onClick={onClickSave}
+              // loading={isLoading}
+              // progressColor={
+              //   methods.formState.isDirty ? "common.white" : "common.black"
+              // }
+              onClick={onClickSave}
             >
               Save
             </SaveButton>

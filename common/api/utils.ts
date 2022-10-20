@@ -1,4 +1,4 @@
-import api from "api/axios";
+import { api, ApiAxiosInstance } from "api/axios";
 import { AxiosError, AxiosResponse, Method } from "axios";
 import { ApiResponse } from "./types";
 import { GetServerSidePropsContext } from "next";
@@ -32,10 +32,11 @@ export type CreateMutationReturn<TEntity, TResponse = TEntity, TParam = {}> = (
 ) => Promise<QueryReturn<TResponse>>;
 
 export function createQuery<TResponse, TParam = {}>(
-  url: string
+  url: string,
+  instance: ApiAxiosInstance = api
 ): CreateQueryReturn<TResponse, TParam> {
   return (params, token) =>
-    api.request<ApiResponse<TResponse>>({
+    instance.request<ApiResponse<TResponse>>({
       url,
       method: "GET",
       params: {
@@ -54,10 +55,11 @@ export function createQuery<TResponse, TParam = {}>(
 
 export function createMutation<TEntity, TResponse, TParam = {}>(
   url: string,
-  method: Method = "POST"
+  method: Method = "POST",
+  instance: ApiAxiosInstance = api
 ): CreateMutationReturn<TEntity, TResponse, TParam> {
   return (entity, params, token) =>
-    api.request<ApiResponse<TResponse>, QueryReturn<TResponse>, TEntity>({
+    instance.request<ApiResponse<TResponse>, QueryReturn<TResponse>, TEntity>({
       url,
       method,
       data: entity,

@@ -4,7 +4,7 @@ import { User, getIdToken, getIdTokenResult } from "@firebase/auth";
 import moment from "moment";
 import nookies from "nookies";
 
-type ApiAxiosInstance = AxiosInstance & {
+export type ApiAxiosInstance = AxiosInstance & {
   defaults: {
     headers: {
       idtoken?: string;
@@ -26,6 +26,14 @@ const api = axios.create({
   baseURL: config.baseURL,
 }) as ApiAxiosInstance;
 
+const notificationApi = axios.create({
+  baseURL: config.notificationBaseURL,
+}) as ApiAxiosInstance;
+
+const wsApi = axios.create({
+  baseURL: config.wsBaseURL,
+}) as ApiAxiosInstance;
+
 const shouldRefreshToken = (config: ApiAxiosRequestConfig) => {
   const token = config.headers.idtoken;
   const expiration = config.headers.exp;
@@ -34,7 +42,11 @@ const shouldRefreshToken = (config: ApiAxiosRequestConfig) => {
   return isExpired || !token || !expiration;
 };
 
-const refreshToken = async (config: ApiAxiosRequestConfig) => {
+const refreshToken = async (
+  config: ApiAxiosRequestConfig,
+  instance: ApiAxiosInstance = api,
+  shouldSetCookies?: boolean
+) => {
   if (!auth.currentUser) return;
   const tokenResult = await getIdTokenResult(auth.currentUser);
 
@@ -44,11 +56,13 @@ const refreshToken = async (config: ApiAxiosRequestConfig) => {
     config.headers.idtoken = token;
 
     // set in cookies
-    nookies.set(undefined, "idtoken", token);
+    if (shouldSetCookies) {
+      nookies.set(undefined, "idtoken", token);
+    }
 
     // for subsequent requests
-    api.defaults.headers.common["idtoken"] = token;
-    api.defaults.headers.common["exp"] = expirationTime;
+    instance.defaults.headers.common["idtoken"] = token;
+    instance.defaults.headers.common["exp"] = expirationTime;
   }
 };
 
@@ -65,22 +79,72 @@ api.interceptors.response.use(
 
     if (isRefreshNeeded) {
       request._retried = true;
-      await refreshToken(request);
+      await refreshToken(request, api, true);
       return api(request);
     }
     return Promise.reject(error);
   }
 );
 
-export const initApi = async (user: User | null) => {
+notificationApi.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const request = error.config;
+    const isRefreshNeeded =
+      shouldRefreshToken(request) &&
+      error.response.status === 401 &&
+      !request._retried;
+
+    if (isRefreshNeeded) {
+      request._retried = true;
+      await refreshToken(request, notificationApi);
+      return notificationApi(request);
+    }
+    return Promise.reject(error);
+  }
+);
+
+wsApi.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const request = error.config;
+    const isRefreshNeeded =
+      shouldRefreshToken(request) &&
+      error.response.status === 401 &&
+      !request._retried;
+
+    if (isRefreshNeeded) {
+      request._retried = true;
+      await refreshToken(request, wsApi);
+      return wsApi(request);
+    }
+    return Promise.reject(error);
+  }
+);
+
+const initApi = async (user: User | null, instance: ApiAxiosInstance = api) => {
   if (user) {
-    api.defaults.headers.common["idtoken"] = await getIdToken(user);
+    instance.defaults.headers.common["idtoken"] = await getIdToken(user);
   }
 };
 
-export const resetApi = () => {
-  delete api.defaults.headers.common["idtoken"];
-  delete api.defaults.headers.common["exp"];
+const resetApi = (instance: ApiAxiosInstance = api) => {
+  delete instance.defaults.headers.common["idtoken"];
+  delete instance.defaults.headers.common["exp"];
 };
 
-export default api;
+export const initApiV2 = (user: User | null) => initApi(user, api);
+export const resetApiV2 = () => resetApi(api);
+
+export const initNotificationApi = (user: User | null) =>
+  initApi(user, notificationApi);
+export const resetNotificationApi = () => resetApi(notificationApi);
+
+export const initWsApi = (user: User | null) => initApi(user, wsApi);
+export const resetWsApi = () => resetApi(wsApi);
+
+export { api, notificationApi, wsApi };
