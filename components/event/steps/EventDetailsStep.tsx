@@ -18,8 +18,6 @@ import { any, date, object, optional } from "superstruct";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
 import { useQuery } from "@tanstack/react-query";
-import _ from "lodash";
-import { IOption } from "types/components";
 
 // const locationOptions = [
 //   { value: "Location1", label: "Location 1" },
@@ -114,7 +112,7 @@ const EventDetailsStep: FC = () => {
         }
       }
     })();
-  }, [updateDetails, gotoStep, nextStep, currentLocations]);
+  }, [methods, currentLocations, updateDetails, eventType, gotoStep, nextStep]);
 
   return (
     <FormProvider {...methods}>
