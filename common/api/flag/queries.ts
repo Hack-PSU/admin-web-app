@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { IFlagsEntity } from "./entity";
+import { IFlagsEntity, IWSPushJudgingEntity } from "./entity";
 import { notificationApi, wsApi } from "api/axios";
 import { QueryAction, QueryScope } from "api/types";
 
@@ -32,10 +32,8 @@ export const patchAppFlags: CreateMutationReturn<
 /**
  * Push WS Message to toggle judging flag in admin mobile app
  */
-export const pushJudgingFlag: CreateMutationReturn<
-  { to: "ADMIN" | "MOBILE" | undefined },
-  {}
-> = createMutation("/update/judging/score", "POST", wsApi);
+export const pushJudgingFlag: CreateMutationReturn<IWSPushJudgingEntity, {}> =
+  createMutation("/update/judging/flag", "POST", wsApi);
 
 export const FlagQueryKeys = {
   all: [{ entity: "flag" }] as const,

@@ -7,6 +7,7 @@ import {
   fetch,
   getAllAppFlags,
   IFlagsEntity,
+  IWSPushJudgingEntity,
   patchAppFlags,
   pushJudgingFlag,
   QueryKeys,
@@ -37,7 +38,7 @@ const SettingsFlags: FC = () => {
 
   const { mutateAsync: mutateAppFlags } = useMutation(
     ({ entity }: CreateEntity<{ flags: IFlagsEntity[] }, "">) =>
-      fetch(() => patchAppFlags(entity)),
+      patchAppFlags(entity),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.flag.all);
@@ -49,8 +50,8 @@ const SettingsFlags: FC = () => {
   );
 
   const { mutateAsync: mutatePushJudging } = useMutation(
-    ({ entity }: CreateEntity<{ to: "ADMIN" | "MOBILE" | undefined }, "">) =>
-      fetch(() => pushJudgingFlag(entity)),
+    ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
+      pushJudgingFlag(entity),
     {
       onSuccess: () => {
         enqueueSnackbar("Successfully notified clients", {
@@ -77,7 +78,14 @@ const SettingsFlags: FC = () => {
             ],
           },
         });
-        await mutatePushJudging({ entity: { to: "ADMIN" } });
+        await mutatePushJudging({
+          entity: {
+            to: "ADMIN",
+            data: {
+              isEnabled: shouldEnable,
+            },
+          },
+        });
       };
     },
     [mutatePushJudging, mutateAppFlags]
