@@ -33,7 +33,7 @@ const AnalyticsPage: NextPage = () => {
   const currentHackathon = useMemo(() => {
     if (allUsers) {
       return _.chain(allUsers)
-        .pickBy((user) => user.hackathon === CURRENT_HACKATHON)
+        .pickBy((user) => user.active)
         .value();
     }
   }, [allUsers]);

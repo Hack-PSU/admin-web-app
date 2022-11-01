@@ -25,7 +25,7 @@ export const getAllOrganizers: CreateQueryReturn<IOrganizerEntity[]> =
 export const getOrganizer: CreateQueryReturn<
   IOrganizerEntity,
   { uid: string }
-> = createQuery("/admin/organizer");
+> = createQuery("/admin/organizers");
 
 /**
  * Creates an organizer
@@ -33,8 +33,9 @@ export const getOrganizer: CreateQueryReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Add_Organizer
  */
-export const createOrganizer: CreateMutationReturn<IOrganizerEntity> =
-  createMutation("/admin/organizer");
+export const createOrganizer: CreateMutationReturn<
+  Omit<IOrganizerEntity, "privilege">
+> = createMutation("/admin/organizers");
 
 /**
  * Updates an organizer
@@ -45,7 +46,7 @@ export const createOrganizer: CreateMutationReturn<IOrganizerEntity> =
 export const updateOrganizer: CreateMutationReturn<
   Partial<IOrganizerEntity>,
   IOrganizerEntity
-> = createMutation("/admin/organizer/update");
+> = createMutation("/admin/organizers/update");
 
 /**
  * Updates an organizer's privilege level
