@@ -53,6 +53,7 @@ const schema = object({
   lastName: NonEmptyString,
   email: Email,
   privilege: NonEmptySelect,
+  uid: NonEmptyString,
 });
 
 const AddNewMemberModal: FC = () => {
