@@ -4,14 +4,14 @@ import BaseDatePicker, {
 } from "react-datepicker";
 import moment from "moment";
 import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
-import { EvaIcon, Input, InputLabel, Select } from "components/base";
+import { EvaIcon, Input, InputLabel } from "components/base";
 import {
   ControlledDatePickerProps,
   IDatePickerProps,
   IInputProps,
   LabelledDatePickerProps,
 } from "types/components";
-import { useController, useForm } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { DateTime } from "luxon";
 
 const DatePickerAdornment: FC = () => (

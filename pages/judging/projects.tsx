@@ -9,8 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllProjects, QueryKeys } from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
 
-const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
-
 const AddProjectButton = () => {
   const { showModal } = useModalContext();
   const theme = useTheme();
@@ -42,12 +40,10 @@ const ManageProjectsPage: NextPage = () => {
     {
       select: (data) => {
         if (data) {
-          return data
-            .filter((d) => d.hackathon === CURRENT_HACKATHON)
-            .map((d) => ({
-              uid: d.uid,
-              name: d.project,
-            }));
+          return data.map((d) => ({
+            uid: d.uid,
+            name: d.project,
+          }));
         }
       },
     }

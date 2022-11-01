@@ -252,7 +252,7 @@ const SponsorshipPage: NextPage = () => {
         },
       });
     }
-  }, [data]);
+  }, [data, mutateAsync]);
 
   useEffect(() => {
     if (allSponsors) {

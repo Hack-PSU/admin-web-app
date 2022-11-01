@@ -7,9 +7,6 @@ import {
   fetch,
   QueryKeys,
   getAllOrganizers,
-  MutateEntity,
-  IOrganizerEntity,
-  updateOrganizer,
   updateOrganizerPermissions,
   CreateEntity,
 } from "api";

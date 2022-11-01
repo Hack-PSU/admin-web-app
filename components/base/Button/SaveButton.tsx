@@ -1,8 +1,6 @@
 import React, { FC } from "react";
 import {
-  ButtonProps,
   CircularProgress,
-  darken,
   lighten,
   Typography,
   TypographyProps,

@@ -5,7 +5,6 @@ import {
   RichUtils,
   DraftHandleValue,
   DraftEditorCommand,
-  Modifier,
   convertToRaw,
   convertFromRaw,
 } from "draft-js";

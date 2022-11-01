@@ -3,9 +3,7 @@ import { NextPage } from "next";
 import {
   EventType,
   IGetAllEventsResponse,
-  getAllEvents,
   fetch,
-  CreateEntity,
   IEventEntity,
   MutateEntity,
   updateEvent,

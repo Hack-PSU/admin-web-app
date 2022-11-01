@@ -66,8 +66,6 @@ const Home: NextPage = () => {
     ...defs,
   });
 
-  const { logout } = useFirebase();
-
   return (
     <Grid container justifyContent="center" alignItems="center">
       <Grid item sx={{ width: "100%" }}>
