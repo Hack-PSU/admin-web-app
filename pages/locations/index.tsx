@@ -1,15 +1,10 @@
 import { NextPage } from "next";
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import {
+  CreateEntity,
+  deleteLocation,
   fetch,
   getAllLocations,
   ILocationEntity,
@@ -30,12 +25,15 @@ import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { useForm, FormProvider } from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewLocationModal from "components/modal/AddNewLocationModal";
+import ConfirmModal from "components/modal/ConfirmModal";
+import _ from "lodash";
+import { useSnackbar } from "notistack";
 
 interface ILocationsPageProps {
   locations: ILocationEntity[];
 }
 
-const AddNewLocationButton = () => {
+const AddNewLocationButton: FC = () => {
   const { showModal } = useModalContext();
   const theme = useTheme();
 
@@ -60,8 +58,9 @@ const AddNewLocationButton = () => {
 };
 
 const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
-  const currentInputKey = useRef<string | null>(null);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   const { data: locationsData, refetch } = useQuery(
     QueryKeys.location.findAll(),
@@ -79,7 +78,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     }
   );
 
-  const { mutateAsync, isLoading } = useMutation(
+  const { mutateAsync: mutateUpdateLocation, isLoading } = useMutation(
     QueryKeys.location.updateBatch(),
     ({ entity }: MutateEntity<ILocationUpdateEntity>) => updateLocation(entity),
     {
@@ -87,6 +86,11 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         await queryClient.invalidateQueries(QueryKeys.location.all);
       },
     }
+  );
+
+  const { mutateAsync: mutateDeleteLocation } = useMutation(
+    ({ entity }: CreateEntity<Pick<ILocationEntity, "uid">, "">) =>
+      fetch(() => deleteLocation(entity))
   );
 
   const defaultValues = useMemo(() => {
@@ -121,13 +125,13 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
 
       await Promise.all(
         editedFields.map((uid) =>
-          mutateAsync({
+          mutateUpdateLocation({
             entity: { uid: data[uid].uid, locationName: data[uid].name },
           })
         )
       );
     })();
-  }, [formState, handleSubmit, mutateAsync]);
+  }, [formState, handleSubmit, mutateUpdateLocation]);
 
   const defs = useColumnDef<{ uid: number; name: string }>({
     columns: [
@@ -166,23 +170,56 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   });
 
   const table = useTable({
+    ...defs,
     data: locationsData ?? [],
     getRowId: (row) => String(row.uid),
-    ...defs,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      rowSelection,
+    },
   });
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     return refetch();
-  };
+  }, [refetch]);
 
-  const onDelete = () => {
-    return null;
-  };
+  const onDeleteConfirm = useCallback(async () => {
+    if (Object.keys(rowSelection).length > 0) {
+      const selectedUids = _.chain(rowSelection)
+        .pickBy((selected) => selected)
+        .keys()
+        .map((k) => parseInt(k))
+        .value();
+
+      await Promise.all(
+        selectedUids.map((uid) =>
+          mutateDeleteLocation(
+            { entity: { uid } },
+            {
+              onSuccess: async () => {
+                await queryClient.invalidateQueries(QueryKeys.location.all);
+                enqueueSnackbar("Successfully removed location", {
+                  variant: "success",
+                });
+              },
+            }
+          )
+        )
+      );
+    }
+  }, [rowSelection, mutateDeleteLocation, queryClient, enqueueSnackbar]);
 
   return (
     <FormProvider {...methods}>
       <ModalProvider>
         <AddNewLocationModal />
+        <ConfirmModal
+          header={"Are you sure?"}
+          message={
+            "All selected rows will be deleted. You can't undo this action."
+          }
+          onConfirm={onDeleteConfirm}
+        />
         <Grid container gap={1.5} flexDirection="column">
           <Grid
             container
@@ -238,7 +275,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               <Table.Container>
                 <Table.Actions
                   center={<Table.PaginationAction />}
-                  right={<Table.DeleteAction onDelete={onDelete} />}
+                  right={<Table.DeleteAction showConfirmModal />}
                 />
                 <Table.Content>
                   <Table.Header />

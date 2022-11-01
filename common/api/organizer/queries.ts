@@ -33,8 +33,9 @@ export const getOrganizer: CreateQueryReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Add_Organizer
  */
-export const createOrganizer: CreateMutationReturn<IOrganizerEntity> =
-  createMutation("/admin/organizer");
+export const createOrganizer: CreateMutationReturn<
+  Omit<IOrganizerEntity, "uid">
+> = createMutation("/admin/organizer");
 
 /**
  * Updates an organizer

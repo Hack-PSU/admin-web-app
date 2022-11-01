@@ -37,7 +37,7 @@ export function useColumnDef<TData extends RowData>(
 ): UseColumnDefReturn<TData> {
   const {
     columns: initialColumns,
-    usePageRowSelection = true,
+    usePageRowSelection = false,
     useRowSelection = true,
   } = options;
 

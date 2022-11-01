@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react";
+import React, { FC } from "react";
 import { useModal } from "components/context";
 import {
   ControlledInput,

@@ -3,5 +3,5 @@ export interface IOrganizerEntity {
   email: string;
   firstname: string;
   lastname: string;
-  privilege?: string;
+  privilege: number;
 }

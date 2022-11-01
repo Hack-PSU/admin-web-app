@@ -104,7 +104,6 @@ const AddNewItemModal: FC = () => {
               <Grid item xs={6}>
                 <Box mt={2}>
                   <MenuButton
-                    isDirty={methods.formState.isDirty}
                     loading={isLoading}
                     menuItems={[
                       {

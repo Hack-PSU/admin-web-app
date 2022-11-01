@@ -16,7 +16,7 @@ const EventFormStepper: FC = () => {
         <EventTypeStep />
         <EventDetailsStep />
         <WorkshopDetailsStep />
-        <EventImageStep />
+        {/*<EventImageStep />*/}
         <EventIconStep />
         <EventReviewStep />
       </Grid>

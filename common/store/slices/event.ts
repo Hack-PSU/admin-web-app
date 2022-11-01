@@ -12,9 +12,9 @@ import create from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 interface IEventBaseModel {
-  eventType: IOption | null;
+  eventType: IOption<EventType> | null;
   eventName: string;
-  eventLocation: IOption | null;
+  eventLocation: IOption<number> | null;
   eventDescription: RawDraftContentState;
   eventDate: {
     start: Date;
@@ -28,13 +28,13 @@ interface IWorkshopModel {
   wsRelevantSkills: IOption[] | undefined;
   wsUrls: string[] | undefined;
   eventImage: File | undefined;
-  eventIcon: File | undefined;
+  eventIcon: string | undefined;
 }
 
 type EventModel = IEventBaseModel & IWorkshopModel;
 
 type EventSlice = EventModel & {
-  updateType(type: IOption): void;
+  updateType(type: IOption<EventType>): void;
   updateDetails(details: Omit<IEventBaseModel, "eventType">): void;
   updateWorkshop(
     details: Omit<IWorkshopModel, "eventImage" | "eventIcon">

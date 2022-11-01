@@ -14,7 +14,8 @@ import _ from "lodash";
 
 enum SettingsRoute {
   MEMBERS = "members",
-  DEVICES = "devices",
+  FLAGS = "flags",
+  // DEVICES = "devices",
   HACKATHONS = "hackathons",
   PROFILE = "profile",
 }
@@ -81,7 +82,8 @@ const SettingsTabs: FC<{ children: React.ReactNode }> = ({ children }) => {
           aria-label={"settings-tabs"}
         >
           <StyledTab label={"Members"} value={SettingsRoute.MEMBERS} />
-          <StyledTab label={"Devices"} value={SettingsRoute.DEVICES} />
+          <StyledTab label={"Flags"} value={SettingsRoute.FLAGS} />
+          {/*<StyledTab label={"Devices"} value={SettingsRoute.DEVICES} />*/}
           <StyledTab label={"Hackathons"} value={SettingsRoute.HACKATHONS} />
           <StyledTab label={"Profile"} value={SettingsRoute.PROFILE} />
         </StyledTabs>
