@@ -164,7 +164,7 @@ const AddNewMemberModal: FC = () => {
                 placeholder={"Enter Firebase user uid"}
                 as={LabelledInput}
                 id={"uid"}
-                label={"Firebase Uid"}
+                label={"Firebase UID"}
                 showError
               />
             </Grid>

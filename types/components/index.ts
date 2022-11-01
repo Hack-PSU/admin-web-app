@@ -54,9 +54,9 @@ export interface ISelectItem<T = any> {
   display: string;
 }
 
-export interface IOption {
+export interface IOption<TValue = string> {
   readonly label: string;
-  readonly value: string;
+  readonly value: TValue;
   readonly isNew?: boolean;
 }
 

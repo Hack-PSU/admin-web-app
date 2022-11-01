@@ -6,7 +6,7 @@ import {
   withServerSideProps,
 } from "common/HOCs";
 import { Table, useColumnDef, useTable } from "components/Table";
-import { Grid, Typography, useTheme } from "@mui/material";
+import { Grid, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base";

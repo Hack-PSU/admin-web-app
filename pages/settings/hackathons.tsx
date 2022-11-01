@@ -5,7 +5,6 @@ import {
   fetch,
   getAllHackathons,
   IHackathonEntity,
-  MutateEntity,
   QueryKeys,
   updateActiveHackathon,
 } from "api";
@@ -14,7 +13,6 @@ import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
 import { DateTime } from "luxon";
 import { Box, darken, Typography, useTheme } from "@mui/material";
 import { useCallback } from "react";
-import { useTab } from "@mui/base";
 
 type HackathonEntity = {
   uid: string;

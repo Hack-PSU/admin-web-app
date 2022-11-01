@@ -11,6 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Button, EvaIcon, Input } from "components/base";
+import { useModalContext } from "components/context";
 
 interface IPaginationButtonProps {
   onClick(): void;
@@ -176,9 +177,24 @@ export const PaginationAction: FC = () => {
   );
 };
 
-export const DeleteAction: FC<{ onDelete(): void }> = ({ onDelete }) => {
+export const DeleteAction: FC<{
+  onDelete?(): void;
+  showConfirmModal?: boolean;
+}> = ({ onDelete, showConfirmModal }) => {
   const theme = useTheme();
   const [hover, setHover] = useState<boolean>(false);
+
+  const modalContext = useModalContext();
+
+  const onClickDeleteAction = useCallback(() => {
+    if (modalContext && showConfirmModal) {
+      modalContext.showModal("confirmModal");
+    }
+
+    if (onDelete) {
+      onDelete();
+    }
+  }, [showConfirmModal, onDelete, modalContext]);
 
   return (
     <Grid item xs={6} justifyContent={"flex-end"}>
@@ -215,7 +231,7 @@ export const DeleteAction: FC<{ onDelete(): void }> = ({ onDelete }) => {
             fontSize: theme.typography.pxToRem(14),
           },
         }}
-        onClick={onDelete}
+        onClick={onClickDeleteAction}
       >
         Delete
       </Button>

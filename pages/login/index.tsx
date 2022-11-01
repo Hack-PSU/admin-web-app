@@ -1,9 +1,9 @@
 import { NextPage } from "next";
-import { darken, Grid, styled, Typography, useTheme } from "@mui/material";
+import { darken, Grid, styled, useTheme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import { LoginForm } from "components/login";
 import { useFirebase } from "components/context";
-import { Button, GradientButton } from "components/base";
+import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import Image from "next/image";

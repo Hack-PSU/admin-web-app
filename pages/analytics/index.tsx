@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography, useTheme } from "@mui/material";
@@ -9,13 +9,11 @@ import { Pie } from "components/Charts";
 import { ChartContainer, RegistrationBarLine } from "components/analytics";
 import { ParentSizeModern } from "@visx/responsive";
 import { DateTime } from "luxon";
-import { useSnackbar } from "notistack";
 
 const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
 
 const AnalyticsPage: NextPage = () => {
   const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
 
   const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
     fetch(() =>
@@ -76,20 +74,23 @@ const AnalyticsPage: NextPage = () => {
 
   const registrationsByHackathon = useMemo(() => {
     if (allUsers && allHackathons) {
-      return _.chain(allUsers)
-        .groupBy("hackathon")
-        .map((users, hackathon) => {
-          const entity = allHackathons.find((h) => h.uid === hackathon);
+      return (
+        _.chain(allUsers)
+          .groupBy("hackathon")
+          .map((users, hackathon) => {
+            const entity = allHackathons.find((h) => h.uid === hackathon);
 
-          return {
-            hackathon: entity?.name ?? hackathon,
-            count: users.length,
-            date: entity?.start_time,
-          };
-        })
-        .sortBy((item) => DateTime.fromMillis(parseInt(item.date ?? "")))
-        .map(({ date, ...rest }) => ({ ...rest }))
-        .value();
+            return {
+              hackathon: entity?.name ?? hackathon,
+              count: users.length,
+              date: entity?.start_time,
+            };
+          })
+          .sortBy((item) => DateTime.fromMillis(parseInt(item.date ?? "")))
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          .map(({ date, ...rest }) => ({ ...rest }))
+          .value()
+      );
     }
   }, [allUsers, allHackathons]);
 

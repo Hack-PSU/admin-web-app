@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { FC, useCallback, useEffect, useMemo } from "react";
 import { NextPage } from "next";
 import { withSettingsLayout } from "components/settings";
 import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
@@ -7,23 +7,26 @@ import {
   fetch,
   QueryKeys,
   getAllOrganizers,
-  MutateEntity,
-  IOrganizerEntity,
-  updateOrganizer,
   updateOrganizerPermissions,
   CreateEntity,
 } from "api";
-import { ControlledSelect } from "components/base";
+import { ControlledSelect, GradientButton } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { IOption } from "types/components";
 import { useSnackbar } from "notistack";
 import _ from "lodash";
-import { useFirebase } from "components/context";
+import {
+  ModalProvider,
+  useFirebase,
+  useModalContext,
+} from "components/context";
+import { Grid, useTheme } from "@mui/material";
+import AddNewMemberModal from "components/modal/AddNewMemberModal";
 
 type OrganizerEntity = {
   uid: string;
   name: string;
-  permission: IOption;
+  permission: IOption<number>;
   email: string;
 };
 
@@ -32,28 +35,51 @@ type UpdateOrganizerEntity = {
   privilege: number;
 };
 
-const PermissionOptions: IOption[] = [
+const PermissionOptions: IOption<number>[] = [
   {
-    value: "1",
+    value: 1,
     label: "Volunteer",
   },
   {
-    value: "2",
+    value: 2,
     label: "Team Member",
   },
   {
-    value: "3",
+    value: 3,
     label: "Exec Member",
   },
   {
-    value: "4",
+    value: 4,
     label: "Tech-Exec",
   },
   {
-    value: "5",
+    value: 5,
     label: "Finance Director",
   },
 ];
+
+const AddNewMemberButton: FC = () => {
+  const theme = useTheme();
+  const { showModal } = useModalContext();
+
+  return (
+    <GradientButton
+      sx={{
+        padding: theme.spacing(1, 3.5),
+        width: "100%",
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={() => showModal("addNewMember")}
+    >
+      Add Member
+    </GradientButton>
+  );
+};
 
 const SettingsMembers: NextPage = () => {
   const { user } = useFirebase();
@@ -69,35 +95,16 @@ const SettingsMembers: NextPage = () => {
         if (data) {
           return data.map((d) => {
             const permission = PermissionOptions.find(
-              (p) => p.value === String(d.privilege)
+              (p) => p.value === d.privilege
             );
             return {
               uid: d.uid,
               name: `${d.firstname} ${d.lastname}`,
               email: d.email,
-              permission: permission ?? { value: "2", label: "Team Member" },
+              permission: permission ?? { value: 2, label: "Team Member" },
             };
           });
         }
-      },
-    }
-  );
-
-  const { mutateAsync } = useMutation(
-    QueryKeys.organizer.updateOne(),
-    ({ entity }: CreateEntity<UpdateOrganizerEntity, "">) =>
-      fetch(() => updateOrganizerPermissions(entity)),
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(QueryKeys.organizer.all);
-        enqueueSnackbar("Successfully updated organizer", {
-          variant: "success",
-        });
-      },
-      onError: () => {
-        enqueueSnackbar("Error occurred updating organizer", {
-          variant: "error",
-        });
       },
     }
   );
@@ -118,7 +125,7 @@ const SettingsMembers: NextPage = () => {
 
         acc[curr.uid] = {
           ...curr,
-          permission: { value: "2", label: "Team Member" },
+          permission: { value: 2, label: "Team Member" },
         };
 
         if (permission) {
@@ -136,6 +143,26 @@ const SettingsMembers: NextPage = () => {
   });
 
   const { reset, watch } = methods;
+
+  const { mutateAsync } = useMutation(
+    QueryKeys.organizer.updateOne(),
+    ({ entity }: CreateEntity<UpdateOrganizerEntity, "">) =>
+      fetch(() => updateOrganizerPermissions(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.organizer.all);
+        enqueueSnackbar("Successfully updated organizer", {
+          variant: "success",
+        });
+      },
+      onError: () => {
+        enqueueSnackbar("Error occurred updating organizer", {
+          variant: "error",
+        });
+        reset();
+      },
+    }
+  );
 
   const submitOrganizerUpdate = useCallback(
     async (entities: UpdateOrganizerEntity[]) => {
@@ -158,7 +185,7 @@ const SettingsMembers: NextPage = () => {
           })
           .map((value, uid) => ({
             uid: uid,
-            privilege: parseInt(value?.permission?.value ?? "2"),
+            privilege: value?.permission?.value ?? 2,
           }))
           .value();
 
@@ -223,24 +250,36 @@ const SettingsMembers: NextPage = () => {
   }, []);
 
   return (
-    <Table {...table}>
-      <Table.GlobalActions>
-        <Table.GlobalRefresh onRefresh={onRefresh} />
-        <Table.GlobalPageSize />
-      </Table.GlobalActions>
-      <Table.Container>
-        <Table.Actions
-          center={<Table.PaginationAction />}
-          right={<Table.DeleteAction onDelete={onDelete} />}
-        />
-        <Table.Content overflowVisible>
-          <Table.Header />
-          <FormProvider {...methods}>
-            <Table.Body />
-          </FormProvider>
-        </Table.Content>
-      </Table.Container>
-    </Table>
+    <ModalProvider>
+      <AddNewMemberModal />
+      <Grid container flexDirection={"column"} gap={1.5}>
+        <Grid container item justifyContent={"flex-end"}>
+          <Grid item>
+            <AddNewMemberButton />
+          </Grid>
+        </Grid>
+        <Grid item>
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
+            <Table.Container>
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content overflowVisible>
+                <Table.Header />
+                <FormProvider {...methods}>
+                  <Table.Body />
+                </FormProvider>
+              </Table.Content>
+            </Table.Container>
+          </Table>
+        </Grid>
+      </Grid>
+    </ModalProvider>
   );
 };
 

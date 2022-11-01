@@ -34,8 +34,10 @@ export const getSponsor: CreateQueryReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Insert_Sponsor
  */
-export const createSponsor: CreateMutationReturn<ISponsorshipEntity> =
-  createMutation("/sponsorship");
+export const createSponsor: CreateMutationReturn<
+  Omit<ISponsorshipEntity, "uid" | "order">,
+  ISponsorshipEntity
+> = createMutation("/sponsorship");
 
 /**
  * Update a Sponsor
@@ -48,6 +50,18 @@ export const updateSponsor: CreateMutationReturn<
   Partial<ISponsorshipEntity>,
   ISponsorshipEntity
 > = createMutation("/sponsorship/update");
+
+/**
+ * Update the given sponsors
+ * @param entity ({ sponsors: Partial<ISponsorshipEntity>[] })
+ * @param params (optional)
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Update_Sponsors
+ */
+export const updateSponsorBatch: CreateMutationReturn<
+  { sponsors: Partial<ISponsorshipEntity>[] },
+  ISponsorshipEntity[]
+> = createMutation("/sponsorship/update/all");
 
 /**
  * Delete a Sponsor
