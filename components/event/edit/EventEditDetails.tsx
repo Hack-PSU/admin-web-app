@@ -17,6 +17,14 @@ import {
   LabelledDatePicker,
   LabelledTimePicker,
 } from "components/base/Pickers";
+import { EventType, fetch, getAllLocations, QueryKeys } from "api";
+import { useQuery } from "@tanstack/react-query";
+
+const eventTypeOptions = [
+  { value: EventType.ACTIVITY, label: "Activity" },
+  { value: EventType.WORKSHOP, label: "Workshop" },
+  { value: EventType.FOOD, label: "Food" },
+];
 
 const EventEditDetails: FC = () => {
   const {
@@ -24,6 +32,21 @@ const EventEditDetails: FC = () => {
     endDateTime: endDate,
     register,
   } = useDateTimeRange("eventDate", { isMultiple: true });
+
+  const { data: locationOptions } = useQuery(
+    QueryKeys.location.findAll(),
+    () => fetch(getAllLocations),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            value: String(d.uid),
+            label: d.location_name,
+          }));
+        }
+      },
+    }
+  );
 
   return (
     <EventEdit title={"Basic Details"}>
@@ -47,6 +70,7 @@ const EventEditDetails: FC = () => {
             as={LabelledCreatableSelect}
             id="event-location"
             label={"Location"}
+            options={locationOptions}
           />
         </Grid>
         <Grid item xs={6}>
@@ -56,6 +80,7 @@ const EventEditDetails: FC = () => {
             as={LabelledSelect}
             id={"event-type"}
             label="Type"
+            options={eventTypeOptions}
           />
         </Grid>
         <Grid item xs={12}>
@@ -101,6 +126,16 @@ const EventEditDetails: FC = () => {
             id={"end-time"}
             label={"End Time"}
             menuWidth={"200px"}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <ControlledInput
+            name={"eventIcon"}
+            placeholder={"Enter event icon url"}
+            as={LabelledInput}
+            label={"Event Icon"}
+            id={"event-icon"}
+            showError
           />
         </Grid>
       </Grid>

@@ -21,8 +21,10 @@ export const getAllEvents: CreateQueryReturn<IGetAllEventsResponse[]> =
  * @param param (optional)
  * @param token (optional)
  */
-export const getEvent: CreateQueryReturn<IGetAllEventsResponse> =
-  createQuery<IGetAllEventsResponse>("/live/events");
+export const getEvent: CreateQueryReturn<
+  IGetAllEventsResponse,
+  { uid: string }
+> = createQuery<IGetAllEventsResponse>("/live/events/get-by-uid");
 
 /**
  * Create an event

@@ -144,8 +144,6 @@ const _Modal: ModalComponent = ({
 };
 
 const ModalBody: FC<ModalBodyProps> = ({ children, sx, ...props }) => {
-  const theme = useTheme();
-
   return (
     <Grid
       container

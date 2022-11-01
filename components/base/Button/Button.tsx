@@ -1,6 +1,5 @@
-import React, { FC, useState, forwardRef } from "react";
+import React, { forwardRef } from "react";
 import {
-  Box,
   Button as BaseButton,
   ButtonProps,
   darken,

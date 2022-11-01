@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { useFormContext } from "react-hook-form";
 import { EvaIcon } from "components/base";
 
 interface IDropzoneItemProps {

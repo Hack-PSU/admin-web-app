@@ -26,7 +26,14 @@ import {
 import jwtDecode from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
-import { initApi, resetApi } from "api/axios";
+import {
+  initApiV2,
+  resetApiV2,
+  initNotificationApi,
+  resetNotificationApi,
+  initWsApi,
+  resetWsApi,
+} from "api/axios";
 import { useRouter } from "next/router";
 
 const FirebaseContext = createContext<IFirebaseProviderHooks>(
@@ -152,9 +159,13 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   useEffect(() => {
     return onIdTokenChanged(auth, async (user) => {
       if (user) {
-        await initApi(user);
+        await initApiV2(user);
+        await initNotificationApi(user);
+        await initWsApi(user);
       } else {
-        resetApi();
+        resetApiV2();
+        resetNotificationApi();
+        resetWsApi();
       }
     });
   }, [auth]);

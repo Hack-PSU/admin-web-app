@@ -7,9 +7,10 @@ import {
   ExtraCreditAssignmentKeys,
   ExtraCreditClassKeys,
 } from "./extra_credit";
-import { JudgingProjectQueryKeys, JudgingScoreQueryKeys } from "api/judging";
-import { OrganizerQueryKeys } from "api/organizer";
-import { SponsorshipQueryKeys } from "api/sponsorship";
+import { JudgingProjectQueryKeys, JudgingScoreQueryKeys } from "./judging";
+import { OrganizerQueryKeys } from "./organizer";
+import { SponsorshipQueryKeys } from "./sponsorship";
+import { FlagQueryKeys } from "./flag";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -24,6 +25,7 @@ export const QueryKeys = {
   judgingScore: JudgingScoreQueryKeys,
   organizer: OrganizerQueryKeys,
   sponsorship: SponsorshipQueryKeys,
+  flag: FlagQueryKeys,
 };
 
 export * from "./checkout_item";
@@ -35,5 +37,6 @@ export * from "./extra_credit";
 export * from "./judging";
 export * from "./organizer";
 export * from "./sponsorship";
+export * from "./flag";
 export * from "./types";
 export * from "./utils";

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react";
+import React, { FC, useCallback, useMemo } from "react";
 import EventStep from "components/event/steps/EventStep";
 import {
   ControlledCreatableSelect,
@@ -12,16 +12,19 @@ import { Box, Grid } from "@mui/material";
 import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
 import { useForm, FormProvider } from "react-hook-form";
-import { EventType } from "api";
+import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
+import { useQuery } from "@tanstack/react-query";
+import _ from "lodash";
+import { IOption } from "types/components";
 
-const locationOptions = [
-  { value: "Location1", label: "Location 1" },
-  { value: "Location2", label: "Location 2" },
-];
+// const locationOptions = [
+//   { value: "Location1", label: "Location 1" },
+//   { value: "Location2", label: "Location 2" },
+// ];
 
 const schema = object({
   eventName: NonEmptyString,
@@ -58,15 +61,52 @@ const EventDetailsStep: FC = () => {
     "2. Event Details"
   );
 
-  const handleNext = () => {
+  const { data: locationOptions } = useQuery(
+    QueryKeys.location.findAll(),
+    () => fetch(getAllLocations),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            value: d.uid,
+            label: d.location_name,
+          }));
+        }
+      },
+    }
+  );
+
+  const currentLocations = useMemo(() => {
+    if (locationOptions) {
+      return new Set(locationOptions.map((l) => l.value));
+    }
+    return new Set();
+  }, [locationOptions]);
+
+  const handleNext = useCallback(() => {
     methods.handleSubmit((data, errors) => {
       if (!errors) {
+        let locationData = data.eventLocation;
+
+        // location is not found in currentLocations
+        if (
+          data.eventLocation &&
+          currentLocations &&
+          !currentLocations.has(data.eventLocation.value)
+        ) {
+          locationData = {
+            ...data.eventLocation,
+            isNew: true,
+          };
+        }
+
         updateDetails({
           eventName: data.eventName,
-          eventLocation: data.eventLocation,
+          eventLocation: locationData,
           eventDescription: data.eventDescription,
           eventDate: data.eventDate,
         });
+
         if (eventType && eventType.value !== EventType.WORKSHOP) {
           gotoStep(3, 2);
         } else {
@@ -74,7 +114,7 @@ const EventDetailsStep: FC = () => {
         }
       }
     })();
-  };
+  }, [updateDetails, gotoStep, nextStep, currentLocations]);
 
   return (
     <FormProvider {...methods}>
@@ -84,7 +124,7 @@ const EventDetailsStep: FC = () => {
         handleNextTitle={
           eventType && eventType.value === EventType.WORKSHOP
             ? "Next"
-            : "Continue to Event Image"
+            : "Continue to Event Icon"
         }
         active={active}
         handlePrevious={previousStep}

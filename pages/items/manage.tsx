@@ -1,16 +1,15 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { FC, useEffect, useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton, SaveButton } from "components/base";
+import { EvaIcon, GradientButton } from "components/base";
 import {
   fetch,
   getAllAvailableItems,
   ICheckoutItemEntity,
-  MutateEntity,
   QueryKeys,
 } from "api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   DefaultActionCell,
   DefaultInputCell,
@@ -18,13 +17,7 @@ import {
   useColumnDef,
   useTable,
 } from "components/Table";
-import {
-  useForm,
-  FormProvider,
-  useFormContext,
-  useFormState,
-  FormState,
-} from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewItemModal from "components/modal/AddNewItemModal";
 
@@ -57,9 +50,9 @@ const AddNewItemButton: FC = () => {
 };
 
 const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   // const [isDirty, setIsDirty] = useState(false);
-  const currentInputKey = useRef<{ key: string }>({ key: "" });
+  // const currentInputKey = useRef<{ key: string }>({ key: "" });
 
   const { data: itemsData, refetch } = useQuery(
     QueryKeys.manageItems.findAll(),
@@ -79,15 +72,15 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     }
   );
 
-  const { mutateAsync, isLoading } = useMutation(
-    QueryKeys.manageItems.updateBatch(),
-    ({ entity }: MutateEntity<ICheckoutItemEntity>) => fetch(),
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(QueryKeys.manageItems.all);
-      },
-    }
-  );
+  // const { mutateAsync, isLoading } = useMutation(
+  //   QueryKeys.manageItems.updateBatch(),
+  //   ({ entity }: MutateEntity<ICheckoutItemEntity>) => fetch(),
+  //   {
+  //     onSuccess: async () => {
+  //       await queryClient.invalidateQueries(QueryKeys.manageItems.all);
+  //     },
+  //   }
+  // );
 
   const defaultValues = useMemo(() => {
     if (itemsData) {
@@ -109,7 +102,7 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
     defaultValues,
   });
 
-  const { formState, reset, handleSubmit, resetField } = methods;
+  const { reset, resetField } = methods;
 
   useEffect(() => {
     reset({ ...defaultValues });
@@ -123,26 +116,26 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
   //   return subscription.unsubscribe;
   // }, [watch, getFieldState]);
 
-  const onClickSave = useCallback(() => {
-    const { dirtyFields } = formState;
-    handleSubmit(async (data) => {
-      const editedFields = Object.keys(dirtyFields).filter(
-        (field) => dirtyFields[field].name || dirtyFields[field].quantity
-      );
-
-      await Promise.all(
-        editedFields.map((uid) =>
-          mutateAsync({
-            entity: {
-              uid: data[uid].uid,
-              name: data[uid].name,
-              quantity: data[uid].quantity,
-            },
-          })
-        )
-      );
-    })();
-  }, [formState, handleSubmit, mutateAsync]);
+  // const onClickSave = useCallback(() => {
+  //   const { dirtyFields } = formState;
+  //   handleSubmit(async (data) => {
+  //     const editedFields = Object.keys(dirtyFields).filter(
+  //       (field) => dirtyFields[field].name || dirtyFields[field].quantity
+  //     );
+  //
+  //     await Promise.all(
+  //       editedFields.map((uid) =>
+  //         mutateAsync({
+  //           entity: {
+  //             uid: data[uid].uid,
+  //             name: data[uid].name,
+  //             quantity: data[uid].quantity,
+  //           },
+  //         })
+  //       )
+  //     );
+  //   })();
+  // }, [formState, handleSubmit, mutateAsync]);
 
   const defs = useColumnDef<{
     uid: number;
@@ -249,9 +242,9 @@ const ManageItems: NextPage<IManageItemsProps> = ({ items }) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton onClick={onClickSave} loading={isLoading}>
-              Save
-            </SaveButton>
+            {/*<SaveButton onClick={onClickSave} loading={isLoading}>*/}
+            {/*  Save*/}
+            {/*</SaveButton>*/}
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>

@@ -9,13 +9,13 @@ export interface IEventEntity {
   eventLocation: number;
   eventStartTime: number;
   eventEndTime: number;
-  eventTitle: number;
+  eventTitle: string;
   eventDescription: string;
   wsPresenterNames?: string;
   wsSkillLevel?: string;
   wsRelevantSkills?: string;
   wsUrls?: string;
-  eventIcon: string;
+  eventIcon: string | null;
   eventType: EventType;
   hackathon?: string;
 }
@@ -23,8 +23,8 @@ export interface IEventEntity {
 export interface IGetAllEventsResponse {
   uid: string;
   event_location: number;
-  event_start_time: number;
-  event_end_time: number;
+  event_start_time: string;
+  event_end_time: string;
   event_title: string;
   event_description: string;
   event_type: EventType;
