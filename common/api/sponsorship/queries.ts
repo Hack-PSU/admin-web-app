@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { ISponsorshipEntity } from "./entity";
+import { ISponsorshipCreateEntity, ISponsorshipEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -36,7 +36,7 @@ export const getSponsor: CreateQueryReturn<
  */
 export const createSponsor: CreateMutationReturn<
   Omit<ISponsorshipEntity, "uid" | "order">,
-  ISponsorshipEntity
+  ISponsorshipCreateEntity
 > = createMutation("/sponsorship");
 
 /**

@@ -59,10 +59,7 @@ const ScoresPage: NextPage = () => {
     scores: allScores,
     projects: allProjects,
     users: allUsers,
-    filterProject: (d) =>
-      d.hackathon === activeHackathon?.uid &&
-      d.project !== "No Show" &&
-      d.project !== "PSU indoor navigation ",
+    filterProject: (d) => d.hackathon === activeHackathon?.uid,
   });
 
   return (

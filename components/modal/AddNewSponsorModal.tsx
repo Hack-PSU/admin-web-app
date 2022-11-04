@@ -13,7 +13,12 @@ import _ from "lodash";
 import { IOption } from "types/components";
 import { Grid } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { CreateEntity, createSponsor, fetch, ISponsorshipEntity } from "api";
+import {
+  CreateEntity,
+  createSponsor,
+  fetch,
+  ISponsorshipCreateEntity,
+} from "api";
 
 enum SponsorLevel {
   BRONZE = "bronze",
@@ -61,7 +66,7 @@ const AddNewSponsorModal: FC = () => {
   const { show, handleHide } = useModal("addNewSponsor");
 
   const { mutateAsync } = useMutation(
-    ({ entity }: CreateEntity<ISponsorshipEntity, "uid" | "order">) =>
+    ({ entity }: CreateEntity<ISponsorshipCreateEntity, "uid" | "order">) =>
       fetch(() => createSponsor(entity)),
     {}
   );
@@ -70,12 +75,13 @@ const AddNewSponsorModal: FC = () => {
 
   const onClickSubmit = () => {
     handleSubmit(async (data) => {
+      console.log(data.websiteLink);
       await mutateAsync({
         entity: {
           name: data.name,
           level: data.level.value,
           logo: data.logo,
-          website_link: data.websiteLink,
+          websiteLink: data.websiteLink,
         },
       });
       handleHide();
@@ -89,7 +95,7 @@ const AddNewSponsorModal: FC = () => {
           name: data.name,
           level: data.level.value,
           logo: data.logo,
-          website_link: data.websiteLink,
+          websiteLink: data.websiteLink,
         },
       });
       reset();
