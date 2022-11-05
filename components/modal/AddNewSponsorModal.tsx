@@ -75,7 +75,6 @@ const AddNewSponsorModal: FC = () => {
 
   const onClickSubmit = () => {
     handleSubmit(async (data) => {
-      console.log(data.websiteLink);
       await mutateAsync({
         entity: {
           name: data.name,
