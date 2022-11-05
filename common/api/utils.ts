@@ -78,7 +78,7 @@ export async function fetch<TResponse>(
   queryFn: () => Promise<QueryReturn<TResponse>>
 ): Promise<TResponse | undefined> {
   const resp = await queryFn();
-  if (resp && resp.data.body.data) {
+  if (resp && resp.data && resp.data.body && resp.data.body.data) {
     return resp.data.body.data;
   }
 }

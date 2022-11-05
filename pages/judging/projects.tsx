@@ -1,13 +1,14 @@
-import React from "react";
+import React, { FC } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
-import { EvaIcon, GradientButton } from "components/base";
+import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider, useModalContext } from "components/context";
 import { useQuery } from "@tanstack/react-query";
 import { fetch, getAllProjects, QueryKeys } from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
+import AssignJudgingProjectsModal from "components/modal/AssignJudgingProjectsModal";
 
 const AddProjectButton = () => {
   const { showModal } = useModalContext();
@@ -30,6 +31,16 @@ const AddProjectButton = () => {
     >
       Add a Project
     </GradientButton>
+  );
+};
+
+const AssignJudgingProjectsButton: FC = () => {
+  const { showModal } = useModalContext();
+
+  return (
+    <SaveButton onClick={() => showModal("assignJudgingProjects")}>
+      Assign
+    </SaveButton>
   );
 };
 
@@ -76,6 +87,7 @@ const ManageProjectsPage: NextPage = () => {
   return (
     <ModalProvider>
       <AddNewJudgingProjectModal />
+      <AssignJudgingProjectsModal />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={10}>
@@ -103,13 +115,12 @@ const ManageProjectsPage: NextPage = () => {
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
-                Assigning projects to be judged will default to all projects
-                unless rows are selected
+                All projects will be selected unless table rows are selected
               </Typography>
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            {/*<AssignClassButton hasSelections={hasSelections} />*/}
+            <AssignJudgingProjectsButton />
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>

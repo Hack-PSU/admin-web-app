@@ -13,6 +13,11 @@ export interface IScoreEntity {
   environmental?: number;
 }
 
+export interface IGenerateJudgingEntity {
+  judges: string[];
+  projectsPerOrganizer: number;
+}
+
 export interface IProjectEntity {
   project: string;
   uid: number;

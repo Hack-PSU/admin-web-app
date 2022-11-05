@@ -1,8 +1,13 @@
-import React, { FC, useCallback, useEffect, useRef } from "react";
+import React, { FC, useCallback, useEffect, useRef, useState } from "react";
 import { NextPage } from "next";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
-import { Table, useColumnDef, useTable } from "components/Table";
+import {
+  DefaultActionCell,
+  Table,
+  useColumnDef,
+  useTable,
+} from "components/Table";
 import { ModalProvider, useModalContext } from "components/context";
 import { withDefaultLayout } from "common/HOCs";
 import PageHeader from "components/Menu/PageHeader";
@@ -13,23 +18,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetch,
   getAllSponsors,
-  ISponsorshipEntity,
+  ISponsorshipCreateEntity,
   QueryKeys,
   updateSponsorBatch,
 } from "api";
 import { useSnackbar } from "notistack";
+import EditSponsorModal from "components/modal/EditSponsorModal";
 
-type Sponsor = {
-  uid: number;
-  name: string;
-  order: number;
-  level: string;
-  link: string;
-};
+type Sponsor = ISponsorshipCreateEntity;
 
 type MutateSponsors = {
   entity: {
-    sponsors: Partial<ISponsorshipEntity>[];
+    sponsors: Sponsor[];
   };
 };
 
@@ -115,13 +115,38 @@ const AddNewSponsorButton: FC = () => {
   );
 };
 
+const EditActionCell: FC<{ onClick(): void }> = ({ onClick }) => {
+  const { showModal } = useModalContext();
+
+  return (
+    <DefaultActionCell
+      cellProps={{
+        sx: {
+          width: "8%",
+        },
+      }}
+      items={[
+        {
+          icon: "edit-outline",
+          onClick: () => {
+            onClick();
+            showModal("editSponsor");
+          },
+        },
+      ]}
+    />
+  );
+};
+
 const SponsorshipPage: NextPage = () => {
   const queryClient = useQueryClient();
   const originalData = useRef<{ [key: number]: Sponsor } | null>(null);
 
+  const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
+
   const { enqueueSnackbar } = useSnackbar();
 
-  const { data: allSponsors } = useQuery(
+  const { data: allSponsors, refetch } = useQuery(
     QueryKeys.sponsorship.findAll(),
     () => fetch(getAllSponsors),
     {
@@ -130,10 +155,11 @@ const SponsorshipPage: NextPage = () => {
           return _.chain(data)
             .map((d) => ({
               uid: d.uid,
+              logo: d.logo,
               order: d.order,
               name: d.name,
               level: d.level,
-              link: d.website_link ?? "",
+              websiteLink: d.website_link ?? "",
             }))
             .sortBy("order")
             .value();
@@ -176,7 +202,21 @@ const SponsorshipPage: NextPage = () => {
         id: "link",
         type: "text",
         header: "Link",
-        accessorKey: "link",
+        accessorKey: "websiteLink",
+      },
+      {
+        id: "actions",
+        type: "custom",
+        header: "",
+        cell: ({ row }) => (
+          <EditActionCell
+            onClick={() => {
+              if (originalData.current) {
+                setSelectedSponsor(originalData.current[row.original.uid]);
+              }
+            }}
+          />
+        ),
       },
     ],
   });
@@ -231,14 +271,6 @@ const SponsorshipPage: NextPage = () => {
     getDraggableOrder: (item) => item.order,
   });
 
-  const onRefresh = () => {
-    return null;
-  };
-
-  const onDelete = () => {
-    return null;
-  };
-
   const onClickSave = useCallback(async () => {
     const origData = originalData.current;
     if (origData) {
@@ -278,6 +310,7 @@ const SponsorshipPage: NextPage = () => {
   return (
     <ModalProvider>
       <AddNewSponsorModal />
+      <EditSponsorModal sponsor={selectedSponsor} />
       <Grid container gap={1.5}>
         <PageHeader header={"Sponsorship"} right={<AddNewSponsorButton />} />
         <Grid
@@ -301,30 +334,17 @@ const SponsorshipPage: NextPage = () => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <SaveButton
-              // isDirty={methods.formState.isDirty}
-              // onClick={onClickSave}
-              // loading={isLoading}
-              // progressColor={
-              //   methods.formState.isDirty ? "common.white" : "common.black"
-              // }
-              onClick={onClickSave}
-            >
-              Save
-            </SaveButton>
+            <SaveButton onClick={onClickSave}>Save</SaveButton>
           </Grid>
         </Grid>
         <Grid item sx={{ width: "100%" }}>
           <Table {...table}>
             <Table.GlobalActions>
-              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalRefresh onRefresh={refetch} />
               <Table.GlobalPageSize />
             </Table.GlobalActions>
             <Table.Container>
-              <Table.Actions
-                center={<Table.PaginationAction />}
-                right={<Table.DeleteAction onDelete={onDelete} />}
-              />
+              <Table.Actions center={<Table.PaginationAction />} />
               <Table.Content>
                 <Table.Header />
                 <Table.Body />

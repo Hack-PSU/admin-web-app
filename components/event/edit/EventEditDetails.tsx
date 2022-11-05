@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import EventEdit from "./EventEdit";
 import { Box, Grid } from "@mui/material";
-import { useFormContext } from "react-hook-form";
 import {
   ControlledCreatableSelect,
   ControlledInput,
@@ -19,6 +18,7 @@ import {
 } from "components/base/Pickers";
 import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { useQuery } from "@tanstack/react-query";
+import { IOption } from "types/components";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -26,27 +26,31 @@ const eventTypeOptions = [
   { value: EventType.FOOD, label: "Food" },
 ];
 
-const EventEditDetails: FC = () => {
+type Props = {
+  locationOptions: IOption<number>[];
+};
+
+const EventEditDetails: FC<Props> = ({ locationOptions }) => {
   const {
     startDateTime: startDate,
     endDateTime: endDate,
     register,
   } = useDateTimeRange("eventDate", { isMultiple: true });
 
-  const { data: locationOptions } = useQuery(
-    QueryKeys.location.findAll(),
-    () => fetch(getAllLocations),
-    {
-      select: (data) => {
-        if (data) {
-          return data.map((d) => ({
-            value: String(d.uid),
-            label: d.location_name,
-          }));
-        }
-      },
-    }
-  );
+  // const { data: locationOptions } = useQuery(
+  //   QueryKeys.location.findAll(),
+  //   () => fetch(getAllLocations),
+  //   {
+  //     select: (data) => {
+  //       if (data) {
+  //         return data.map((d) => ({
+  //           value: String(d.uid),
+  //           label: d.location_name,
+  //         }));
+  //       }
+  //     },
+  //   }
+  // );
 
   return (
     <EventEdit title={"Basic Details"}>

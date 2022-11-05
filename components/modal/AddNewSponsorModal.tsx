@@ -164,7 +164,7 @@ const AddNewSponsorModal: FC = () => {
                 },
               ]}
             >
-              Save
+              Submit
             </MenuButton>
           </Grid>
         </Modal.Body>

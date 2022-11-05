@@ -22,7 +22,13 @@ const Radio: FC<IRadioProps> = ({ items, onChange, labelProps }) => {
   return (
     <>
       {items.map((item, index) => (
-        <Grid container item alignItems="center" key={`${item.value}-${index}`}>
+        <Grid
+          container
+          item
+          alignItems="center"
+          key={`${item.value}-${index}`}
+          sx={{ width: "fit-content" }}
+        >
           <Grid item>
             <MuiRadio
               checked={selected === item.value}

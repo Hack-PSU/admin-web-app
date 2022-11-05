@@ -14,6 +14,6 @@ export interface ISponsorshipEntity {
   level: string;
   logo: string;
   order: number;
-  websiteLink?: string;
+  website_link?: string;
   hackathon?: string;
 }

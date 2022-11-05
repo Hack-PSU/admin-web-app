@@ -1,4 +1,8 @@
-import { IProjectEntity, IScoreEntity } from "./entities";
+import {
+  IGenerateJudgingEntity,
+  IProjectEntity,
+  IScoreEntity,
+} from "./entities";
 import {
   createMutation,
   CreateMutationReturn,
@@ -38,6 +42,16 @@ export const createProject: CreateMutationReturn<
   IProjectEntity
 > = createMutation("/judging/project");
 
+/**
+ * Generate judging assignments
+ * @param entity (required)
+ * @param param (optional)
+ * @param token (optional)
+ * @link https://api.hackpsu.org/v2/doc/#api-Judging-Generate_Judging_Assignments
+ */
+export const generateJudging: CreateMutationReturn<IGenerateJudgingEntity, {}> =
+  createMutation("/judging/assignments");
+
 export const JudgingProjectQueryKeys = {
   all: [{ entity: "judging_project" }] as const,
   findAll: () =>
@@ -74,6 +88,14 @@ export const JudgingScoreQueryKeys = {
         ...JudgingScoreQueryKeys.all[0],
         action: QueryAction.create,
         scope: QueryScope.NEW,
+      },
+    ] as const,
+  createAll: () =>
+    [
+      {
+        ...JudgingScoreQueryKeys.all[0],
+        action: QueryAction.create,
+        scope: QueryScope.ALL,
       },
     ] as const,
 };

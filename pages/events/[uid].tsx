@@ -9,6 +9,10 @@ import {
   updateEvent,
   QueryKeys,
   getEvent,
+  getAllLocations,
+  CreateEntity,
+  ILocationUpdateEntity,
+  createLocation,
 } from "api";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Grid, lighten, Typography, useTheme } from "@mui/material";
@@ -24,7 +28,7 @@ import { DateTime } from "luxon";
 import EventEditWorkshop from "components/event/edit/EventEditWorkshop";
 import _ from "lodash";
 import { Button } from "components/base";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { prepareContent } from "components/base/RichText";
 
@@ -52,7 +56,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
     defaultValues: {
       eventTitle: event.event_title,
       eventLocation: {
-        value: String(event.event_location),
+        value: event.event_location,
         label: event.location_name,
       },
       eventType: {
@@ -84,6 +88,28 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
 
   const { handleSubmit } = methods;
 
+  const { data: locationOptions } = useQuery(
+    QueryKeys.location.findAll(),
+    () => fetch(getAllLocations),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            value: d.uid,
+            label: d.location_name,
+          }));
+        }
+      },
+    }
+  );
+
+  const currentLocations = useMemo(() => {
+    if (locationOptions) {
+      return new Set(locationOptions.map((d) => d.value));
+    }
+    return new Set();
+  }, [locationOptions]);
+
   const { mutateAsync: mutateUpdateEvent } = useMutation(
     ({ entity }: MutateEntity<IEventEntity>) =>
       fetch(() => updateEvent(entity)),
@@ -97,32 +123,60 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
     }
   );
 
+  const { mutateAsync: mutateCreateLocation } = useMutation(
+    ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+      fetch(() => createLocation(entity))
+  );
+
   const onSubmit = useCallback(() => {
     handleSubmit(async (data) => {
-      await mutateUpdateEvent({
-        entity: {
-          uid: String(event.uid),
-          eventTitle: data.eventTitle,
-          eventLocation: parseInt(data.eventLocation.value),
-          eventDescription: prepareContent(
-            convertFromRaw(data.eventDescription)
-          ),
-          eventStartTime: DateTime.fromJSDate(data.eventDate.start).toMillis(),
-          eventEndTime: DateTime.fromJSDate(data.eventDate.end).toMillis(),
-          eventType: data.eventType.value,
-          eventIcon: data.eventIcon,
-          wsPresenterNames:
-            data.wsPresenterNames?.map((name) => name.value).join(", ") ??
-            undefined,
-          wsRelevantSkills:
-            data.wsRelevantSkills?.map((skill) => skill.value).join(", ") ??
-            undefined,
-          wsSkillLevel: data.wsSkillLevel.value,
-          wsUrls: data.wsUrls.join("|"),
-        },
-      });
+      if (currentLocations) {
+        let eventLocation = data.eventLocation.value ?? -1;
+        if (!currentLocations.has(data.eventLocation.value)) {
+          // create new location
+          const newLocationData = await mutateCreateLocation({
+            entity: {
+              locationName: data.eventLocation.label,
+            },
+          });
+
+          if (newLocationData?.uid) {
+            eventLocation = newLocationData?.uid;
+          }
+        }
+        await mutateUpdateEvent({
+          entity: {
+            uid: String(event.uid),
+            eventTitle: data.eventTitle,
+            eventLocation: eventLocation,
+            eventDescription: prepareContent(
+              convertFromRaw(data.eventDescription)
+            ),
+            eventStartTime: DateTime.fromJSDate(
+              data.eventDate.start
+            ).toMillis(),
+            eventEndTime: DateTime.fromJSDate(data.eventDate.end).toMillis(),
+            eventType: data.eventType.value,
+            eventIcon: data.eventIcon,
+            wsPresenterNames:
+              data.wsPresenterNames?.map((name) => name.value).join(", ") ??
+              undefined,
+            wsRelevantSkills:
+              data.wsRelevantSkills?.map((skill) => skill.value).join(", ") ??
+              undefined,
+            wsSkillLevel: data.wsSkillLevel.value,
+            wsUrls: data.wsUrls.join("|"),
+          },
+        });
+      }
     })();
-  }, [event, handleSubmit, mutateUpdateEvent]);
+  }, [
+    handleSubmit,
+    currentLocations,
+    mutateUpdateEvent,
+    event.uid,
+    mutateCreateLocation,
+  ]);
 
   return (
     <FormProvider {...methods}>
@@ -162,7 +216,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
           {/*  </Grid>*/}
           {/*</Grid>*/}
           <Grid item xs={12}>
-            <EventEditDetails />
+            <EventEditDetails locationOptions={locationOptions ?? []} />
           </Grid>
           {event.event_type === EventType.WORKSHOP && (
             <Grid item xs={12}>
