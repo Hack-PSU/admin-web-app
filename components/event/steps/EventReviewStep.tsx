@@ -61,15 +61,16 @@ const EventReviewStep: FC = () => {
     }
   );
 
-  const { mutateAsync: mutateLocation } = useMutation(
-    ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
-      fetch(() => createLocation(entity)),
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(QueryKeys.location.all);
-      },
-    }
-  );
+  const { mutateAsync: mutateLocation, isLoading: isLoadingLocation } =
+    useMutation(
+      ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+        fetch(() => createLocation(entity)),
+      {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries(QueryKeys.location.all);
+        },
+      }
+    );
 
   const onSubmit = useCallback(async () => {
     let eventLocationUid = eventLocation?.value ?? -1;
@@ -121,7 +122,7 @@ const EventReviewStep: FC = () => {
     }
   }, [isSuccess, router]);
 
-  if (isLoading) {
+  if (isLoading || isLoadingLocation) {
     return <Loading />;
   }
 
