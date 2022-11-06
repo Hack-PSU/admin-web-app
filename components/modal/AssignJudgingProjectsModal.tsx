@@ -129,6 +129,8 @@ const AssignJudgingProjectsModal: FC = () => {
         },
       });
 
+      handleHide();
+
       if (flagEnabledMap && !flagEnabledMap["judging"]) {
         showModal("confirmModal");
       }
@@ -136,6 +138,7 @@ const AssignJudgingProjectsModal: FC = () => {
   }, [
     handleSubmit,
     mutateGenerateJudging,
+    handleHide,
     flagEnabledMap,
     organizerOptions,
     showModal,
