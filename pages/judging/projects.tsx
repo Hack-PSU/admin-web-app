@@ -177,7 +177,7 @@ const ManageProjectsPage: NextPage = () => {
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">
-                All projects will be selected unless table rows are selected
+                All projects will be selected when assigning projects
               </Typography>
             </Grid>
           </Grid>
