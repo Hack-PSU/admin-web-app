@@ -34,8 +34,8 @@ const filterOptions: IOption[] = [
     label: "Technical Skills",
   },
   {
-    value: ScoreType.HUMANITARIAN,
-    label: "Humanitarian Challenge",
+    value: ScoreType.ENERGY,
+    label: "Energy Challenge",
   },
   {
     value: ScoreType.ENVIRONMENTAL,
@@ -118,7 +118,7 @@ const Top3Section: FC<Top3SectionProps> = ({
   top3Environmental,
   top3Growth,
   top3Implementation,
-  top3Humanitarian,
+  top3Energy,
   top3Technical,
   top3Clarity,
   top3SupplyChain,
@@ -155,8 +155,8 @@ const Top3Section: FC<Top3SectionProps> = ({
         case ScoreType.GROWTH:
           setSelectedData(top3Growth);
           break;
-        case ScoreType.HUMANITARIAN:
-          setSelectedData(top3Humanitarian);
+        case ScoreType.ENERGY:
+          setSelectedData(top3Energy);
           break;
         case ScoreType.SUPPLY_CHAIN:
           setSelectedData(top3SupplyChain);
@@ -173,7 +173,7 @@ const Top3Section: FC<Top3SectionProps> = ({
       top3Environmental,
       top3Growth,
       top3Implementation,
-      top3Humanitarian,
+      top3Energy,
       top3Technical,
       top3Clarity,
     ]

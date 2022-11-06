@@ -5,12 +5,14 @@ import { RenderSubRows, Table, useColumnDef, useTable } from "components/Table";
 import ScoreBreakdown from "components/judging/scores/ScoreBreakdown";
 import { EvaIcon } from "components/base";
 
-type AllScoresSectionProps = Pick<UseScoreResultsReturn, "allData">;
+type AllScoresSectionProps = Pick<UseScoreResultsReturn, "allData"> & {
+  refetch(): void;
+};
 type AllScoresEntity = AllScoresSectionProps["allData"][number];
 
 const formatScore = (value: unknown) => Number(value).toFixed(2);
 
-const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
+const AllScoresSection: FC<AllScoresSectionProps> = ({ allData, refetch }) => {
   const defs = useColumnDef<AllScoresEntity>({
     columns: [
       {
@@ -64,9 +66,9 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
       {
         id: "humanitarian",
         type: "text",
-        header: "Hum..",
+        header: "Ener..",
         format: formatScore,
-        accessorKey: "humanitarian",
+        accessorKey: "energy",
       },
       {
         id: "supply_chain",
@@ -127,7 +129,7 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData }) => {
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
           <Table.GlobalActions>
-            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalRefresh onRefresh={refetch} />
             <Table.GlobalPageSize />
           </Table.GlobalActions>
           <Table.Container>

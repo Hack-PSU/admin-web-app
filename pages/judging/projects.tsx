@@ -1,14 +1,25 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider, useModalContext } from "components/context";
-import { useQuery } from "@tanstack/react-query";
-import { fetch, getAllProjects, QueryKeys } from "api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  CreateEntity,
+  fetch,
+  getAllProjects,
+  IFlagsEntity,
+  IWSPushJudgingEntity,
+  patchAppFlags,
+  pushJudgingFlag,
+  QueryKeys,
+} from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
 import AssignJudgingProjectsModal from "components/modal/AssignJudgingProjectsModal";
+import ConfirmModal from "components/modal/ConfirmModal";
+import { useSnackbar } from "notistack";
 
 const AddProjectButton = () => {
   const { showModal } = useModalContext();
@@ -45,7 +56,10 @@ const AssignJudgingProjectsButton: FC = () => {
 };
 
 const ManageProjectsPage: NextPage = () => {
-  const { data: allProjects } = useQuery(
+  const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { data: allProjects, refetch } = useQuery(
     QueryKeys.judgingProject.findAll(),
     () => fetch(getAllProjects),
     {
@@ -76,18 +90,66 @@ const ManageProjectsPage: NextPage = () => {
     ...defs,
   });
 
-  const onRefresh = () => {
-    return null;
-  };
-
   const onDelete = () => {
     return null;
   };
+
+  const { mutateAsync: mutateAppFlags } = useMutation(
+    ({ entity }: CreateEntity<{ flags: IFlagsEntity[] }, "">) =>
+      patchAppFlags(entity),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.flag.all);
+        enqueueSnackbar("Successfully updated app flags", {
+          variant: "success",
+        });
+      },
+    }
+  );
+
+  const { mutateAsync: mutatePushJudging } = useMutation(
+    ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
+      pushJudgingFlag(entity),
+    {
+      onSuccess: () => {
+        enqueueSnackbar("Successfully notified clients", {
+          variant: "success",
+        });
+      },
+    }
+  );
+
+  const onConfirmEnableJudging = useCallback(async () => {
+    await mutateAppFlags({
+      entity: {
+        flags: [
+          {
+            name: "judging",
+            isEnabled: true,
+          },
+        ],
+      },
+    });
+
+    await mutatePushJudging({
+      entity: {
+        to: "ADMIN",
+        data: {
+          isEnabled: true,
+        },
+      },
+    });
+  }, [mutateAppFlags, mutatePushJudging]);
 
   return (
     <ModalProvider>
       <AddNewJudgingProjectModal />
       <AssignJudgingProjectsModal />
+      <ConfirmModal
+        header={"Toggle Judging"}
+        message={"Would you like to enable judging?"}
+        onConfirm={onConfirmEnableJudging}
+      />
       <Grid container gap={1.5} flexDirection="column">
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid item xs={10}>
@@ -126,7 +188,7 @@ const ManageProjectsPage: NextPage = () => {
         <Grid item sx={{ width: "100%" }}>
           <Table {...table}>
             <Table.GlobalActions>
-              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalRefresh onRefresh={refetch} />
               <Table.GlobalPageSize />
             </Table.GlobalActions>
             <Table.Container>

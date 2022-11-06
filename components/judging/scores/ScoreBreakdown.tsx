@@ -80,7 +80,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
             <BreakdownHeader header={"Growth"} score />
             <BreakdownHeader header={"Clarity"} score />
             <BreakdownHeader header={"Technical"} score />
-            <BreakdownHeader header={"Humanitarian"} score />
+            <BreakdownHeader header={"Energy"} score />
             <BreakdownHeader header={"Supply Chain"} score />
             <BreakdownHeader header={"Environmental"} score />
           </DefaultRow>
@@ -94,7 +94,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
               growth,
               clarity,
               technical,
-              humanitarian,
+              energy,
               supply_chain,
               environmental,
             } = data;
@@ -125,7 +125,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
                 <BreakdownCell score={format(growth)} />
                 <BreakdownCell score={format(clarity)} />
                 <BreakdownCell score={format(technical)} />
-                <BreakdownCell score={format(humanitarian ?? 0)} />
+                <BreakdownCell score={format(energy ?? 0)} />
                 <BreakdownCell score={format(supply_chain ?? 0)} />
                 <BreakdownCell score={format(environmental ?? 0)} />
               </DefaultRow>

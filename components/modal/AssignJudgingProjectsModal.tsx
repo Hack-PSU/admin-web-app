@@ -8,9 +8,10 @@ import {
   LabelledInput,
   LabelledRadio,
   LabelledSelect,
+  Loading,
   Modal,
 } from "components/base";
-import { useModal } from "components/context";
+import { useModal, useModalContext } from "components/context";
 import { useForm, FormProvider } from "react-hook-form";
 import { Grid } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +19,7 @@ import {
   CreateEntity,
   fetch,
   generateJudging,
+  getAllAppFlags,
   getAllOrganizers,
   IGenerateJudgingEntity,
   QueryKeys,
@@ -34,9 +36,25 @@ enum FilterType {
 
 const AssignJudgingProjectsModal: FC = () => {
   const queryClient = useQueryClient();
+  const { showModal } = useModalContext();
 
   const { show, handleHide } = useModal("assignJudgingProjects");
   const { enqueueSnackbar } = useSnackbar();
+
+  const { data: flagEnabledMap, isLoading } = useQuery(
+    QueryKeys.flag.findAll(),
+    () => fetch(getAllAppFlags),
+    {
+      select: (data) => {
+        if (data) {
+          return data.reduce((acc, curr) => {
+            acc[curr.name] = curr.isEnabled;
+            return acc;
+          }, {} as { [key: string]: boolean });
+        }
+      },
+    }
+  );
 
   const methods = useForm({
     defaultValues: {
@@ -110,8 +128,22 @@ const AssignJudgingProjectsModal: FC = () => {
           projectsPerOrganizer: parseInt(data.projectsPerOrganizer),
         },
       });
+
+      if (flagEnabledMap && !flagEnabledMap["judging"]) {
+        showModal("confirmModal");
+      }
     })();
-  }, [handleSubmit, mutateGenerateJudging, organizerOptions]);
+  }, [
+    handleSubmit,
+    mutateGenerateJudging,
+    flagEnabledMap,
+    organizerOptions,
+    showModal,
+  ]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <FormProvider {...methods}>

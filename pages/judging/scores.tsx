@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { useQuery } from "@tanstack/react-query";
@@ -23,43 +23,51 @@ const ScoresPage: NextPage = () => {
   const { activeHackathon: hackathon, updateActiveHackathon } =
     useHackathonStore();
 
-  const { data: allUsers } = useQuery(QueryKeys.organizer.findAll(), () =>
-    fetch(getAllOrganizers)
+  const { data: allUsers, refetch: refetchUsers } = useQuery(
+    QueryKeys.organizer.findAll(),
+    () => fetch(getAllOrganizers)
   );
 
-  const { data: allProjects } = useQuery(
+  const { data: allProjects, refetch: refetchProjects } = useQuery(
     QueryKeys.judgingProject.findAll(),
     () => fetch(getAllProjects)
   );
 
-  const { data: allScores } = useQuery(QueryKeys.judgingScore.findAll(), () =>
-    fetch(getAllScores)
+  const { data: allScores, refetch: refetchScores } = useQuery(
+    QueryKeys.judgingScore.findAll(),
+    () => fetch(getAllScores)
   );
 
-  const { data: allHackathons } = useQuery(
-    QueryKeys.hackathon.findAll(),
-    () => fetch(getAllHackathons),
-    {
-      enabled: !hackathon,
-    }
-  );
+  // const { data: allHackathons } = useQuery(
+  //   QueryKeys.hackathon.findAll(),
+  //   () => fetch(getAllHackathons),
+  //   {
+  //     enabled: !hackathon,
+  //   }
+  // );
 
-  const activeHackathon = useMemo(() => {
-    if (hackathon === null && allHackathons) {
-      const activeHackathons = _.filter(allHackathons, "active");
-      if (activeHackathons.length > 0) {
-        updateActiveHackathon(activeHackathons[0]);
-        return activeHackathons[0];
-      }
-    }
-    return hackathon;
-  }, [allHackathons, hackathon, updateActiveHackathon]);
+  // const activeHackathon = useMemo(() => {
+  //   if (hackathon === null && allHackathons) {
+  //     const activeHackathons = _.filter(allHackathons, "active");
+  //     if (activeHackathons.length > 0) {
+  //       updateActiveHackathon(activeHackathons[0]);
+  //       return activeHackathons[0];
+  //     }
+  //   }
+  //   return hackathon;
+  // }, [allHackathons, hackathon, updateActiveHackathon]);
+
+  const refetch = useCallback(() => {
+    refetchProjects();
+    refetchScores();
+    refetchUsers();
+  }, [refetchProjects, refetchScores, refetchUsers]);
 
   const { allData, ...top3 } = useScoreResults({
     scores: allScores,
     projects: allProjects,
     users: allUsers,
-    filterProject: (d) => d.hackathon === activeHackathon?.uid,
+    // filterProject: (d) => d.hackathon === activeHackathon?.uid,
   });
 
   return (
@@ -78,7 +86,7 @@ const ScoresPage: NextPage = () => {
         </Grid>
       </Grid>
       <Top3Section {...top3} />
-      <AllScoresSection allData={allData} />
+      <AllScoresSection allData={allData} refetch={refetch} />
     </Grid>
   );
 };

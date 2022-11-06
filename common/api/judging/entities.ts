@@ -8,7 +8,7 @@ export interface IScoreEntity {
   clarity: number;
   growth: number;
   submitted: boolean;
-  humanitarian?: number;
+  energy?: number;
   supply_chain?: number;
   environmental?: number;
 }

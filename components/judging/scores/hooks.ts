@@ -27,7 +27,7 @@ export type UseScoreResultsReturn = {
   top3Implementation: ResolvedData[];
   top3Clarity: ResolvedData[];
   top3Growth: ResolvedData[];
-  top3Humanitarian: ResolvedData[];
+  top3Energy: ResolvedData[];
   top3Environmental: ResolvedData[];
   top3SupplyChain: ResolvedData[];
   allData: AllResolvedData[];
@@ -40,7 +40,7 @@ export enum ScoreType {
   IMPLEMENTATION = "implementation",
   CLARITY = "clarity",
   GROWTH = "growth",
-  HUMANITARIAN = "humanitarian",
+  ENERGY = "energy",
   SUPPLY_CHAIN = "supply_chain",
   ENVIRONMENTAL = "environmental",
 }
@@ -90,7 +90,7 @@ export function useScoreResults(
           const clarity = _.meanBy(scores, "clarity");
           const growth = _.meanBy(scores, "growth");
 
-          const humanitarian = _.meanBy(scores, "humanitarian");
+          const energy = _.meanBy(scores, "energy");
           const supply_chain = _.meanBy(scores, "supply_chain");
           const environmental = _.meanBy(scores, "environmental");
 
@@ -105,7 +105,7 @@ export function useScoreResults(
             technical,
             projectName: project,
             environmental,
-            humanitarian,
+            energy,
             implementation,
             supply_chain,
           } as ResolvedData;
@@ -178,7 +178,7 @@ export function useScoreResults(
       top3Creativity: getTop3(ScoreType.CREATIVITY),
       top3Environmental: getTop3(ScoreType.ENVIRONMENTAL),
       top3Growth: getTop3(ScoreType.GROWTH),
-      top3Humanitarian: getTop3(ScoreType.HUMANITARIAN),
+      top3Energy: getTop3(ScoreType.ENERGY),
       top3Implementation: getTop3(ScoreType.IMPLEMENTATION),
       top3Technical: getTop3(ScoreType.TECHNICAL),
       top3SupplyChain: getTop3(ScoreType.SUPPLY_CHAIN),
