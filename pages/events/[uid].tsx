@@ -224,6 +224,27 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
             </Grid>
           )}
         </Grid>
+        <Grid container item sx={{ justifyContent: "flex-end" }}>
+          <Grid item xs={2}>
+            <Button
+              onClick={onSubmit}
+              sx={{
+                backgroundColor: "common.black",
+                ":hover": {
+                  backgroundColor: lighten(theme.palette.common.black, 0.1),
+                },
+                width: "100%",
+              }}
+              textProps={{
+                sx: {
+                  color: "common.white",
+                },
+              }}
+            >
+              Save
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
     </FormProvider>
   );
