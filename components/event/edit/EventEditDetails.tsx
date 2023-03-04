@@ -10,15 +10,14 @@ import {
   LabelledInput,
   LabelledSelect,
 } from "components/base";
-import { RichText } from "components/base/RichText";
 import { useDateTimeRange } from "common/hooks";
 import {
   LabelledDatePicker,
   LabelledTimePicker,
 } from "components/base/Pickers";
-import { EventType, fetch, getAllLocations, QueryKeys } from "api";
-import { useQuery } from "@tanstack/react-query";
+import { EventType } from "api";
 import { IOption } from "types/components";
+import { ControlledEditor } from "components/base/Editor";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -36,21 +35,6 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
     endDateTime: endDate,
     register,
   } = useDateTimeRange("eventDate", { isMultiple: true });
-
-  // const { data: locationOptions } = useQuery(
-  //   QueryKeys.location.findAll(),
-  //   () => fetch(getAllLocations),
-  //   {
-  //     select: (data) => {
-  //       if (data) {
-  //         return data.map((d) => ({
-  //           value: String(d.uid),
-  //           label: d.location_name,
-  //         }));
-  //       }
-  //     },
-  //   }
-  // );
 
   return (
     <EventEdit title={"Basic Details"}>
@@ -90,9 +74,9 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         <Grid item xs={12}>
           <InputLabel id={"event-description"} label={"Description"} />
           <Box mt={0.6}>
-            <RichText
-              placeholder={"Enter a description"}
+            <ControlledEditor
               name={"eventDescription"}
+              placeholder={"Enter a description"}
             />
           </Box>
         </Grid>

@@ -8,7 +8,13 @@ type LocationEntity = {
 };
 
 const Home: NextPage = () => {
-  return <Editor />;
+  return (
+    <Editor
+      value={""}
+      onChange={(value) => console.log(value)}
+      placeholder={"Type in a word"}
+    />
+  );
 };
 
 // export const getServerSideProps = withServerSideProps(() => {

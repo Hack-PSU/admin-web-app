@@ -9,15 +9,15 @@ import {
   useStepper,
 } from "components/base";
 import { Box, Grid } from "@mui/material";
-import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
 import { useQuery } from "@tanstack/react-query";
+import { ControlledEditor } from "components/base/Editor";
 
 // const locationOptions = [
 //   { value: "Location1", label: "Location 1" },
@@ -158,10 +158,14 @@ const EventDetailsStep: FC = () => {
               label={"Description (optional)"}
             />
             <Box mt={0.6}>
-              <RichText
-                placeholder="Enter a description"
-                name="eventDescription"
+              <ControlledEditor
+                name={"eventDescription"}
+                placeholder={"Enter a description"}
               />
+              {/*<RichText*/}
+              {/*  placeholder="Enter a description"*/}
+              {/*  name="eventDescription"*/}
+              {/*/>*/}
             </Box>
           </Grid>
           <DateTimeForm />

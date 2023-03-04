@@ -2229,6 +2229,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-placeholder@npm:^2.0.0-beta.220":
+  version: 2.0.0-beta.220
+  resolution: "@tiptap/extension-placeholder@npm:2.0.0-beta.220"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0-beta.209
+    "@tiptap/pm": ^2.0.0-beta.209
+  checksum: 58bb459a4879bc0cf2824f893b1efd7d0ed1aba7012a282e142fd870a27494a157e406bb34a8d007e1f254440c345f04fdc0c997b38133dffad772a2337e2faf
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-strike@npm:^2.0.0-beta.220":
   version: 2.0.0-beta.220
   resolution: "@tiptap/extension-strike@npm:2.0.0-beta.220"
@@ -3056,6 +3066,7 @@ __metadata:
     "@tanstack/react-table": ^8.3.3
     "@tiptap/extension-bubble-menu": ^2.0.0-beta.220
     "@tiptap/extension-link": ^2.0.0-beta.220
+    "@tiptap/extension-placeholder": ^2.0.0-beta.220
     "@tiptap/extension-underline": ^2.0.0-beta.220
     "@tiptap/pm": ^2.0.0-beta.220
     "@tiptap/react": ^2.0.0-beta.220
@@ -3098,6 +3109,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
     lottie-react: ^2.2.1
+    lucide-react: ^0.121.0
     luxon: ^2.4.0
     match-sorter: ^6.3.1
     moment: ^2.29.3
@@ -5544,6 +5556,15 @@ __metadata:
   dependencies:
     yallist: ^4.0.0
   checksum: f97f499f898f23e4585742138a22f22526254fdba6d75d41a1c2526b3b6cc5747ef59c5612ba7375f42aca4f8461950e925ba08c991ead0651b4918b7c978297
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:^0.121.0":
+  version: 0.121.0
+  resolution: "lucide-react@npm:0.121.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: a7b3e87a3cfc0180db009adc6c5b1103ed547391aab31577ac987a43cc15d44a58350332504b8021bddf81f03acfcb73771730506acc4ade403e1defef16af21
   languageName: node
   linkType: hard
 

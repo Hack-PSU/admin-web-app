@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { Editor } from "@tiptap/core";
 import { BubbleMenu } from "@tiptap/react";
-import { ButtonGroup, lighten, styled, useTheme } from "@mui/material";
+import { darken, Grid, lighten, styled, useTheme } from "@mui/material";
 import BaseStylesButton from "components/base/Editor/StylesButton";
+import { Unlink } from "lucide-react";
 
 type Props = {
   editor: Editor;
@@ -21,46 +22,41 @@ const StylesButton = styled(BaseStylesButton)(({ theme, isActive }) => ({
   },
 }));
 
+const MenuContainer = styled(Grid)(({ theme }) => ({
+  backgroundColor: theme.palette.common.black,
+  borderRadius: "5px",
+  padding: theme.spacing(0.8),
+}));
+
 const EditorContextMenu: FC<Props> = ({ editor }) => {
   const theme = useTheme();
 
   return (
-    <BubbleMenu editor={editor}>
-      <ButtonGroup
-        sx={{
-          border: `1px solid ${theme.palette.common.black}`,
-        }}
-      >
-        <StylesButton
-          isActive={editor.isActive("bold")}
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          B
-        </StylesButton>
-        <StylesButton
-          isActive={editor.isActive("italic")}
-          textProps={{
-            sx: {
-              fontStyle: "italic",
-            },
-          }}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          I
-        </StylesButton>
-        <StylesButton
-          isActive={editor.isActive("underline")}
-          textProps={{
-            sx: {
-              textDecoration: "underline",
-              textUnderlineOffset: "1px",
-            },
-          }}
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-        >
-          U
-        </StylesButton>
-      </ButtonGroup>
+    <BubbleMenu
+      editor={editor}
+      shouldShow={({ editor }) => editor.isActive("link")}
+    >
+      <MenuContainer container>
+        <Grid item>
+          <StylesButton
+            isActive={false}
+            disabled={!editor.isActive("link")}
+            onClick={() => editor.chain().focus().unsetLink().run()}
+            sx={{
+              backgroundColor: "transparent",
+              ":hover": {
+                backgroundColor: darken(theme.palette.common.white, 0.7),
+              },
+            }}
+          >
+            <Unlink
+              color={theme.palette.common.white}
+              size={14}
+              style={{ marginTop: "3px" }}
+            />
+          </StylesButton>
+        </Grid>
+      </MenuContainer>
     </BubbleMenu>
   );
 };
