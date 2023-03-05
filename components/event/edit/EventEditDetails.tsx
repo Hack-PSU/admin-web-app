@@ -12,13 +12,10 @@ import {
 } from "components/base";
 import { RichText } from "components/base/RichText";
 import { useDateTimeRange } from "common/hooks";
-import {
-  LabelledDatePicker,
-  LabelledTimePicker,
-} from "components/base/Pickers";
-import { EventType, fetch, getAllLocations, QueryKeys } from "api";
-import { useQuery } from "@tanstack/react-query";
+import { LabelledDatePicker } from "components/base/Pickers";
+import { EventType } from "api";
 import { IOption } from "types/components";
+import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -117,19 +114,17 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
           />
         </Grid>
         <Grid item xs={6}>
-          <LabelledTimePicker
-            {...register("startTime")}
+          <LabelledTimeInput
             id={"start-time"}
             label={"Start Time"}
-            menuWidth="200px"
+            {...register("startTime")}
           />
         </Grid>
         <Grid item xs={6}>
-          <LabelledTimePicker
-            {...register("endTime")}
+          <LabelledTimeInput
             id={"end-time"}
             label={"End Time"}
-            menuWidth={"200px"}
+            {...register("endTime")}
           />
         </Grid>
         <Grid item xs={12}>
