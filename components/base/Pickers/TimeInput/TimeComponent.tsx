@@ -102,6 +102,7 @@ const TimeComponent: FC<Props> = ({
         if (!isNumeric(e.key)) {
           return;
         }
+
         onChangeValue(e.key.padStart(2, "0"));
         initialRef.current = false;
 
