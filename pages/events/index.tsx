@@ -54,7 +54,7 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
           color: "header.light",
         }}
       >
-        {DateTime.fromMillis(date).toLocaleString(DateTime.DATE_SHORT)}
+        {DateTime.fromMillis(date).toFormat("EEEE")}
       </TextCell>
     </DefaultCell>
   );
