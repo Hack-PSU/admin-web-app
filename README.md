@@ -1,5 +1,9 @@
 ## Getting Started
 
+### Documentation Migration
+
+The documentation below is no longer being updated. Refer to the documentation [here](https://hack-psu.github.io/docs/admin-web-app/overview).
+
 ### Setting Up Environment
 
 This repo uses `yarn` as the package manager. To get `yarn` run:
