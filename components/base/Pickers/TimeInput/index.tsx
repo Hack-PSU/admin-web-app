@@ -53,8 +53,10 @@ const TimeInput: FC<Props> = ({ value, onChange, ...props }) => {
   }, []);
 
   useEffect(() => {
-    onChange?.(toDate());
-  }, [toDate, onChange]);
+    if (DateTime.fromFormat(`${hour}:${minute} ${ampm}`, "hh:mm a").isValid) {
+      onChange?.(toDate());
+    }
+  }, [toDate, onChange, hour, minute, ampm]);
 
   useEffect(() => {
     const dateTime = DateTime.fromJSDate(value);
