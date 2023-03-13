@@ -46,7 +46,7 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
           color: "common.black",
         }}
       >
-        {DateTime.fromMillis(date).toLocaleString(DateTime.DATE_SHORT)}
+        {DateTime.fromMillis(date).toLocaleString(DateTime.TIME_SIMPLE)}
       </TextCell>
       <TextCell
         sx={{
@@ -54,7 +54,7 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
           color: "header.light",
         }}
       >
-        {DateTime.fromMillis(date).toLocaleString(DateTime.TIME_SIMPLE)}
+        {DateTime.fromMillis(date).toFormat("EEEE")}
       </TextCell>
     </DefaultCell>
   );
@@ -81,14 +81,14 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       {
         id: "startDate",
         type: "text",
-        header: "Start Date",
+        header: "Start Time",
         accessorKey: "event_start_time",
         cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
       },
       {
         id: "endDate",
         type: "text",
-        header: "End Date",
+        header: "End Time",
         accessorKey: "event_end_time",
         cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
       },
