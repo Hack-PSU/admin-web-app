@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  PaginatedQueryFn,
-  UseApiQueryReturn,
-  UseClipboardReturn,
-  UseDateTime,
-  UseDateTimeRange,
-  UsePaginatedQuery,
-  UsePaginatedQueryOptions,
-} from "types/hooks";
+import { UseClipboardReturn, UseDateTime, UseDateTimeRange } from "types/hooks";
 import { useController, UseFormReturn } from "react-hook-form";
 import { DateTime } from "luxon";
 
@@ -55,14 +47,10 @@ export function useDateTimeRange(
   } = useController({ name });
 
   const [startDate, setStartDate] = useState<Date>(value?.start ?? new Date());
-  const [startTime, setStartTime] = useState<Date>(
-    DateTime.fromFormat("01:00 AM", "hh:mm a").toJSDate()
-  );
+  const [startTime, setStartTime] = useState<Date>(value?.start ?? new Date());
 
   const [endDate, setEndDate] = useState<Date>(value?.end ?? new Date());
-  const [endTime, setEndTime] = useState<Date>(
-    DateTime.fromFormat("01:00 AM", "hh:mm a").toJSDate()
-  );
+  const [endTime, setEndTime] = useState<Date>(value?.end ?? new Date());
 
   const [isMultipleDays, setIsMultipleDays] = useState<boolean>(
     options?.isMultiple ?? false

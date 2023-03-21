@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo } from "react";
 import { NextPage } from "next";
 import {
-  EventType,
-  IGetAllEventsResponse,
-  fetch,
-  IEventEntity,
-  MutateEntity,
-  updateEvent,
-  QueryKeys,
-  getEvent,
-  getAllLocations,
   CreateEntity,
-  ILocationUpdateEntity,
   createLocation,
+  EventType,
+  fetch,
+  getAllLocations,
+  getEvent,
+  IEventEntity,
+  IGetAllEventsResponse,
+  ILocationUpdateEntity,
+  MutateEntity,
+  QueryKeys,
+  updateEvent,
 } from "api";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Grid, lighten, Typography, useTheme } from "@mui/material";
@@ -28,7 +28,7 @@ import { DateTime } from "luxon";
 import EventEditWorkshop from "components/event/edit/EventEditWorkshop";
 import _ from "lodash";
 import { Button } from "components/base";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { prepareContent } from "components/base/RichText";
 
