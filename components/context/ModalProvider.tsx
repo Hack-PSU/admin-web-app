@@ -6,8 +6,8 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { WithChildren } from "types/common";
 import { useImmer } from "use-immer";
+import { WithChildren } from "common/types";
 
 type ModalHooks = {
   show: boolean;
@@ -24,8 +24,11 @@ type UseModalReturn = ModalHooks & {
 
 interface IModalProviderHooks {
   showModal(name: string): void;
+
   register(name: string): void;
+
   handleHide(name: string): void;
+
   getState(name: string): boolean | null;
 }
 

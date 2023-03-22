@@ -4,8 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { IFlagsEntity, IWSPushJudgingEntity } from "./entity";
-import { notificationApi, wsApi } from "api/axios";
+import { FlagsEntity, ToggleFlagEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -13,10 +12,11 @@ import { QueryAction, QueryScope } from "api/types";
  * @param params (optional)
  * @param token (optional)
  */
-export const getAllAppFlags: CreateQueryReturn<IFlagsEntity[]> = createQuery(
-  "/flags",
-  notificationApi
-);
+export const getAllAppFlags: CreateQueryReturn<FlagsEntity[]> =
+  createQuery("/flags");
+
+export const toggleFlag: CreateMutationReturn<ToggleFlagEntity, {}> =
+  createMutation("/flags/toggle");
 
 /**
  * Patch application flags
@@ -24,16 +24,8 @@ export const getAllAppFlags: CreateQueryReturn<IFlagsEntity[]> = createQuery(
  * @param params (optional)
  * @param token (optional)
  */
-export const patchAppFlags: CreateMutationReturn<
-  { flags: IFlagsEntity[] },
-  IFlagsEntity[]
-> = createMutation("/flags", "PATCH", notificationApi);
-
-/**
- * Push WS Message to toggle judging flag in admin mobile app
- */
-export const pushJudgingFlag: CreateMutationReturn<IWSPushJudgingEntity, {}> =
-  createMutation("/update/judging/flag", "POST", wsApi);
+export const patchAppFlags: CreateMutationReturn<{ flags: FlagsEntity[] }, {}> =
+  createMutation("/flags", "PATCH");
 
 export const FlagQueryKeys = {
   all: [{ entity: "flag" }] as const,

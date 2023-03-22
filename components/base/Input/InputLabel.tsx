@@ -1,8 +1,14 @@
 import { FC } from "react";
-import { InputLabelProps } from "types/components";
 import { Box, Grid, styled, Typography, useTheme } from "@mui/material";
 import { FormErrorCode, parseFormError } from "common/form";
 import { EvaIcon } from "components/base";
+
+export type InputLabelProps = {
+  id: string;
+  label: string;
+  error?: string;
+  showError?: boolean;
+};
 
 const StyledLabel = styled(Typography)(({ theme }) => ({
   color: theme.palette.common.black,

@@ -11,7 +11,7 @@ import {
 import { Box, Grid } from "@mui/material";
 import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
@@ -35,22 +35,16 @@ const schema = object({
 });
 
 const EventDetailsStep: FC = () => {
-  const {
-    eventType,
-    eventName,
-    eventLocation,
-    eventDescription,
-    eventDate,
-    updateDetails,
-  } = useEventStore();
+  const { type, name, location, description, date, updateDetails } =
+    useEventStore();
 
   const methods = useForm({
     resolver: superstructResolver(schema),
     defaultValues: {
-      eventName,
-      eventLocation,
-      eventDescription,
-      eventDate,
+      name,
+      location,
+      description,
+      date,
     },
   });
 
@@ -66,8 +60,8 @@ const EventDetailsStep: FC = () => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            value: d.uid,
-            label: d.location_name,
+            value: d.id,
+            label: d.name,
           }));
         }
       },
@@ -84,35 +78,35 @@ const EventDetailsStep: FC = () => {
   const handleNext = useCallback(() => {
     methods.handleSubmit((data, errors) => {
       if (!errors) {
-        let locationData = data.eventLocation;
+        let locationData = data.location;
 
         // location is not found in currentLocations
         if (
-          data.eventLocation &&
+          data.location &&
           currentLocations &&
-          !currentLocations.has(data.eventLocation.value)
+          !currentLocations.has(data.location.value)
         ) {
           locationData = {
-            ...data.eventLocation,
+            ...data.location,
             isNew: true,
           };
         }
 
         updateDetails({
-          eventName: data.eventName,
-          eventLocation: locationData,
-          eventDescription: data.eventDescription,
-          eventDate: data.eventDate,
+          name: data.name,
+          location: locationData,
+          description: data.description,
+          date: data.date,
         });
 
-        if (eventType && eventType.value !== EventType.WORKSHOP) {
+        if (type && type.value !== EventType.WORKSHOP) {
           gotoStep(3, 2);
         } else {
           nextStep();
         }
       }
     })();
-  }, [methods, currentLocations, updateDetails, eventType, gotoStep, nextStep]);
+  }, [methods, currentLocations, updateDetails, type, gotoStep, nextStep]);
 
   return (
     <FormProvider {...methods}>
@@ -120,7 +114,7 @@ const EventDetailsStep: FC = () => {
         title="Event Details"
         handleNext={handleNext}
         handleNextTitle={
-          eventType && eventType.value === EventType.WORKSHOP
+          type && type.value === EventType.WORKSHOP
             ? "Next"
             : "Continue to Event Icon"
         }
@@ -130,7 +124,7 @@ const EventDetailsStep: FC = () => {
         <Grid container item spacing={1} gap={2}>
           <Grid item xs={12}>
             <ControlledInput
-              name={"eventName"}
+              name={"name"}
               placeholder={"Enter event name"}
               as={LabelledInput}
               id="name"
@@ -143,7 +137,7 @@ const EventDetailsStep: FC = () => {
           </Grid>
           <Grid item xs={12}>
             <ControlledCreatableSelect
-              name={"eventLocation"}
+              name={"location"}
               options={locationOptions}
               as={LabelledCreatableSelect}
               id="location"
@@ -153,10 +147,7 @@ const EventDetailsStep: FC = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <InputLabel
-              id={"eventDescription"}
-              label={"Description (optional)"}
-            />
+            <InputLabel id={"description"} label={"Description (optional)"} />
             <Box mt={0.6}>
               <RichText
                 placeholder="Enter a description"

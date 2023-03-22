@@ -35,7 +35,7 @@ export type ApiResponse<TData> = {
   };
 };
 
-export type CreateEntity<TEntity, TId extends string = "uid"> = {
+export type CreateEntity<TEntity, TId extends string = "id"> = {
   entity: Omit<TEntity, TId>;
 };
 export type MutateEntity<TEntity> = { entity: Partial<TEntity> };

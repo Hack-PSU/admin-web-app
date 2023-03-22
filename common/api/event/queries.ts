@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { IEventEntity, IGetAllEventsResponse } from "./entity";
+import { EventEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -13,18 +13,16 @@ import { QueryAction, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Get_events
  */
-export const getAllEvents: CreateQueryReturn<IGetAllEventsResponse[]> =
-  createQuery("/live/events");
+export const getAllEvents: CreateQueryReturn<EventEntity[]> =
+  createQuery("/events");
 
 /**
  * Get an event
  * @param param (optional)
  * @param token (optional)
  */
-export const getEvent: CreateQueryReturn<
-  IGetAllEventsResponse,
-  { uid: string }
-> = createQuery<IGetAllEventsResponse>("/live/events/get-by-uid");
+export const getEvent: CreateQueryReturn<EventEntity, { id: string }> =
+  createQuery("/events/:id");
 
 /**
  * Create an event
@@ -34,9 +32,12 @@ export const getEvent: CreateQueryReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Events-New_Event
  */
 export const createEvent: CreateMutationReturn<
-  Omit<IEventEntity, "uid">,
-  IEventEntity
-> = createMutation("/live/events");
+  Omit<EventEntity, "id">,
+  EventEntity
+> = createMutation("/events");
+
+export const createEventForm: CreateMutationReturn<FormData, EventEntity> =
+  createMutation("/events");
 
 /**
  * Update an event
@@ -46,9 +47,10 @@ export const createEvent: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Update_Event
  */
 export const updateEvent: CreateMutationReturn<
-  Partial<IEventEntity>,
-  IEventEntity
-> = createMutation("/live/events/update");
+  Partial<Omit<EventEntity, "id">>,
+  EventEntity,
+  { id: string }
+> = createMutation("/events/:id", "PATCH");
 
 /**
  * Delete an event
@@ -57,10 +59,8 @@ export const updateEvent: CreateMutationReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Delete_Event
  */
-export const deleteEvent: CreateMutationReturn<
-  Pick<IEventEntity, "uid" | "hackathon">,
-  {}
-> = createMutation("/live/events/delete");
+export const deleteEvent: CreateMutationReturn<{}, {}, { id: string }> =
+  createMutation("/events/:id");
 
 export const EventKeys = {
   all: [{ entity: "event" }] as const,
@@ -68,10 +68,16 @@ export const EventKeys = {
     [
       { ...EventKeys.all[0], action: QueryAction.query, scope: QueryScope.ALL },
     ] as const,
-  findById: (id: string | number) =>
-    [{ ...EventKeys.all[0], action: QueryAction.query, scope: id }] as const,
-  update: (id: string | number) =>
-    [{ ...EventKeys.all[0], action: QueryAction.update, scope: id }] as const,
-  delete: (id: string | number) =>
-    [{ ...EventKeys.all[0], action: QueryAction.delete, scope: id }] as const,
+  findById: (...ids: (string | number)[]) =>
+    [
+      { ...EventKeys.all[0], action: QueryAction.query, scope: [...ids] },
+    ] as const,
+  update: (...ids: (string | number)[]) =>
+    [
+      { ...EventKeys.all[0], action: QueryAction.update, scope: [...ids] },
+    ] as const,
+  delete: (...ids: (string | number)[]) =>
+    [
+      { ...EventKeys.all[0], action: QueryAction.delete, scope: [...ids] },
+    ] as const,
 };

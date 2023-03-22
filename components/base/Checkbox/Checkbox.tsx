@@ -1,13 +1,35 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
-import { Checkbox as MuiCheckbox, Grid, Typography } from "@mui/material";
 import {
-  ControlledCheckboxProps,
-  ICheckboxProps,
-  LabelledCheckboxProps,
-  CheckboxSelectionState,
-} from "types/components";
+  Checkbox as MuiCheckbox,
+  CheckboxProps,
+  Grid,
+  Typography,
+  TypographyProps,
+} from "@mui/material";
 import InputLabel from "components/base/Input/InputLabel";
-import { useController } from "react-hook-form";
+import { useController, UseControllerReturn } from "react-hook-form";
+import { ISelectItem } from "components/base/Select/types";
+import { WithControllerProps, WithLabelledProps } from "components/base";
+
+export interface ICheckboxProps
+  extends Omit<
+    CheckboxProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledCheckboxProps = WithLabelledProps<ICheckboxProps>;
+
+export type ControlledCheckboxProps = WithControllerProps<
+  Omit<ICheckboxProps, "value" | "onChange"> & Partial<LabelledCheckboxProps>
+>;
+
+export type CheckboxSelectionState = {
+  [key: string]: boolean;
+};
 
 const Checkbox: FC<ICheckboxProps> = ({
   items,

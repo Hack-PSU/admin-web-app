@@ -3,25 +3,18 @@ import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { fetch, getAllHackathons, getAllHackers, QueryKeys } from "api";
+import { fetch, getAllHackathons, getAllUsers, QueryKeys } from "api";
 import _ from "lodash";
 import { Pie } from "components/Charts";
 import { ChartContainer, RegistrationBarLine } from "components/analytics";
 import { ParentSizeModern } from "@visx/responsive";
 import { DateTime } from "luxon";
 
-const CURRENT_HACKATHON = "81069f2a04cb465994ad84155af6e868";
-
 const AnalyticsPage: NextPage = () => {
   const theme = useTheme();
 
   const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
-    fetch(() =>
-      getAllHackers({
-        type: "registration_stats",
-        allHackathons: true,
-      })
-    )
+    fetch(getAllUsers)
   );
 
   const { data: allHackathons } = useQuery(QueryKeys.hackathon.findAll(), () =>
@@ -30,9 +23,10 @@ const AnalyticsPage: NextPage = () => {
 
   const currentHackathon = useMemo(() => {
     if (allUsers) {
-      return _.chain(allUsers)
-        .pickBy((user) => user.active)
-        .value();
+      return allUsers;
+      // return _.chain(allUsers)
+      //   .pickBy((user) => user.)
+      //   .value();
     }
   }, [allUsers]);
 
@@ -78,12 +72,12 @@ const AnalyticsPage: NextPage = () => {
         _.chain(allUsers)
           .groupBy("hackathon")
           .map((users, hackathon) => {
-            const entity = allHackathons.find((h) => h.uid === hackathon);
+            const entity = allHackathons.find((h) => h.id === hackathon);
 
             return {
               hackathon: entity?.name ?? hackathon,
               count: users.length,
-              date: entity?.start_time,
+              date: entity?.startTime,
             };
           })
           .sortBy((item) => DateTime.fromMillis(parseInt(item.date ?? "")))

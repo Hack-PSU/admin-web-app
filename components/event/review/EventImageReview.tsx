@@ -1,23 +1,16 @@
 import React, { FC, useCallback } from "react";
-import Image from "next/image";
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useEventStore } from "common/store";
 
-interface IEventImageReviewProps {
-  name: "eventImage" | "eventIcon";
-}
-
-const EventImageReview: FC<IEventImageReviewProps> = ({ name }) => {
-  const event = useEventStore();
+const EventImageReview: FC = () => {
+  const { icon } = useEventStore();
 
   const getImageURL = useCallback(() => {
-    const image = event[name];
-
-    if (image) {
-      return URL.createObjectURL(image);
+    if (icon) {
+      return URL.createObjectURL(icon);
     }
     return "";
-  }, [event, name]);
+  }, [icon]);
 
   return (
     <>

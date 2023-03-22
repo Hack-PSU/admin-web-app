@@ -1,19 +1,9 @@
-export interface ISponsorshipCreateEntity {
-  uid: number;
+export interface SponsorEntity {
+  id: number;
   name: string;
   level: string;
   logo: string;
   order: number;
-  websiteLink?: string;
-  hackathon?: string;
-}
-
-export interface ISponsorshipEntity {
-  uid: number;
-  name: string;
-  level: string;
-  logo: string;
-  order: number;
-  website_link?: string;
-  hackathon?: string;
+  link?: string;
+  hackathonId?: string;
 }

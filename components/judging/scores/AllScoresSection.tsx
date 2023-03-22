@@ -1,25 +1,26 @@
 import React, { FC, useCallback } from "react";
-import { UseScoreResultsReturn } from "components/judging";
 import { Box, Grid, Typography } from "@mui/material";
 import { RenderSubRows, Table, useColumnDef, useTable } from "components/Table";
 import ScoreBreakdown from "components/judging/scores/ScoreBreakdown";
 import { EvaIcon } from "components/base";
+import { ProjectBreakdownEntity } from "api";
 
-type AllScoresSectionProps = Pick<UseScoreResultsReturn, "allData"> & {
+type AllScoresSectionProps = {
   refetch(): void;
+  data: ProjectBreakdownEntity[];
 };
-type AllScoresEntity = AllScoresSectionProps["allData"][number];
+type AllScoresEntity = ProjectBreakdownEntity;
 
 const formatScore = (value: unknown) => Number(value).toFixed(2);
 
-const AllScoresSection: FC<AllScoresSectionProps> = ({ allData, refetch }) => {
+const AllScoresSection: FC<AllScoresSectionProps> = ({ data, refetch }) => {
   const defs = useColumnDef<AllScoresEntity>({
     columns: [
       {
         id: "project",
         type: "text",
         header: "Project",
-        accessorKey: "projectName",
+        accessorKey: "name",
       },
       {
         id: "average",
@@ -75,7 +76,7 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData, refetch }) => {
         type: "text",
         header: "Sup..",
         format: formatScore,
-        accessorKey: "supply_chain",
+        accessorKey: "supplyChain",
       },
       {
         id: "environmental",
@@ -93,7 +94,7 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ allData, refetch }) => {
   );
 
   const table = useTable({
-    data: allData,
+    data,
     useExpanded: true,
     renderSubRows,
     ...defs,

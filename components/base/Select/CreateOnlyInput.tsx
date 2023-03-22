@@ -1,15 +1,29 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { OnChangeValue } from "react-select";
+import { GroupBase, OnChangeValue } from "react-select";
+import CreatableSelect, { CreatableSelectProps } from "./CreatableSelect";
 import {
-  ControlledCreateOnlyInputProps,
-  CreateOnlyInputProps,
-  IOption,
-  LabelledCreateOnlyInputProps,
-} from "types/components";
-import CreatableSelect from "./CreatableSelect";
-import { InputLabel } from "components/base";
+  InputLabel,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base";
 import { Box } from "@mui/material";
-import { useController } from "react-hook-form";
+import { useController, UseControllerReturn } from "react-hook-form";
+import { IOption } from "./types";
+
+export type CreateOnlyInputProps = Omit<
+  CreatableSelectProps<IOption, true, GroupBase<IOption>>,
+  "onChange" | "onInputChange" | "onKeyDown" | "value"
+> & {
+  onChange?: UseControllerReturn["field"]["onChange"];
+  initialValue?: IOption[];
+};
+
+export type LabelledCreateOnlyInputProps =
+  WithLabelledProps<CreateOnlyInputProps>;
+
+export type ControlledCreateOnlyInputProps = WithControllerProps<
+  Omit<CreateOnlyInputProps, "onChange"> & Partial<LabelledCreateOnlyInputProps>
+>;
 
 const CreateOnlyInput: FC<CreateOnlyInputProps> = ({
   initialValue,

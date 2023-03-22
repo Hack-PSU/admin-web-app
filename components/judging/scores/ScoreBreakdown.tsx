@@ -1,23 +1,21 @@
 import { FC, useMemo } from "react";
-import { UseScoreResultsReturn } from "./hooks";
 import {
-  TableContainer,
-  useTheme,
-  Table as MuiTable,
-  TableHead,
-  TableBody,
   lighten,
+  Table as MuiTable,
+  TableBody,
+  TableContainer,
+  TableHead,
+  useTheme,
 } from "@mui/material";
 import {
-  DefaultCell,
   DefaultHeaderCell,
   DefaultRow,
   DefaultTextCell,
 } from "components/Table";
 import _ from "lodash";
+import { ProjectBreakdownEntity } from "api";
 
-type AllScoresSectionProps = Pick<UseScoreResultsReturn, "allData">;
-type AllScoresEntity = AllScoresSectionProps["allData"][number];
+type AllScoresEntity = ProjectBreakdownEntity;
 
 interface IScoreBreakdownProps {
   row: AllScoresEntity;
@@ -57,7 +55,7 @@ const BreakdownCell: FC<{ score: string }> = ({ score }) => (
 const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
   const theme = useTheme();
 
-  const breakdown = useMemo(() => row.breakdown, [row]);
+  const breakdown = useMemo(() => row.scores, [row]);
 
   return (
     <TableContainer
@@ -88,14 +86,14 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
         <TableBody>
           {breakdown.map((data, index) => {
             const {
-              judgeName,
+              judge,
               creativity,
               implementation,
               growth,
               clarity,
               technical,
               energy,
-              supply_chain,
+              supplyChain,
               environmental,
             } = data;
 
@@ -111,14 +109,14 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
 
             return (
               <DefaultRow
-                key={`${row.projectName}-${data.judgeName}-${index}`}
+                key={`${row.name}-${judge.firstName}-${judge.lastName}-${index}`}
                 sx={{
                   ":nth-child(even)": {
                     backgroundColor: lighten(theme.palette.border.light, 0.6),
                   },
                 }}
               >
-                <BreakdownCell score={judgeName} />
+                <BreakdownCell score={`${judge.firstName} ${judge.lastName}`} />
                 <BreakdownCell score={format(average)} />
                 <BreakdownCell score={format(creativity)} />
                 <BreakdownCell score={format(implementation)} />
@@ -126,7 +124,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
                 <BreakdownCell score={format(clarity)} />
                 <BreakdownCell score={format(technical)} />
                 <BreakdownCell score={format(energy ?? 0)} />
-                <BreakdownCell score={format(supply_chain ?? 0)} />
+                <BreakdownCell score={format(supplyChain ?? 0)} />
                 <BreakdownCell score={format(environmental ?? 0)} />
               </DefaultRow>
             );

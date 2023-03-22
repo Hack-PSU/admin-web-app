@@ -1,23 +1,22 @@
 import React, { createContext, FC, useContext } from "react";
 import { flexRender, RowData, Table as BaseTable } from "@tanstack/react-table";
 import {
-  TableContainer,
-  Grid,
-  lighten,
-  TableBody,
-  Table as MuiTable,
-  useTheme,
-  TableHead,
   Collapse,
   darken,
+  Grid,
+  lighten,
+  Table as MuiTable,
+  TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
+  useTheme,
 } from "@mui/material";
-import { WithChildren } from "types/common";
 import {
-  GlobalSearch,
-  GlobalRefresh,
-  GlobalPageSize,
   DeleteAction,
+  GlobalPageSize,
+  GlobalRefresh,
+  GlobalSearch,
   PaginationAction,
   SortColumn,
 } from "./actions";
@@ -29,6 +28,7 @@ import {
   OnDragEndResponder,
 } from "react-beautiful-dnd";
 import DefaultDragHandleCell from "components/Table/defaults/DefaultDragHandleCell";
+import { WithChildren } from "common/types";
 
 type TableProps<TData extends RowData> = BaseTable<TData> & {
   renderSubRows?: (row: TData) => React.ReactNode;
@@ -47,6 +47,7 @@ interface ITableComponent {
   <TData extends RowData = any>(
     props: WithChildren<TableProps<TData>>
   ): ReturnType<FC>;
+
   GlobalActions: FC<WithChildren>;
   GlobalRefresh: typeof GlobalRefresh;
   GlobalPageSize: typeof GlobalPageSize;

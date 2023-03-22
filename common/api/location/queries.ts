@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { ILocationEntity, ILocationUpdateEntity } from "./entity";
+import { LocationEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -13,8 +13,8 @@ import { QueryAction, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Get_Location_List
  */
-export const getAllLocations: CreateQueryReturn<ILocationEntity[]> =
-  createQuery("/admin/location");
+export const getAllLocations: CreateQueryReturn<LocationEntity[]> =
+  createQuery("/locations");
 
 /**
  * Create A Location
@@ -24,9 +24,9 @@ export const getAllLocations: CreateQueryReturn<ILocationEntity[]> =
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Create_Location
  */
 export const createLocation: CreateMutationReturn<
-  Omit<ILocationUpdateEntity, "uid">,
-  ILocationEntity
-> = createMutation("/admin/location");
+  Omit<LocationEntity, "id">,
+  LocationEntity
+> = createMutation("/locations");
 
 /**
  * Update A Location
@@ -36,21 +36,17 @@ export const createLocation: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Update_Location
  */
 export const updateLocation: CreateMutationReturn<
-  Partial<ILocationUpdateEntity>,
-  ILocationEntity
-> = createMutation("/admin/location/update");
+  Partial<Omit<LocationEntity, "id">>,
+  LocationEntity,
+  { id: string }
+> = createMutation("/locations/:id", "PATCH");
 
 /**
  * Delete A Location
- * @param entity
- * @param params (optional)
- * @param token (optional)
- * @link https://api.hackpsu.org/v2/doc/#api-Admin_Location-Remove_Location
+ * @param params
  */
-export const deleteLocation: CreateMutationReturn<
-  Pick<ILocationEntity, "uid">,
-  ILocationEntity
-> = createMutation("/admin/location/delete");
+export const deleteLocation: CreateMutationReturn<{}, {}, { id: string }> =
+  createMutation("/locations/:id");
 
 export const LocationKeys = {
   all: [{ entity: "location" }] as const,

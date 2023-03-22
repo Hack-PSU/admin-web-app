@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { Grid } from "@mui/material";
 import EventDetail from "./EventDetail";
 import { useEventStore } from "common/store";
-import { IOption } from "types/components";
+import { IOption } from "components/base/Select/types";
 
 const joinMultiple = (values: IOption[], extract?: (value: any) => string) => {
   if (!values || values.length === 0) return "";
@@ -29,8 +29,6 @@ const joinMultiple = (values: IOption[], extract?: (value: any) => string) => {
 
 const WorkshopDetailsReview: FC = () => {
   const { wsPresenterNames, wsRelevantSkills, wsSkillLevel } = useEventStore();
-
-  console.log(wsPresenterNames);
 
   return (
     <>

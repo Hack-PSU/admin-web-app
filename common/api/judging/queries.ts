@@ -1,7 +1,8 @@
 import {
-  IGenerateJudgingEntity,
-  IProjectEntity,
-  IScoreEntity,
+  GenerateJudgingEntity,
+  ProjectBreakdownEntity,
+  ProjectEntity,
+  ScoreDataEntity,
 } from "./entities";
 import {
   createMutation,
@@ -17,9 +18,8 @@ import { QueryAction, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Judging-Get_All_Projects
  */
-export const getAllProjects: CreateQueryReturn<IProjectEntity[]> = createQuery(
-  "/judging/project/all"
-);
+export const getAllProjects: CreateQueryReturn<ProjectEntity[]> =
+  createQuery("/judging/projects");
 
 /**
  * Get all scores
@@ -27,8 +27,14 @@ export const getAllProjects: CreateQueryReturn<IProjectEntity[]> = createQuery(
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Judging-Get_all_Scores
  */
-export const getAllScores: CreateQueryReturn<IScoreEntity[]> =
-  createQuery("/judging/score/all");
+export const getAllScores: CreateQueryReturn<ScoreDataEntity[]> =
+  createQuery("/judging/scores");
+
+/**
+ * Get a breakdown of scores by projects and each judge
+ */
+export const getScoreBreakdown: CreateQueryReturn<ProjectBreakdownEntity[]> =
+  createQuery("/judging/breakdown");
 
 /**
  * Create a project
@@ -38,9 +44,9 @@ export const getAllScores: CreateQueryReturn<IScoreEntity[]> =
  * @link https://api.hackpsu.org/v2/doc/#api-Judging-Insert_Project
  */
 export const createProject: CreateMutationReturn<
-  Omit<IProjectEntity, "uid" | "hackathon">,
-  IProjectEntity
-> = createMutation("/judging/project");
+  Omit<ProjectEntity, "id">,
+  ProjectEntity
+> = createMutation("/judging/projects");
 
 /**
  * Generate judging assignments
@@ -49,8 +55,8 @@ export const createProject: CreateMutationReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Judging-Generate_Judging_Assignments
  */
-export const generateJudging: CreateMutationReturn<IGenerateJudgingEntity, {}> =
-  createMutation("/judging/assignments");
+export const generateJudging: CreateMutationReturn<GenerateJudgingEntity, {}> =
+  createMutation("/judging/scores/assign");
 
 export const JudgingProjectQueryKeys = {
   all: [{ entity: "judging_project" }] as const,

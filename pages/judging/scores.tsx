@@ -1,42 +1,19 @@
-import React, { useCallback, useMemo } from "react";
+import React from "react";
 import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { useQuery } from "@tanstack/react-query";
+import { fetch, getScoreBreakdown, QueryKeys } from "api";
 import {
-  fetch,
-  getAllHackathons,
-  getAllOrganizers,
-  getAllProjects,
-  getAllScores,
-  QueryKeys,
-} from "api";
-import {
-  useScoreResults,
-  Top3Section,
   AllScoresSection,
+  Top3Section,
+  useScoreResults,
 } from "components/judging";
 import { Grid, Typography } from "@mui/material";
 import { useHackathonStore } from "common/store";
-import _ from "lodash";
 
 const ScoresPage: NextPage = () => {
   const { activeHackathon: hackathon, updateActiveHackathon } =
     useHackathonStore();
-
-  const { data: allUsers, refetch: refetchUsers } = useQuery(
-    QueryKeys.organizer.findAll(),
-    () => fetch(getAllOrganizers)
-  );
-
-  const { data: allProjects, refetch: refetchProjects } = useQuery(
-    QueryKeys.judgingProject.findAll(),
-    () => fetch(getAllProjects)
-  );
-
-  const { data: allScores, refetch: refetchScores } = useQuery(
-    QueryKeys.judgingScore.findAll(),
-    () => fetch(getAllScores)
-  );
 
   // const { data: allHackathons } = useQuery(
   //   QueryKeys.hackathon.findAll(),
@@ -57,17 +34,12 @@ const ScoresPage: NextPage = () => {
   //   return hackathon;
   // }, [allHackathons, hackathon, updateActiveHackathon]);
 
-  const refetch = useCallback(() => {
-    refetchProjects();
-    refetchScores();
-    refetchUsers();
-  }, [refetchProjects, refetchScores, refetchUsers]);
+  const { data, refetch } = useQuery(QueryKeys.judgingScore.findAll(), () =>
+    fetch(getScoreBreakdown)
+  );
 
-  const { allData, ...top3 } = useScoreResults({
-    scores: allScores,
-    projects: allProjects,
-    users: allUsers,
-    // filterProject: (d) => d.hackathon === activeHackathon?.uid,
+  const top3 = useScoreResults({
+    data: data ?? [],
   });
 
   return (
@@ -86,7 +58,7 @@ const ScoresPage: NextPage = () => {
         </Grid>
       </Grid>
       <Top3Section {...top3} />
-      <AllScoresSection allData={allData} refetch={refetch} />
+      <AllScoresSection data={data ?? []} refetch={refetch} />
     </Grid>
   );
 };

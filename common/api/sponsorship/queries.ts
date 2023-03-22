@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { ISponsorshipCreateEntity, ISponsorshipEntity } from "./entity";
+import { SponsorEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -13,8 +13,8 @@ import { QueryAction, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Get_all_Sponsors
  */
-export const getAllSponsors: CreateQueryReturn<ISponsorshipEntity[]> =
-  createQuery("/sponsorship/all");
+export const getAllSponsors: CreateQueryReturn<SponsorEntity[]> =
+  createQuery("/sponsors");
 
 /**
  * Get a Sponsor by Uid
@@ -22,10 +22,8 @@ export const getAllSponsors: CreateQueryReturn<ISponsorshipEntity[]> =
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Get_Sponsor
  */
-export const getSponsor: CreateQueryReturn<
-  ISponsorshipEntity,
-  { uid: number }
-> = createQuery("/sponsorship");
+export const getSponsor: CreateQueryReturn<SponsorEntity, { id: number }> =
+  createQuery("/sponsors/:id");
 
 /**
  * Create a Sponsor
@@ -34,10 +32,8 @@ export const getSponsor: CreateQueryReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Insert_Sponsor
  */
-export const createSponsor: CreateMutationReturn<
-  Omit<ISponsorshipEntity, "uid" | "order">,
-  ISponsorshipCreateEntity
-> = createMutation("/sponsorship");
+export const createSponsor: CreateMutationReturn<Omit<SponsorEntity, "id">> =
+  createMutation("/sponsors");
 
 /**
  * Update a Sponsor
@@ -47,9 +43,15 @@ export const createSponsor: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Update_Sponsor
  */
 export const updateSponsor: CreateMutationReturn<
-  Partial<ISponsorshipEntity>,
-  ISponsorshipEntity
-> = createMutation("/sponsorship/update");
+  SponsorEntity,
+  SponsorEntity,
+  { id: number }
+> = createMutation("/sponsors/:id", "PATCH");
+
+type PatchBatchSponsor = Partial<
+  Omit<SponsorEntity, "id" | "name" | "logo" | "hackathonId">
+> &
+  Pick<SponsorEntity, "id">;
 
 /**
  * Update the given sponsors
@@ -59,9 +61,9 @@ export const updateSponsor: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Update_Sponsors
  */
 export const updateSponsorBatch: CreateMutationReturn<
-  { sponsors: Partial<ISponsorshipEntity>[] },
-  ISponsorshipEntity[]
-> = createMutation("/sponsorship/update/all");
+  { sponsors: PatchBatchSponsor[] },
+  SponsorEntity[]
+> = createMutation("/sponsors/batch/update");
 
 /**
  * Delete a Sponsor
@@ -70,8 +72,8 @@ export const updateSponsorBatch: CreateMutationReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Delete_Sponsor
  */
-export const deleteSponsor: CreateMutationReturn<{ uid: number }, {}> =
-  createMutation("/sponsorship/delete");
+export const deleteSponsor: CreateMutationReturn<{}, {}, { id: number }> =
+  createMutation("/sponsors/:id");
 
 export const SponsorshipQueryKeys = {
   all: [{ entity: "sponsorship" }] as const,

@@ -2,10 +2,9 @@ import React, { FC, useCallback } from "react";
 import { ISelectItem, LabelledSelectProps } from "types/components";
 import LabelledEventSelect from "./LabelledEventSelect";
 import { BaseMenuItem } from "components/base";
-import { alpha, lighten, Typography } from "@mui/material";
+import { lighten, Typography } from "@mui/material";
 import { theme } from "styles";
 import { useModalContext } from "components/context/ModalProvider";
-import AddNewLocationModal from "components/modal/AddNewLocationModal";
 
 const EventLocationSelect: FC<LabelledSelectProps> = ({ ...props }) => {
   const { showModal } = useModalContext();

@@ -1,10 +1,16 @@
 import React from "react";
-import { IErrorBoundaryProps, IErrorBoundaryStates } from "types/components";
 import DefaultError from "./DefaultError";
-import { WithChildren } from 'types/common';
 import UnauthorizedError from "components/base/Error/UnauthorizedError";
+import { WithChildren } from "common/types";
+import {
+  IErrorBoundaryProps,
+  IErrorBoundaryStates,
+} from "components/base/Error/types";
 
-class ErrorBoundary extends React.Component<WithChildren<IErrorBoundaryProps>, IErrorBoundaryStates> {
+class ErrorBoundary extends React.Component<
+  WithChildren<IErrorBoundaryProps>,
+  IErrorBoundaryStates
+> {
   constructor(props: WithChildren<IErrorBoundaryProps>) {
     super(props);
     this.state = { hasError: false, error: "" };

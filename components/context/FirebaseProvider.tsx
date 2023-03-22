@@ -7,7 +7,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { WithChildren } from "types/common";
 import {
   getIdToken,
   onAuthStateChanged,
@@ -16,25 +15,58 @@ import {
   signOut,
   User,
 } from "@firebase/auth";
-import {
-  AuthError,
-  AuthPermission,
-  IFirebaseProviderHooks,
-  IFirebaseProviderProps,
-  IJwtToken,
-} from "types/context";
-import jwtDecode from "jwt-decode";
+import jwtDecode, { JwtPayload } from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
 import {
   initApiV2,
-  resetApiV2,
   initNotificationApi,
-  resetNotificationApi,
   initWsApi,
+  resetApiV2,
+  resetNotificationApi,
   resetWsApi,
 } from "api/axios";
 import { useRouter } from "next/router";
+import { Auth } from "@firebase/auth/dist/node-esm";
+import { WithChildren } from "common/types";
+
+export interface IFirebaseProviderProps {
+  auth: Auth;
+}
+
+export interface IJwtToken extends JwtPayload {
+  privilege: number;
+}
+
+export enum AuthPermission {
+  NONE,
+  VOLUNTEER = 1,
+  TEAM,
+  DIRECTOR,
+}
+
+export enum AuthError {
+  NONE = "",
+  INVALID_PASSWORD = "auth/wrong-password",
+  INVALID_EMAIL = "auth/missing-email",
+  NO_PERMISSION = "auth/no-permission",
+}
+
+export interface IFirebaseProviderHooks {
+  user: User | undefined;
+  token: string;
+  permission: AuthPermission;
+  isAuthenticated: boolean;
+  error: AuthError;
+
+  validatePermissions(privilege: number, userToken?: string): boolean;
+
+  resolveAuthState(user?: User): Promise<void>;
+
+  loginWithEmailAndPassword(email: string, password: string): Promise<void>;
+
+  logout(): Promise<void>;
+}
 
 const FirebaseContext = createContext<IFirebaseProviderHooks>(
   {} as IFirebaseProviderHooks

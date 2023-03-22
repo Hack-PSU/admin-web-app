@@ -9,12 +9,11 @@ import {
 import EventStep from "./EventStep";
 import {
   CreateEntity,
-  createEvent,
+  createEventForm,
   createLocation,
   EventType,
   fetch,
-  IEventEntity,
-  ILocationUpdateEntity,
+  LocationEntity,
   QueryKeys,
 } from "api";
 import { useEventStore } from "common/store";
@@ -32,12 +31,12 @@ const EventReviewStep: FC = () => {
 
   const { enqueueSnackbar } = useSnackbar();
   const {
-    eventType,
-    eventIcon,
-    eventName,
-    eventLocation,
-    eventDescription,
-    eventDate,
+    type,
+    icon,
+    name,
+    location,
+    description,
+    date,
     wsUrls,
     wsSkillLevel,
     wsRelevantSkills,
@@ -49,8 +48,8 @@ const EventReviewStep: FC = () => {
     isLoading,
     isSuccess,
   } = useMutation(
-    ({ entity }: CreateEntity<IEventEntity>) =>
-      fetch(() => createEvent(entity)),
+    ({ entity }: CreateEntity<FormData>) =>
+      fetch(() => createEventForm(entity)),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.event.all);
@@ -63,7 +62,7 @@ const EventReviewStep: FC = () => {
 
   const { mutateAsync: mutateLocation, isLoading: isLoadingLocation } =
     useMutation(
-      ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+      ({ entity }: CreateEntity<LocationEntity>) =>
         fetch(() => createLocation(entity)),
       {
         onSuccess: async () => {
@@ -73,42 +72,67 @@ const EventReviewStep: FC = () => {
     );
 
   const onSubmit = useCallback(async () => {
-    let eventLocationUid = eventLocation?.value ?? -1;
-    if (eventLocation && eventLocation.isNew) {
+    let locationId = location?.value ?? -1;
+    if (location && location.isNew) {
       const data = await mutateLocation({
         entity: {
-          locationName: eventLocation.label,
+          name: location.label,
         },
       });
-      if (data?.uid) {
-        eventLocationUid = data?.uid;
+      if (data?.id) {
+        locationId = data?.id;
       }
     }
-    await mutateEvent({
-      entity: {
-        eventIcon: eventIcon ?? null,
-        eventType: eventType ? eventType.value : EventType.ACTIVITY,
-        eventDescription: prepareContent(convertFromRaw(eventDescription)),
-        eventLocation: eventLocationUid,
-        eventStartTime: DateTime.fromJSDate(eventDate.start).toMillis(),
-        eventEndTime: DateTime.fromJSDate(eventDate.end).toMillis(),
-        eventTitle: eventName,
-        wsUrls: wsUrls?.join("|") ?? undefined,
-        wsPresenterNames:
-          wsPresenterNames?.map((name) => name.value).join(", ") ?? undefined,
-        wsSkillLevel: wsSkillLevel?.value ?? undefined,
-        wsRelevantSkills:
-          wsRelevantSkills?.map((skill) => skill.value).join(", ") ?? undefined,
-      },
-    });
+
+    const formData = new FormData();
+
+    if (icon) {
+      formData.append("icon", icon);
+    }
+    formData.append("type", type ? type.value : EventType.ACTIVITY);
+    formData.append("description", prepareContent(convertFromRaw(description)));
+    formData.append("location", String(locationId));
+    formData.append(
+      "startTime",
+      String(DateTime.fromJSDate(date.start).toMillis())
+    );
+    formData.append(
+      "endTime",
+      String(DateTime.fromJSDate(date.end).toMillis())
+    );
+    formData.append("name", name);
+
+    if (wsUrls) {
+      formData.append("wsUrls", wsUrls.join("|"));
+    }
+
+    if (wsPresenterNames) {
+      formData.append(
+        "wsPresenterNames",
+        wsPresenterNames.map((name) => name.value).join(", ")
+      );
+    }
+
+    if (wsSkillLevel) {
+      formData.append("wsSkillLevel", wsSkillLevel.value);
+    }
+
+    if (wsRelevantSkills) {
+      formData.append(
+        "wsRelevantSkills",
+        wsRelevantSkills.map((skill) => skill.value).join(", ")
+      );
+    }
+
+    await mutateEvent({ entity: formData });
   }, [
-    eventLocation,
+    location,
     mutateEvent,
-    eventIcon,
-    eventType,
-    eventDescription,
-    eventDate,
-    eventName,
+    icon,
+    type,
+    description,
+    date,
+    name,
     wsUrls,
     wsPresenterNames,
     wsSkillLevel,
@@ -129,9 +153,7 @@ const EventReviewStep: FC = () => {
   return (
     <EventStep
       title={`Review ${
-        eventType && eventType.value === EventType.WORKSHOP
-          ? "Workshop"
-          : "Event"
+        type && type.value === EventType.WORKSHOP ? "Workshop" : "Event"
       }`}
       handleNext={onSubmit}
       handleNextTitle="Submit"
@@ -153,7 +175,7 @@ const EventReviewStep: FC = () => {
         >
           <EventDetailsReview />
         </Grid>
-        {eventType && eventType.value === EventType.WORKSHOP && (
+        {type && type.value === EventType.WORKSHOP && (
           <>
             <Grid item>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -171,19 +193,7 @@ const EventReviewStep: FC = () => {
             </Grid>
           </>
         )}
-        {/*{eventImage && (*/}
-        {/*  <>*/}
-        {/*    <Grid item sx={{ mt: 0.5 }}>*/}
-        {/*      <Typography variant="h6" sx={{ fontWeight: 800 }}>*/}
-        {/*        Event Image*/}
-        {/*      </Typography>*/}
-        {/*    </Grid>*/}
-        {/*    <Grid container item justifyContent="center" alignItems="center">*/}
-        {/*      <EventImageReview name={"eventImage"} />*/}
-        {/*    </Grid>*/}
-        {/*  </>*/}
-        {/*)}*/}
-        {eventIcon && (
+        {icon && (
           <>
             <Grid item sx={{ mt: 0.5 }}>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>
