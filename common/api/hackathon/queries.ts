@@ -44,6 +44,15 @@ export const updateHackathon: CreateMutationReturn<
   { id: string }
 > = createMutation("/hackathons/:id", "PATCH");
 
+/**
+ * Mark hackathon as active
+ */
+export const markActiveHackathon: CreateMutationReturn<
+  {},
+  HackathonEntity,
+  { id: string }
+> = createMutation("/hackathons/:id/active", "PATCH");
+
 export const HackathonKeys = {
   all: [{ entity: "hackathon" }] as const,
   findAll: () =>

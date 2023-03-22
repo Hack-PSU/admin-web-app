@@ -9,31 +9,8 @@ import {
   useScoreResults,
 } from "components/judging";
 import { Grid, Typography } from "@mui/material";
-import { useHackathonStore } from "common/store";
 
 const ScoresPage: NextPage = () => {
-  const { activeHackathon: hackathon, updateActiveHackathon } =
-    useHackathonStore();
-
-  // const { data: allHackathons } = useQuery(
-  //   QueryKeys.hackathon.findAll(),
-  //   () => fetch(getAllHackathons),
-  //   {
-  //     enabled: !hackathon,
-  //   }
-  // );
-
-  // const activeHackathon = useMemo(() => {
-  //   if (hackathon === null && allHackathons) {
-  //     const activeHackathons = _.filter(allHackathons, "active");
-  //     if (activeHackathons.length > 0) {
-  //       updateActiveHackathon(activeHackathons[0]);
-  //       return activeHackathons[0];
-  //     }
-  //   }
-  //   return hackathon;
-  // }, [allHackathons, hackathon, updateActiveHackathon]);
-
   const { data, refetch } = useQuery(QueryKeys.judgingScore.findAll(), () =>
     fetch(getScoreBreakdown)
   );

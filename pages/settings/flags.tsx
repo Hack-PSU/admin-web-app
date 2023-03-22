@@ -1,16 +1,14 @@
 import React, { FC, useCallback, useMemo } from "react";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { withSettingsLayout } from "components/settings";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CreateEntity,
   fetch,
   getAllAppFlags,
-  IFlagsEntity,
-  IWSPushJudgingEntity,
-  patchAppFlags,
-  pushJudgingFlag,
   QueryKeys,
+  toggleFlag,
+  ToggleFlagEntity,
 } from "api";
 import { useSnackbar } from "notistack";
 import { Button, EvaIcon, Loading } from "components/base";
@@ -37,8 +35,7 @@ const SettingsFlags: FC = () => {
   );
 
   const { mutateAsync: mutateAppFlags } = useMutation(
-    ({ entity }: CreateEntity<{ flags: IFlagsEntity[] }, "">) =>
-      patchAppFlags(entity),
+    ({ entity }: CreateEntity<ToggleFlagEntity, "">) => toggleFlag(entity),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.flag.all);
@@ -49,17 +46,17 @@ const SettingsFlags: FC = () => {
     }
   );
 
-  const { mutateAsync: mutatePushJudging } = useMutation(
-    ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
-      pushJudgingFlag(entity),
-    {
-      onSuccess: () => {
-        enqueueSnackbar("Successfully notified clients", {
-          variant: "success",
-        });
-      },
-    }
-  );
+  // const { mutateAsync: mutatePushJudging } = useMutation(
+  //   ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
+  //     pushJudgingFlag(entity),
+  //   {
+  //     onSuccess: () => {
+  //       enqueueSnackbar("Successfully notified clients", {
+  //         variant: "success",
+  //       });
+  //     },
+  //   }
+  // );
 
   const isJudgingEnabled = useMemo(() => {
     return Boolean(flagEnabledMap && flagEnabledMap["judging"]);
@@ -70,25 +67,21 @@ const SettingsFlags: FC = () => {
       return async () => {
         await mutateAppFlags({
           entity: {
-            flags: [
-              {
-                name: "judging",
-                isEnabled: shouldEnable,
-              },
-            ],
+            name: "judging",
+            isEnabled: shouldEnable,
           },
         });
-        await mutatePushJudging({
-          entity: {
-            to: "ADMIN",
-            data: {
-              isEnabled: shouldEnable,
-            },
-          },
-        });
+        // await mutatePushJudging({
+        //   entity: {
+        //     to: "ADMIN",
+        //     data: {
+        //       isEnabled: shouldEnable,
+        //     },
+        //   },
+        // });
       };
     },
-    [mutatePushJudging, mutateAppFlags]
+    [mutateAppFlags]
   );
 
   if (isLoading) {

@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { SponsorEntity } from "./entity";
+import { PatchBatchSponsor, SponsorEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -47,11 +47,6 @@ export const updateSponsor: CreateMutationReturn<
   SponsorEntity,
   { id: number }
 > = createMutation("/sponsors/:id", "PATCH");
-
-type PatchBatchSponsor = Partial<
-  Omit<SponsorEntity, "id" | "name" | "logo" | "hackathonId">
-> &
-  Pick<SponsorEntity, "id">;
 
 /**
  * Update the given sponsors

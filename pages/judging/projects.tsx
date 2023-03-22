@@ -10,11 +10,9 @@ import {
   CreateEntity,
   fetch,
   getAllProjects,
-  IFlagsEntity,
-  IWSPushJudgingEntity,
-  patchAppFlags,
-  pushJudgingFlag,
   QueryKeys,
+  toggleFlag,
+  ToggleFlagEntity,
 } from "api";
 import AddNewJudgingProjectModal from "components/modal/AddNewJudgingProjectModal";
 import AssignJudgingProjectsModal from "components/modal/AssignJudgingProjectsModal";
@@ -66,15 +64,15 @@ const ManageProjectsPage: NextPage = () => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            uid: d.uid,
-            name: d.project,
+            id: d.id,
+            name: d.name,
           }));
         }
       },
     }
   );
 
-  const defs = useColumnDef<{ uid: number; name: string }>({
+  const defs = useColumnDef<{ id: number; name: string }>({
     columns: [
       {
         id: "name",
@@ -95,8 +93,7 @@ const ManageProjectsPage: NextPage = () => {
   };
 
   const { mutateAsync: mutateAppFlags } = useMutation(
-    ({ entity }: CreateEntity<{ flags: IFlagsEntity[] }, "">) =>
-      patchAppFlags(entity),
+    ({ entity }: CreateEntity<ToggleFlagEntity, "">) => toggleFlag(entity),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.flag.all);
@@ -107,39 +104,35 @@ const ManageProjectsPage: NextPage = () => {
     }
   );
 
-  const { mutateAsync: mutatePushJudging } = useMutation(
-    ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
-      pushJudgingFlag(entity),
-    {
-      onSuccess: () => {
-        enqueueSnackbar("Successfully notified clients", {
-          variant: "success",
-        });
-      },
-    }
-  );
+  // const { mutateAsync: mutatePushJudging } = useMutation(
+  //   ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
+  //     pushJudgingFlag(entity),
+  //   {
+  //     onSuccess: () => {
+  //       enqueueSnackbar("Successfully notified clients", {
+  //         variant: "success",
+  //       });
+  //     },
+  //   },
+  // );
 
   const onConfirmEnableJudging = useCallback(async () => {
     await mutateAppFlags({
       entity: {
-        flags: [
-          {
-            name: "judging",
-            isEnabled: true,
-          },
-        ],
+        name: "judging",
+        isEnabled: true,
       },
     });
 
-    await mutatePushJudging({
-      entity: {
-        to: "ADMIN",
-        data: {
-          isEnabled: true,
-        },
-      },
-    });
-  }, [mutateAppFlags, mutatePushJudging]);
+    // await mutatePushJudging({
+    //   entity: {
+    //     to: "ADMIN",
+    //     data: {
+    //       isEnabled: true,
+    //     },
+    //   },
+    // });
+  }, [mutateAppFlags]);
 
   return (
     <ModalProvider>

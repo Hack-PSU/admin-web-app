@@ -6,18 +6,13 @@ import { Button, EvaIcon, GradientButton } from "components/base";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
-import {
-  fetch,
-  QueryKeys,
-  getAllExtraCreditAssignments,
-  getAllExtraCreditClasses,
-} from "api";
+import { fetch, getAllExtraCreditAssignments, QueryKeys } from "api";
 import { ModalProvider, useModalContext } from "components/context";
 import AddExtraCreditClassModal from "components/modal/AddExtraCreditClassModal";
 import AssignExtraCreditClassModal from "components/modal/AssignExtraCreditClassModal";
 
 type DataRow = {
-  uid: number;
+  id: number;
   name: string;
   users: number;
 };
@@ -98,57 +93,36 @@ const ExtraCreditClassesPage: NextPage = () => {
   });
 
   const { data: allAssignments } = useQuery(
-    QueryKeys.extraCreditAssignment.findAll(),
-    () =>
-      fetch(() =>
-        getAllExtraCreditAssignments({
-          hackathon: "81069f2a04cb465994ad84155af6e868",
-        })
-      )
-  );
-
-  const { data: allClasses } = useQuery(
     QueryKeys.extraCreditClass.findAll(),
-    () =>
-      fetch(() =>
-        getAllExtraCreditClasses({
-          hackathon: "81069f2a04cb465994ad84155af6e868",
-        })
-      ),
+    () => fetch(getAllExtraCreditAssignments),
     {
       select: (data) => {
-        if (data && allAssignments) {
-          return data.map((d) => {
-            const assignments = allAssignments.filter(
-              (assignment) => assignment.class_uid === d.uid
-            );
-            return {
-              uid: d.uid,
-              name: d.class_name,
-              users: assignments.length,
-            };
-          });
+        if (data) {
+          return data.map((d) => ({
+            id: d.id,
+            name: d.name,
+            users: d.users.length,
+          }));
         }
       },
-      enabled: !!allAssignments,
     }
   );
 
   const defaultValues = useMemo(() => {
-    if (allClasses) {
-      return allClasses.reduce((acc, curr) => {
-        acc[String(curr.uid)] = curr;
+    if (allAssignments) {
+      return allAssignments.reduce((acc, curr) => {
+        acc[String(curr.id)] = curr;
         return acc;
-      }, {} as { [key: string]: { uid: number; name: string; users: number } });
+      }, {} as { [key: string]: { id: number; name: string; users: number } });
     }
-  }, [allClasses]);
+  }, [allAssignments]);
 
   const table = useTable<DataRow>({
-    data: allClasses ?? [],
+    data: allAssignments ?? [],
     state: {
       rowSelection,
     },
-    getRowId: (row) => String(row.uid),
+    getRowId: (row) => String(row.id),
     onRowSelectionChange: setRowSelection,
     ...defs,
   });

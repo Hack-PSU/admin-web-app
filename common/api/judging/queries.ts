@@ -13,7 +13,7 @@ import {
 import { QueryAction, QueryScope } from "api/types";
 
 /**
- * Get all projects (from Devpost)
+ * Get all projects
  * @param param (optional)
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Judging-Get_All_Projects

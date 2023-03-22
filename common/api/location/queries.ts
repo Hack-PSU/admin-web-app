@@ -38,14 +38,14 @@ export const createLocation: CreateMutationReturn<
 export const updateLocation: CreateMutationReturn<
   Partial<Omit<LocationEntity, "id">>,
   LocationEntity,
-  { id: string }
+  { id: number }
 > = createMutation("/locations/:id", "PATCH");
 
 /**
  * Delete A Location
  * @param params
  */
-export const deleteLocation: CreateMutationReturn<{}, {}, { id: string }> =
+export const deleteLocation: CreateMutationReturn<{}, {}, { id: number }> =
   createMutation("/locations/:id");
 
 export const LocationKeys = {
