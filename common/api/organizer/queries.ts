@@ -44,7 +44,7 @@ export const updateOrganizer: CreateMutationReturn<
   Partial<Omit<OrganizerEntity, "id">>,
   OrganizerEntity,
   { id: string }
-> = createMutation("/organizers/:id");
+> = createMutation("/organizers/:id", "PATCH");
 
 export const OrganizerQueryKeys = {
   all: [{ entity: "organizer" }] as const,

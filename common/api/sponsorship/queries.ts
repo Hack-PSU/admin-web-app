@@ -32,7 +32,7 @@ export const getSponsor: CreateQueryReturn<SponsorEntity, { id: number }> =
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Insert_Sponsor
  */
-export const createSponsor: CreateMutationReturn<Omit<SponsorEntity, "id">> =
+export const createSponsor: CreateMutationReturn<FormData> =
   createMutation("/sponsors");
 
 /**
@@ -43,7 +43,7 @@ export const createSponsor: CreateMutationReturn<Omit<SponsorEntity, "id">> =
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Update_Sponsor
  */
 export const updateSponsor: CreateMutationReturn<
-  SponsorEntity,
+  FormData,
   SponsorEntity,
   { id: number }
 > = createMutation("/sponsors/:id", "PATCH");

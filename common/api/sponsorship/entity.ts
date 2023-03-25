@@ -2,7 +2,8 @@ export interface SponsorEntity {
   id: number;
   name: string;
   level: string;
-  logo: string;
+  lightLogo?: string;
+  darkLogo?: string;
   order: number;
   link?: string;
   hackathonId?: string;

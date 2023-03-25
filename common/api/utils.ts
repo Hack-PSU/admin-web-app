@@ -29,32 +29,6 @@ export type CreateMutationReturn<
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
 
-// export type CreateQueryByIdReturn<TResponse, TParam extends object = {}> = (
-//   id: string | number,
-//   params?: TParam,
-//   token?: string,
-// ) => Promise<QueryReturn<TResponse>>;
-// export type CreateMutationByIdReturn<
-//   TEntity,
-//   TResponse,
-//   TParam extends object = {}
-// > = (
-//   id: string | number,
-//   entity: TEntity,
-//   param?: TParam,
-//   token?: string,
-// ) => Promise<QueryReturn<TResponse>>;
-
-// export type CreateQueryReturn<TResponse, TParam = {}> = (
-//   params?: TParam,
-//   token?: string,
-// ) => Promise<QueryReturn<TResponse>>;
-// export type CreateMutationReturn<TEntity, TResponse = TEntity, TParam = {}> = (
-//   entity: TEntity,
-//   params?: TParam,
-//   token?: string,
-// ) => Promise<QueryReturn<TResponse>>;
-
 function replacePathParams(path: string, params: PathParams) {
   const replaceParams = Object.keys(params).reduce((acc, curr) => {
     acc[`:${curr}`] = params[curr] as any;
@@ -83,7 +57,7 @@ export function createQuery<
     return instance.request<TResponse>({
       url: endpoint,
       method: "GET",
-      params: params,
+      params: query,
       ...(token
         ? {
             headers: {
@@ -114,7 +88,7 @@ export function createMutation<
       url: endpoint,
       method,
       data: entity,
-      ...(params ? { params } : {}),
+      ...(query ? { params: query } : {}),
       ...(token
         ? {
             headers: {

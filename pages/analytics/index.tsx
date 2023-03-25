@@ -3,90 +3,51 @@ import { NextPage } from "next";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { fetch, getAllHackathons, getAllUsers, QueryKeys } from "api";
-import _ from "lodash";
+import { fetch, getAnalyticsSummary, QueryKeys } from "api";
 import { Pie } from "components/Charts";
 import { ChartContainer, RegistrationBarLine } from "components/analytics";
 import { ParentSizeModern } from "@visx/responsive";
-import { DateTime } from "luxon";
 
 const AnalyticsPage: NextPage = () => {
   const theme = useTheme();
 
-  const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
-    fetch(getAllUsers)
+  const { data } = useQuery(QueryKeys.analytics.findAll(), () =>
+    fetch(getAnalyticsSummary)
   );
-
-  const { data: allHackathons } = useQuery(QueryKeys.hackathon.findAll(), () =>
-    fetch(getAllHackathons)
-  );
-
-  const currentHackathon = useMemo(() => {
-    if (allUsers) {
-      return allUsers;
-      // return _.chain(allUsers)
-      //   .pickBy((user) => user.)
-      //   .value();
-    }
-  }, [allUsers]);
-
-  const allGenders = useMemo(() => {
-    if (currentHackathon) {
-      return _.chain(currentHackathon)
-        .groupBy("gender")
-        .map((users, gender) => ({ gender, count: users.length }))
-        .value();
-    }
-  }, [currentHackathon]);
-
-  const raceEthnicity = useMemo(() => {
-    if (currentHackathon) {
-      return _.chain(currentHackathon)
-        .groupBy("race")
-        .map((users, race) => ({ race, count: users.length }))
-        .value();
-    }
-  }, [currentHackathon]);
-
-  const allYears = useMemo(() => {
-    if (currentHackathon) {
-      return _.chain(currentHackathon)
-        .groupBy("academic_year")
-        .map((users, year) => ({ year, count: users.length }))
-        .value();
-    }
-  }, [currentHackathon]);
-
-  const codingExp = useMemo(() => {
-    if (currentHackathon) {
-      return _.chain(currentHackathon)
-        .groupBy("coding_experience")
-        .map((users, exp) => ({ experience: exp, count: users.length }))
-        .value();
-    }
-  }, [currentHackathon]);
 
   const registrationsByHackathon = useMemo(() => {
-    if (allUsers && allHackathons) {
-      return (
-        _.chain(allUsers)
-          .groupBy("hackathon")
-          .map((users, hackathon) => {
-            const entity = allHackathons.find((h) => h.id === hackathon);
-
-            return {
-              hackathon: entity?.name ?? hackathon,
-              count: users.length,
-              date: entity?.startTime,
-            };
-          })
-          .sortBy((item) => DateTime.fromMillis(parseInt(item.date ?? "")))
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          .map(({ date, ...rest }) => ({ ...rest }))
-          .value()
-      );
+    if (data) {
+      return data.registrations;
     }
-  }, [allUsers, allHackathons]);
+    return [];
+  }, [data]);
+
+  const allGenders = useMemo(() => {
+    if (data) {
+      return data.gender;
+    }
+    return [];
+  }, [data]);
+
+  const raceEthnicity = useMemo(() => {
+    if (data) {
+      return data.race;
+    }
+    return [];
+  }, [data]);
+
+  const allYears = useMemo(() => {
+    if (data) {
+      return data.academicYear;
+    }
+    return [];
+  }, [data]);
+
+  const codingExp = useMemo(() => {
+    if (data) {
+      return data.codingExp;
+    }
+  }, [data]);
 
   const growthByHackathon = useMemo(() => {
     if (registrationsByHackathon) {
@@ -94,9 +55,9 @@ const AnalyticsPage: NextPage = () => {
 
       registrationsByHackathon.reduce((prev, curr, index) => {
         if (index === 0) {
-          growth[curr.hackathon] = 0;
+          growth[curr.name] = 0;
         } else {
-          growth[curr.hackathon] = ((curr.count - prev) / (prev ?? 1)) * 100;
+          growth[curr.name] = ((curr.count - prev) / (prev ?? 1)) * 100;
         }
 
         return curr.count;
@@ -127,7 +88,7 @@ const AnalyticsPage: NextPage = () => {
                   growth={growthByHackathon ?? {}}
                   width={width}
                   height={350}
-                  getXScale={(item) => item.hackathon}
+                  getXScale={(item) => item.name}
                   getYScale={(item) => item.count}
                   barColor={theme.palette.sunset.light}
                   lineColor={theme.palette.sunset.dark}
@@ -199,8 +160,8 @@ const AnalyticsPage: NextPage = () => {
                 <Pie
                   width={width}
                   data={allYears}
-                  getKey={(item) => item.year}
-                  getLabel={(item) => item.year}
+                  getKey={(item) => item.academicYear}
+                  getLabel={(item) => item.academicYear}
                   getCount={(item) => item.count}
                   getTooltipData={(item) => {
                     if (allYears) {
@@ -224,12 +185,12 @@ const AnalyticsPage: NextPage = () => {
                 <Pie
                   width={width}
                   data={codingExp}
-                  getKey={(item) => item.experience}
+                  getKey={(item) => item.codingExperience}
                   getLabel={(item) => {
-                    if (item.experience === "none") {
+                    if (item.codingExperience === "none") {
                       return "Not-Filled";
                     }
-                    return item.experience;
+                    return item.codingExperience;
                   }}
                   getCount={(item) => item.count}
                   getTooltipData={(item) => {

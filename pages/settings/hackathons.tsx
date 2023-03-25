@@ -14,6 +14,7 @@ import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
 import { DateTime } from "luxon";
 import { Box, darken, Typography, useTheme } from "@mui/material";
 import { useCallback } from "react";
+import _ from "lodash";
 
 const SettingsHackathons: NextPage = () => {
   const queryClient = useQueryClient();
@@ -22,7 +23,14 @@ const SettingsHackathons: NextPage = () => {
 
   const { data: allHackathons, refetch } = useQuery(
     QueryKeys.hackathon.findAll(),
-    () => fetch(getAllHackathons)
+    () => fetch(getAllHackathons),
+    {
+      select: (data) => {
+        if (data) {
+          return _.sortBy(data, "startTime").reverse();
+        }
+      },
+    }
   );
 
   const { mutateAsync } = useMutation(

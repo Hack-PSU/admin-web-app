@@ -98,7 +98,8 @@ const SponsorshipPage: NextPage = () => {
           return _.chain(data)
             .map((d) => ({
               id: d.id,
-              logo: d.logo,
+              lightLogo: d.lightLogo ?? "",
+              darkLogo: d.darkLogo ?? "",
               order: d.order,
               name: d.name,
               level: d.level,
@@ -253,7 +254,7 @@ const SponsorshipPage: NextPage = () => {
 
   return (
     <ModalProvider>
-      <AddNewSponsorModal />
+      <AddNewSponsorModal totalSponsors={allSponsors?.length ?? 0} />
       <EditSponsorModal sponsor={selectedSponsor} />
       <Grid container gap={1.5}>
         <PageHeader header={"Sponsorship"} right={<AddNewSponsorButton />} />

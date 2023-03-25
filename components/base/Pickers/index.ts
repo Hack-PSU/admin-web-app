@@ -3,8 +3,4 @@ export {
   LabelledDatePicker,
   ControlledDatePicker,
 } from "./DatePicker";
-export {
-  default as TimePicker,
-  LabelledTimePicker,
-  ControlledTimePicker,
-} from "./TimePicker";
+export * from "./TimeInput";

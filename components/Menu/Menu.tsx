@@ -4,8 +4,7 @@ import MenuItem, { CollapsibleMenuItem } from "./MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
 import { useQuery } from "@tanstack/react-query";
-import { fetch, getAllHackathons, IHackathonEntity, QueryKeys } from "api";
-import _ from "lodash";
+import { fetch, getActiveHackathon, HackathonEntity, QueryKeys } from "api";
 import { DateTime } from "luxon";
 import { useHackathonStore } from "common/store";
 
@@ -18,6 +17,7 @@ const DrawerHeader = styled(Grid)(({ theme }) => ({
 interface IMenuProps {
   open: boolean;
   shouldClose: boolean;
+
   handleClose(): void;
 }
 
@@ -25,9 +25,9 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
   const { activeHackathon: hackathon, updateActiveHackathon } =
     useHackathonStore();
 
-  const { data: allHackathons } = useQuery(
-    QueryKeys.hackathon.findAll(),
-    () => fetch(getAllHackathons),
+  const { data: hackathonData } = useQuery(
+    QueryKeys.hackathon.findById(0),
+    () => fetch(getActiveHackathon),
     {
       staleTime: Infinity,
       cacheTime: Infinity,
@@ -35,21 +35,18 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
   );
 
   const activeHackathon = useMemo(() => {
-    if (allHackathons) {
-      const activeHackathons = _.filter(allHackathons, "active");
-      if (activeHackathons.length > 0) {
-        if (hackathon === null) {
-          updateActiveHackathon(activeHackathons[0]);
-        }
-
-        return activeHackathons[0];
+    if (hackathonData) {
+      if (hackathon === null) {
+        updateActiveHackathon(hackathonData[0]);
       }
-    }
-    return {} as IHackathonEntity;
-  }, [allHackathons, hackathon, updateActiveHackathon]);
 
-  const formatHackathon = useCallback((hackathon: IHackathonEntity) => {
-    const startTime = DateTime.fromMillis(Number(hackathon.start_time));
+      return hackathonData[0];
+    }
+    return {} as HackathonEntity;
+  }, [hackathon, hackathonData, updateActiveHackathon]);
+
+  const formatHackathon = useCallback((hackathon: HackathonEntity) => {
+    const startTime = DateTime.fromMillis(Number(hackathon.startTime));
 
     const springMonths = ["January", "February", "March", "April", "May"];
     const summerMonths = ["June", "July"];
@@ -110,15 +107,15 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           label={"Extra Credit"}
           icon={"award-outline"}
         />
-        <CollapsibleMenuItem
-          nestedItems={[
-            { label: "Manage Items", to: "/items/manage" },
-            { label: "Checkout", to: "/items/checkout" },
-          ]}
-          to={"/items"}
-          label={"Item Checkout"}
-          icon={"shopping-cart-outline"}
-        />
+        {/*<CollapsibleMenuItem*/}
+        {/*  nestedItems={[*/}
+        {/*    { label: "Manage Items", to: "/items/manage" },*/}
+        {/*    { label: "Checkout", to: "/items/checkout" },*/}
+        {/*  ]}*/}
+        {/*  to={"/items"}*/}
+        {/*  label={"Item Checkout"}*/}
+        {/*  icon={"shopping-cart-outline"}*/}
+        {/*/>*/}
         <CollapsibleMenuItem
           nestedItems={[
             { label: "Scores", to: "/judging/scores" },

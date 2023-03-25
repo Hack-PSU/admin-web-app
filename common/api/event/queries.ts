@@ -47,7 +47,7 @@ export const createEventForm: CreateMutationReturn<FormData, EventEntity> =
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Update_Event
  */
 export const updateEvent: CreateMutationReturn<
-  Partial<Omit<EventEntity, "id">>,
+  FormData,
   EventEntity,
   { id: string }
 > = createMutation("/events/:id", "PATCH");

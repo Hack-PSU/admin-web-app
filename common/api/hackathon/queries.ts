@@ -16,7 +16,7 @@ import { QueryAction, QueryScope } from "api/types";
 export const getAllHackathons: CreateQueryReturn<HackathonEntity[]> =
   createQuery("/hackathons");
 
-export const getActiveHackathon: CreateQueryReturn<HackathonEntity> =
+export const getActiveHackathon: CreateQueryReturn<HackathonEntity[]> =
   createQuery("/hackathons?active=true");
 
 /**

@@ -1,16 +1,14 @@
 import React, { useCallback, useMemo } from "react";
 import { NextPage } from "next";
 import {
-  CreateEntity,
   createLocation,
+  EventEntity,
   EventType,
   fetch,
   getAllLocations,
   getEvent,
-  IEventEntity,
-  IGetAllEventsResponse,
-  ILocationUpdateEntity,
-  MutateEntity,
+  LocationEntity,
+  QueryEntity,
   QueryKeys,
   updateEvent,
 } from "api";
@@ -31,9 +29,11 @@ import { Button } from "components/base";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { prepareContent } from "components/base/RichText";
+import EventEditIcon from "components/event/edit/EventEditIcon";
+import EventIconPreview from "components/event/edit/EventIconPreview";
 
 interface IEventPageProps {
-  event: IGetAllEventsResponse;
+  event: EventEntity;
 }
 
 const EventPage: NextPage<IEventPageProps> = ({ event }) => {
@@ -41,8 +41,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
-  const eventDescription = useMemo(() => {
-    const htmlDescription = event.event_description;
+  const description = useMemo(() => {
+    const htmlDescription = event.description;
     const htmlBlock = convertFromHTML(htmlDescription);
     const state = ContentState.createFromBlockArray(
       htmlBlock.contentBlocks,
@@ -54,35 +54,35 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
 
   const methods = useForm({
     defaultValues: {
-      eventTitle: event.event_title,
-      eventLocation: {
-        value: event.event_location,
-        label: event.location_name,
+      name: event.name,
+      location: {
+        value: event.location.id,
+        label: event.location.name,
       },
-      eventType: {
-        value: event.event_type,
-        label: _.capitalize(event.event_type),
+      type: {
+        value: event.type,
+        label: _.capitalize(event.type),
       },
-      eventDescription,
-      eventDate: {
-        start: DateTime.fromMillis(parseInt(event.event_start_time)).toJSDate(),
-        end: DateTime.fromMillis(parseInt(event.event_end_time)).toJSDate(),
+      description,
+      date: {
+        start: DateTime.fromMillis(event.startTime).toJSDate(),
+        end: DateTime.fromMillis(event.endTime).toJSDate(),
       },
-      eventIcon: event.event_icon ?? "",
-      eventImage: [],
+      iconUrl: event.icon,
+      icon: [],
       wsPresenterNames:
-        event.ws_presenter_names
+        event.wsPresenterNames
           ?.split(", ")
           .map((value) => ({ value, label: value })) ?? [],
       wsSkillLevel: {
-        value: event.ws_skill_level,
-        label: event.ws_skill_level,
+        value: event.wsSkillLevel,
+        label: event.wsSkillLevel,
       },
       wsRelevantSkills:
-        event.ws_relevant_skills
+        event.wsRelevantSkills
           ?.split(", ")
           .map((value) => ({ value, label: value })) ?? null,
-      wsUrls: event.ws_urls?.map((link) => ({ link })) ?? [],
+      wsUrls: event.wsUrls?.map((link) => ({ link })) ?? [],
     },
   });
 
@@ -95,8 +95,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            value: d.uid,
-            label: d.location_name,
+            value: d.id,
+            label: d.name,
           }));
         }
       },
@@ -111,8 +111,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   }, [locationOptions]);
 
   const { mutateAsync: mutateUpdateEvent } = useMutation(
-    ({ entity }: MutateEntity<IEventEntity>) =>
-      fetch(() => updateEvent(entity)),
+    ({ entity: { id, data } }: QueryEntity<{ data: FormData; id: string }>) =>
+      fetch(() => updateEvent(data, { id })),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.event.all);
@@ -124,48 +124,77 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   );
 
   const { mutateAsync: mutateCreateLocation } = useMutation(
-    ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+    ({ entity }: QueryEntity<Omit<LocationEntity, "id">>) =>
       fetch(() => createLocation(entity))
   );
 
   const onSubmit = useCallback(() => {
     handleSubmit(async (data) => {
       if (currentLocations) {
-        let eventLocation = data.eventLocation.value ?? -1;
-        if (!currentLocations.has(data.eventLocation.value)) {
+        let eventLocation = data.location.value ?? -1;
+        if (!currentLocations.has(data.location.value)) {
           // create new location
           const newLocationData = await mutateCreateLocation({
             entity: {
-              locationName: data.eventLocation.label,
+              name: data.location.label,
             },
           });
 
-          if (newLocationData?.uid) {
-            eventLocation = newLocationData?.uid;
+          if (newLocationData?.id) {
+            eventLocation = newLocationData?.id;
           }
         }
+
+        const formData = new FormData();
+
+        if (event.icon) {
+          formData.append("icon", event.icon);
+        }
+        formData.append(
+          "type",
+          data.type ? data.type.value : EventType.ACTIVITY
+        );
+        formData.append(
+          "description",
+          prepareContent(convertFromRaw(description))
+        );
+        formData.append("location", String(eventLocation));
+        formData.append(
+          "startTime",
+          String(DateTime.fromJSDate(data.date.start).toMillis())
+        );
+        formData.append(
+          "endTime",
+          String(DateTime.fromJSDate(data.date.end).toMillis())
+        );
+        formData.append("name", data.name);
+
+        if (data.wsUrls) {
+          formData.append("wsUrls", data.wsUrls.join("|"));
+        }
+
+        if (data.wsPresenterNames) {
+          formData.append(
+            "wsPresenterNames",
+            data.wsPresenterNames.map((name) => name.value).join(", ")
+          );
+        }
+
+        if (data.wsSkillLevel.value) {
+          formData.append("wsSkillLevel", data.wsSkillLevel.value);
+        }
+
+        if (data.wsRelevantSkills) {
+          formData.append(
+            "wsRelevantSkills",
+            data.wsRelevantSkills.map((skill) => skill.value).join(", ")
+          );
+        }
+
         await mutateUpdateEvent({
           entity: {
-            uid: String(event.uid),
-            eventTitle: data.eventTitle,
-            eventLocation: eventLocation,
-            eventDescription: prepareContent(
-              convertFromRaw(data.eventDescription)
-            ),
-            eventStartTime: DateTime.fromJSDate(
-              data.eventDate.start
-            ).toMillis(),
-            eventEndTime: DateTime.fromJSDate(data.eventDate.end).toMillis(),
-            eventType: data.eventType.value,
-            eventIcon: data.eventIcon,
-            wsPresenterNames:
-              data.wsPresenterNames?.map((name) => name.value).join(", ") ??
-              undefined,
-            wsRelevantSkills:
-              data.wsRelevantSkills?.map((skill) => skill.value).join(", ") ??
-              undefined,
-            wsSkillLevel: data.wsSkillLevel.value,
-            wsUrls: data.wsUrls.join("|"),
+            data: formData,
+            id: event.id,
           },
         });
       }
@@ -174,7 +203,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
     handleSubmit,
     currentLocations,
     mutateUpdateEvent,
-    event.uid,
+    event.id,
     mutateCreateLocation,
   ]);
 
@@ -183,8 +212,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
       <Grid container spacing={2}>
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ fontWeight: 800 }}>
-            Edit{" "}
-            {event.event_type === EventType.WORKSHOP ? "Workshop" : "Event"}
+            Edit {event.type === EventType.WORKSHOP ? "Workshop" : "Event"}
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -207,18 +235,20 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
           </Button>
         </Grid>
         <Grid container item spacing={2}>
-          {/*<Grid container item xs={4} flexDirection="column">*/}
-          {/*  <Grid item sx={{ height: "50%" }}>*/}
-          {/*    <EventEditIcon />*/}
-          {/*  </Grid>*/}
-          {/*  <Grid item sx={{ height: "50%" }}>*/}
-          {/*    <EventEditImage />*/}
-          {/*  </Grid>*/}
-          {/*</Grid>*/}
+          <Grid container item xs={4} flexDirection="column">
+            <Grid item sx={{ height: "50%" }}>
+              <EventIconPreview />
+            </Grid>
+          </Grid>
+          <Grid container item xs={6} flexDirection="column">
+            <Grid item sx={{ height: "50%" }}>
+              <EventEditIcon />
+            </Grid>
+          </Grid>
           <Grid item xs={12}>
             <EventEditDetails locationOptions={locationOptions ?? []} />
           </Grid>
-          {event.event_type === EventType.WORKSHOP && (
+          {event.type === EventType.WORKSHOP && (
             <Grid item xs={12}>
               <EventEditWorkshop />
             </Grid>
@@ -229,24 +259,26 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   );
 };
 
-export const getServerSideProps = withServerSideProps(async (context) => {
-  const { uid } = context.query;
-  const event = await fetch(() => getEvent({ uid: uid as string }));
+export const getServerSideProps = withServerSideProps(
+  async (context, token) => {
+    const { id } = context.query;
+    const event = await fetch(() => getEvent({ id: id as string }, {}, token));
 
-  if (event) {
-    return {
-      props: {
-        event,
-      },
-    };
-  } else {
-    return {
-      redirect: {
-        destination: "/events",
-        permanent: false,
-      },
-    };
+    if (event) {
+      return {
+        props: {
+          event,
+        },
+      };
+    } else {
+      return {
+        redirect: {
+          destination: "/events",
+          permanent: false,
+        },
+      };
+    }
   }
-});
+);
 
 export default withDefaultLayout(EventPage);

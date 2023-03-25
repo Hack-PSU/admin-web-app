@@ -201,7 +201,7 @@ const EventReviewStep: FC = () => {
               </Typography>
             </Grid>
             <Grid container item justifyContent="center" alignItems="center">
-              <EventImageReview name={"eventIcon"} />
+              <EventImageReview />
             </Grid>
           </>
         )}

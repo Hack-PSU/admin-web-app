@@ -18,14 +18,7 @@ import {
 import jwtDecode, { JwtPayload } from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
-import {
-  initApiV2,
-  initNotificationApi,
-  initWsApi,
-  resetApiV2,
-  resetNotificationApi,
-  resetWsApi,
-} from "api/axios";
+import { initApi, resetApi } from "api/axios";
 import { useRouter } from "next/router";
 import { Auth } from "@firebase/auth/dist/node-esm";
 import { WithChildren } from "common/types";
@@ -112,7 +105,7 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
     async (user: User) => {
       const token = await getUserIdToken(user);
       setToken(token);
-      nookies.set(undefined, "idtoken", token, { path: "/" });
+      nookies.set(undefined, "token", token, { path: "/" });
 
       return validatePermissions(AuthPermission.TEAM, token);
     },
@@ -131,7 +124,7 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
           setError(AuthError.NO_PERMISSION);
         }
       } else {
-        nookies.set(undefined, "idtoken", "", { path: "/" });
+        nookies.set(undefined, "token", "", { path: "/" });
         setUser(undefined);
         setIsAuthenticated(false);
         setError(AuthError.NONE);
@@ -191,13 +184,9 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   useEffect(() => {
     return onIdTokenChanged(auth, async (user) => {
       if (user) {
-        await initApiV2(user);
-        await initNotificationApi(user);
-        await initWsApi(user);
+        await initApi(user);
       } else {
-        resetApiV2();
-        resetNotificationApi();
-        resetWsApi();
+        resetApi();
       }
     });
   }, [auth]);

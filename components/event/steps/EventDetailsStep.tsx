@@ -15,7 +15,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
-import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
 import { useQuery } from "@tanstack/react-query";
 
@@ -25,10 +24,10 @@ import { useQuery } from "@tanstack/react-query";
 // ];
 
 const schema = object({
-  eventName: NonEmptyString,
-  eventLocation: NonEmptySelect,
-  eventDescription: optional(any()),
-  eventDate: object({
+  name: NonEmptyString,
+  location: NonEmptySelect,
+  description: optional(any()),
+  date: object({
     start: date(),
     end: date(),
   }),
@@ -39,7 +38,7 @@ const EventDetailsStep: FC = () => {
     useEventStore();
 
   const methods = useForm({
-    resolver: superstructResolver(schema),
+    // resolver: superstructResolver(schema),
     defaultValues: {
       name,
       location,
@@ -77,6 +76,7 @@ const EventDetailsStep: FC = () => {
 
   const handleNext = useCallback(() => {
     methods.handleSubmit((data, errors) => {
+      console.log(data);
       if (!errors) {
         let locationData = data.location;
 
@@ -106,7 +106,7 @@ const EventDetailsStep: FC = () => {
         }
       }
     })();
-  }, [methods, currentLocations, updateDetails, type, gotoStep, nextStep]);
+  }, [currentLocations, gotoStep, methods, nextStep, type, updateDetails]);
 
   return (
     <FormProvider {...methods}>
@@ -149,10 +149,7 @@ const EventDetailsStep: FC = () => {
           <Grid item xs={12}>
             <InputLabel id={"description"} label={"Description (optional)"} />
             <Box mt={0.6}>
-              <RichText
-                placeholder="Enter a description"
-                name="eventDescription"
-              />
+              <RichText placeholder="Enter a description" name="description" />
             </Box>
           </Grid>
           <DateTimeForm />
