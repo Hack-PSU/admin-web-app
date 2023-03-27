@@ -9,7 +9,6 @@ import {
   useStepper,
 } from "components/base";
 import { Box, Grid } from "@mui/material";
-import RichText from "components/base/RichText/RichText";
 import DateTimeForm from "components/event/forms/DetailsForm/DateTimeForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { EventType, fetch, getAllLocations, QueryKeys } from "api";
@@ -17,11 +16,8 @@ import { useEventStore } from "common/store";
 import { any, date, object, optional } from "superstruct";
 import { NonEmptySelect, NonEmptyString } from "common/form";
 import { useQuery } from "@tanstack/react-query";
-
-// const locationOptions = [
-//   { value: "Location1", label: "Location 1" },
-//   { value: "Location2", label: "Location 2" },
-// ];
+import { ControlledEditor } from "components/base/Editor";
+import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 const schema = object({
   name: NonEmptyString,
@@ -38,7 +34,7 @@ const EventDetailsStep: FC = () => {
     useEventStore();
 
   const methods = useForm({
-    // resolver: superstructResolver(schema),
+    resolver: superstructResolver(schema),
     defaultValues: {
       name,
       location,
@@ -76,7 +72,7 @@ const EventDetailsStep: FC = () => {
 
   const handleNext = useCallback(() => {
     methods.handleSubmit((data, errors) => {
-      console.log(data);
+      console.log(data, errors);
       if (!errors) {
         let locationData = data.location;
 
@@ -149,7 +145,10 @@ const EventDetailsStep: FC = () => {
           <Grid item xs={12}>
             <InputLabel id={"description"} label={"Description (optional)"} />
             <Box mt={0.6}>
-              <RichText placeholder="Enter a description" name="description" />
+              <ControlledEditor
+                name={"description"}
+                placeholder={"Enter a description"}
+              />
             </Box>
           </Grid>
           <DateTimeForm />

@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import TimeInput from "components/base/Pickers/TimeInput";
-import { Grid } from "@mui/material";
+import { Editor } from "components/base/Editor";
 
 type LocationEntity = {
   name: string;
@@ -10,11 +9,11 @@ type LocationEntity = {
 
 const Home: NextPage = () => {
   return (
-    <Grid container>
-      <Grid item xs={12}>
-        <TimeInput value={new Date()} />
-      </Grid>
-    </Grid>
+    <Editor
+      value={""}
+      onChange={(value) => console.log(value)}
+      placeholder={"Type in a word"}
+    />
   );
 };
 

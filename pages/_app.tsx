@@ -1,5 +1,4 @@
 import "react-datepicker/dist/react-datepicker.css";
-import "draft-js/dist/Draft.css";
 import "../styles/globals.css";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "styles";

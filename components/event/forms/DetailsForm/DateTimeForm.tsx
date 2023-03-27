@@ -11,7 +11,7 @@ const DateTimeForm: FC = () => {
     register,
     toggleMultiple,
     isMultipleDays,
-  } = useDateTimeRange("eventDate");
+  } = useDateTimeRange("date");
 
   const onChangeSwitch = () => {
     toggleMultiple();

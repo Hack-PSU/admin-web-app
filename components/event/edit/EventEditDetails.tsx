@@ -10,8 +10,8 @@ import {
   LabelledInput,
   LabelledSelect,
 } from "components/base";
-import { RichText } from "components/base/RichText";
 import { useDateTimeRange } from "common/hooks";
+import { ControlledEditor } from "components/base/Editor";
 import { LabelledDatePicker } from "components/base/Pickers";
 import { EventType } from "api";
 import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
@@ -33,21 +33,6 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
     endDateTime: endDate,
     register,
   } = useDateTimeRange("eventDate", { isMultiple: true });
-
-  // const { data: locationOptions } = useQuery(
-  //   QueryKeys.location.findAll(),
-  //   () => fetch(getAllLocations),
-  //   {
-  //     select: (data) => {
-  //       if (data) {
-  //         return data.map((d) => ({
-  //           value: String(d.uid),
-  //           label: d.location_name,
-  //         }));
-  //       }
-  //     },
-  //   }
-  // );
 
   return (
     <EventEdit title={"Basic Details"}>
@@ -87,9 +72,9 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         <Grid item xs={12}>
           <InputLabel id={"event-description"} label={"Description"} />
           <Box mt={0.6}>
-            <RichText
-              placeholder={"Enter a description"}
+            <ControlledEditor
               name={"description"}
+              placeholder={"Enter a description"}
             />
           </Box>
         </Grid>

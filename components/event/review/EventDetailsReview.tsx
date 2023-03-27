@@ -1,19 +1,10 @@
 import React, { FC } from "react";
-import { Box, Grid, styled } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { InputLabel } from "components/base";
 import EventDetail from "./EventDetail";
 import { DateTime } from "luxon";
-import { convertFromRaw, Editor, EditorState } from "draft-js";
-import { decorator } from "components/base/RichText/decorators";
 import { useEventStore } from "common/store";
-
-const ReadOnlyEditor = styled(Box)(({ theme }) => ({
-  "& .public-DraftEditor-content": {
-    fontSize: "0.85rem",
-    color: theme.palette.common.black,
-    fontFamily: "Poppins",
-  },
-}));
+import { Editor } from "components/base/Editor";
 
 const EventDetailsReview: FC = () => {
   const { name, type, location, description, date } = useEventStore();
@@ -31,16 +22,14 @@ const EventDetailsReview: FC = () => {
       </Grid>
       <Grid item xs={12}>
         <InputLabel id={"Description"} label={"Description"} />
-        <ReadOnlyEditor>
+        <Box mt={0.5}>
           <Editor
             onChange={() => null}
-            editorState={EditorState.createWithContent(
-              convertFromRaw(description),
-              decorator
-            )}
-            readOnly={true}
+            value={description}
+            placeholder={""}
+            disabled
           />
-        </ReadOnlyEditor>
+        </Box>
       </Grid>
       <Grid item xs={3}>
         <EventDetail

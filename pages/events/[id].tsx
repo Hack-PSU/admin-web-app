@@ -16,19 +16,12 @@ import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import { Grid, lighten, Typography, useTheme } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import EventEditDetails from "components/event/edit/EventEditDetails";
-import {
-  ContentState,
-  convertFromHTML,
-  convertFromRaw,
-  convertToRaw,
-} from "draft-js";
 import { DateTime } from "luxon";
 import EventEditWorkshop from "components/event/edit/EventEditWorkshop";
 import _ from "lodash";
 import { Button } from "components/base";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { prepareContent } from "components/base/RichText";
 import EventEditIcon from "components/event/edit/EventEditIcon";
 import EventIconPreview from "components/event/edit/EventIconPreview";
 
@@ -41,17 +34,6 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
-  const description = useMemo(() => {
-    const htmlDescription = event.description;
-    const htmlBlock = convertFromHTML(htmlDescription);
-    const state = ContentState.createFromBlockArray(
-      htmlBlock.contentBlocks,
-      htmlBlock.entityMap
-    );
-
-    return convertToRaw(state);
-  }, [event]);
-
   const methods = useForm({
     defaultValues: {
       name: event.name,
@@ -63,7 +45,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
         value: event.type,
         label: _.capitalize(event.type),
       },
-      description,
+      description: event.description,
       date: {
         start: DateTime.fromMillis(event.startTime).toJSDate(),
         end: DateTime.fromMillis(event.endTime).toJSDate(),
@@ -154,11 +136,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
           "type",
           data.type ? data.type.value : EventType.ACTIVITY
         );
-        formData.append(
-          "description",
-          prepareContent(convertFromRaw(description))
-        );
-        formData.append("location", String(eventLocation));
+        formData.append("description", data.description);
+        formData.append("locationId", String(eventLocation));
         formData.append(
           "startTime",
           String(DateTime.fromJSDate(data.date.start).toMillis())
@@ -202,8 +181,9 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   }, [
     handleSubmit,
     currentLocations,
-    mutateUpdateEvent,
+    event.icon,
     event.id,
+    mutateUpdateEvent,
     mutateCreateLocation,
   ]);
 

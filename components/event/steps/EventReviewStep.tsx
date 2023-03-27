@@ -19,8 +19,6 @@ import {
 import { useEventStore } from "common/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { prepareContent } from "components/base/RichText";
-import { convertFromRaw } from "draft-js";
 import { DateTime } from "luxon";
 import { useRouter } from "next/router";
 
@@ -90,8 +88,8 @@ const EventReviewStep: FC = () => {
       formData.append("icon", icon);
     }
     formData.append("type", type ? type.value : EventType.ACTIVITY);
-    formData.append("description", prepareContent(convertFromRaw(description)));
-    formData.append("location", String(locationId));
+    formData.append("description", description);
+    formData.append("locationId", String(locationId));
     formData.append(
       "startTime",
       String(DateTime.fromJSDate(date.start).toMillis())

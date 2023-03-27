@@ -1,5 +1,4 @@
 import { EventType } from "api";
-import { RawDraftContentState } from "draft-js";
 import create from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { IOption } from "components/base/Select/types";
@@ -8,7 +7,7 @@ interface IEventBaseModel {
   type: IOption<EventType> | null;
   name: string;
   location: IOption<number> | null;
-  description: RawDraftContentState;
+  description: string;
   date: {
     start: Date;
     end: Date;
