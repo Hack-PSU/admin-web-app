@@ -1,14 +1,37 @@
 import React, { useMemo } from "react";
-import SingleSelect, { GroupBase, StylesConfig } from "react-select";
+import SingleSelect, { GroupBase, Props, StylesConfig } from "react-select";
 import { Box, useTheme } from "@mui/material";
 import {
-  ControlledSelectProps,
-  LabelledSelectProps,
-  SelectProps,
-} from "types/components";
-import { InputLabel } from "components/base/Input";
+  InputLabel,
+  InputLabelProps,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base/Input";
 import { useController } from "react-hook-form";
 import { selectStyles } from "components/base/Select/styles";
+
+export type SelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<Props<TOption, TIsMulti, TGroup>, "styles"> & {
+  error?: boolean;
+  allowOverlap?: boolean;
+};
+
+export type LabelledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<SelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  SelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
+>;
 
 function Select<
   TOption,

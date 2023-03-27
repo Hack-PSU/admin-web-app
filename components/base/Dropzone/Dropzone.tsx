@@ -1,15 +1,28 @@
-import { FC, useCallback } from "react";
-import { Grid, styled, useTheme } from "@mui/material";
+import React, { FC, useCallback } from "react";
+import { Grid, styled, SxProps, Theme, useTheme } from "@mui/material";
 import { DropzoneOptions, useDropzone } from "react-dropzone";
 import { blue } from "@mui/material/colors";
-import { InputLabel } from "components/base/Input";
 import {
-  ControlledDropzoneProps,
-  IDropzoneProps,
-  LabelledDropzoneProps,
-} from "types/components";
+  InputLabel,
+  InputLabelProps,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base/Input";
 import { useController } from "react-hook-form";
 import DropzonePlaceholder from "./DropzonePlaceholder";
+
+export interface IDropzoneProps extends DropzoneOptions {
+  containerStyle?: SxProps<Theme>;
+  custom?: boolean;
+  children?: React.ReactNode;
+  replace?: boolean;
+}
+
+export type LabelledDropzoneProps = WithLabelledProps<IDropzoneProps>;
+
+export type ControlledDropzoneProps = WithControllerProps<
+  Omit<IDropzoneProps, "onDrop"> & Partial<InputLabelProps>
+>;
 
 const Container = styled(Grid)(({ theme }) => ({
   flexDirection: "column",

@@ -1,10 +1,8 @@
 import { FC } from "react";
 import { Grid, Switch, Typography } from "@mui/material";
-import {
-  LabelledDatePicker,
-  LabelledTimePicker,
-} from "components/base/Pickers";
+import { LabelledDatePicker } from "components/base/Pickers";
 import { useDateTimeRange } from "common/hooks";
+import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
 
 const DateTimeForm: FC = () => {
   const {
@@ -13,7 +11,7 @@ const DateTimeForm: FC = () => {
     register,
     toggleMultiple,
     isMultipleDays,
-  } = useDateTimeRange("eventDate");
+  } = useDateTimeRange("date");
 
   const onChangeSwitch = () => {
     toggleMultiple();
@@ -70,10 +68,9 @@ const DateTimeForm: FC = () => {
         </Grid>
         <Grid container item spacing={2}>
           <Grid item xs={6}>
-            <LabelledTimePicker
-              menuWidth="200px"
-              id="start-time"
-              label="Start Time"
+            <LabelledTimeInput
+              id={"start-time"}
+              label={"Start Time"}
               {...register("startTime")}
               sx={{
                 mt: 0.6,
@@ -82,10 +79,9 @@ const DateTimeForm: FC = () => {
             />
           </Grid>
           <Grid item xs={6}>
-            <LabelledTimePicker
-              menuWidth="200px"
-              id="end-time"
-              label="End Time"
+            <LabelledTimeInput
+              id={"end-time"}
+              label={"End Time"}
               {...register("endTime")}
               sx={{
                 mt: 0.6,

@@ -1,17 +1,16 @@
 import "react-datepicker/dist/react-datepicker.css";
-import "draft-js/dist/Draft.css";
 import "../styles/globals.css";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "styles";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { FirebaseProvider } from "components/context";
 import { auth } from "common/config";
-import { AppPropsLayout } from "types/common";
 import { Root } from "components/base";
 import Head from "next/head";
 import { SnackbarProvider } from "notistack";
-import { SuccessSnackbar, ErrorSnackbar } from "components/snackbar";
+import { ErrorSnackbar, SuccessSnackbar } from "components/snackbar";
+import { AppPropsLayout } from "common/types";
 
 const client = new QueryClient();
 

@@ -14,81 +14,22 @@ import PageHeader from "components/Menu/PageHeader";
 import { useImmer } from "use-immer";
 import _ from "lodash";
 import AddNewSponsorModal from "components/modal/AddNewSponsorModal";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetch,
   getAllSponsors,
-  ISponsorshipCreateEntity,
+  PatchBatchSponsor,
+  QueryEntity,
   QueryKeys,
+  SponsorEntity,
   updateSponsorBatch,
 } from "api";
 import { useSnackbar } from "notistack";
 import EditSponsorModal from "components/modal/EditSponsorModal";
 
-type Sponsor = ISponsorshipCreateEntity;
-
 type MutateSponsors = {
-  entity: {
-    sponsors: Sponsor[];
-  };
+  sponsors: PatchBatchSponsor[];
 };
-
-// const sponsorsData: Sponsor[] = [
-//   {
-//     name: "Nittany AI Alliance",
-//     order: 0,
-//     level: SponsorLevel.GOLD,
-//     link: "https://nittanyai.psu.edu/",
-//   },
-//   {
-//     name: "M&T Tech",
-//     order: 1,
-//     level: SponsorLevel.GOLD,
-//     link: "https://www3.mtb.com/techhub/",
-//   },
-//   {
-//     name: "celonis",
-//     order: 2,
-//     level: SponsorLevel.GOLD,
-//     link: "https://www.celonis.com/",
-//   },
-//   {
-//     name: "Penn State Startup Week",
-//     order: 3,
-//     level: SponsorLevel.GOLD,
-//     link: "https://oec.psu.edu/",
-//   },
-//   {
-//     name: "Penn State EECS",
-//     order: 4,
-//     level: SponsorLevel.SILVER,
-//     link: "https://www.eecs.psu.edu/",
-//   },
-//   {
-//     name: "Penn State ICDS",
-//     order: 5,
-//     level: SponsorLevel.SILVER,
-//     link: "https://www.icds.psu.edu/",
-//   },
-//   {
-//     name: "PWC",
-//     order: 6,
-//     level: SponsorLevel.SILVER,
-//     link: "https://www.pwc.com/",
-//   },
-//   {
-//     name: "echo3D",
-//     order: 7,
-//     level: SponsorLevel.BRONZE,
-//     link: "https://www.echo3d.co/",
-//   },
-//   {
-//     name: "Saxbys",
-//     order: 8,
-//     level: SponsorLevel.BRONZE,
-//     link: "https://www.saxbyscoffee.com/",
-//   },
-// ];
 
 const AddNewSponsorButton: FC = () => {
   const theme = useTheme();
@@ -140,9 +81,11 @@ const EditActionCell: FC<{ onClick(): void }> = ({ onClick }) => {
 
 const SponsorshipPage: NextPage = () => {
   const queryClient = useQueryClient();
-  const originalData = useRef<{ [key: number]: Sponsor } | null>(null);
+  const originalData = useRef<{ [key: number]: SponsorEntity } | null>(null);
 
-  const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
+  const [selectedSponsor, setSelectedSponsor] = useState<SponsorEntity | null>(
+    null
+  );
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -154,12 +97,13 @@ const SponsorshipPage: NextPage = () => {
         if (data) {
           return _.chain(data)
             .map((d) => ({
-              uid: d.uid,
-              logo: d.logo,
+              id: d.id,
+              lightLogo: d.lightLogo ?? "",
+              darkLogo: d.darkLogo ?? "",
               order: d.order,
               name: d.name,
               level: d.level,
-              websiteLink: d.website_link ?? "",
+              link: d.link ?? "",
             }))
             .sortBy("order")
             .value();
@@ -169,7 +113,8 @@ const SponsorshipPage: NextPage = () => {
   );
 
   const { mutateAsync } = useMutation(
-    ({ entity }: MutateSponsors) => fetch(() => updateSponsorBatch(entity)),
+    ({ entity }: QueryEntity<MutateSponsors>) =>
+      fetch(() => updateSponsorBatch(entity)),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.sponsorship.all);
@@ -180,9 +125,9 @@ const SponsorshipPage: NextPage = () => {
     }
   );
 
-  const [data, setData] = useImmer<Sponsor[]>(allSponsors ?? []);
+  const [data, setData] = useImmer<SponsorEntity[]>(allSponsors ?? []);
 
-  const defs = useColumnDef<Sponsor>({
+  const defs = useColumnDef<SponsorEntity>({
     columns: [
       {
         id: "name",
@@ -202,7 +147,7 @@ const SponsorshipPage: NextPage = () => {
         id: "link",
         type: "text",
         header: "Link",
-        accessorKey: "websiteLink",
+        accessorKey: "link",
       },
       {
         id: "actions",
@@ -212,7 +157,7 @@ const SponsorshipPage: NextPage = () => {
           <EditActionCell
             onClick={() => {
               if (originalData.current) {
-                setSelectedSponsor(originalData.current[row.original.uid]);
+                setSelectedSponsor(originalData.current[row.original.id]);
               }
             }}
           />
@@ -276,7 +221,7 @@ const SponsorshipPage: NextPage = () => {
     if (origData) {
       const changedData = _.filter(
         data,
-        (d) => d.order !== origData[d.uid].order
+        (d) => d.order !== origData[d.id].order
       );
       await mutateAsync({
         entity: {
@@ -299,17 +244,17 @@ const SponsorshipPage: NextPage = () => {
       originalData.current = _.reduce(
         initialData,
         (acc, curr) => {
-          acc[curr.uid] = curr;
+          acc[curr.id] = curr;
           return acc;
         },
-        {} as { [key: number]: Sponsor }
+        {} as { [key: number]: SponsorEntity }
       );
     }
   }, [allSponsors, setData]);
 
   return (
     <ModalProvider>
-      <AddNewSponsorModal />
+      <AddNewSponsorModal totalSponsors={allSponsors?.length ?? 0} />
       <EditSponsorModal sponsor={selectedSponsor} />
       <Grid container gap={1.5}>
         <PageHeader header={"Sponsorship"} right={<AddNewSponsorButton />} />

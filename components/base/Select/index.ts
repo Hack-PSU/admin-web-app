@@ -1,4 +1,9 @@
 export { default as Select, LabelledSelect, ControlledSelect } from "./Select";
+export type {
+  LabelledSelectProps,
+  ControlledSelectProps,
+  SelectProps,
+} from "./Select";
 export {
   default as CreatableSelect,
   LabelledCreatableSelect,

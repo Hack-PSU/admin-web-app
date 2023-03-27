@@ -1,10 +1,9 @@
 import React, { FC } from "react";
-import { StepperProvider, Stepper } from "components/base";
+import { Stepper, StepperProvider } from "components/base";
 import EventTypeStep from "./EventTypeStep";
 import { Grid } from "@mui/material";
 import EventDetailsStep from "./EventDetailsStep";
 import WorkshopDetailsStep from "./WorkshopDetailsStep";
-import EventImageStep from "./EventImageStep";
 import EventIconStep from "./EventIconStep";
 import EventReviewStep from "./EventReviewStep";
 
@@ -16,7 +15,6 @@ const EventFormStepper: FC = () => {
         <EventTypeStep />
         <EventDetailsStep />
         <WorkshopDetailsStep />
-        {/*<EventImageStep />*/}
         <EventIconStep />
         <EventReviewStep />
       </Grid>

@@ -1,25 +1,47 @@
-export interface IScoreEntity {
-  uid: number;
-  project_id: number;
-  judge: string;
+import { OrganizerEntity } from "common/api/organizer/entity";
+
+export interface ProjectEntity {
+  id: number;
+  name: string;
+  hackathonId?: string;
+}
+
+export interface ScoreEntity {
+  id: number;
+  projectId: number;
+  judgeId: number;
   creativity: number;
   technical: number;
   implementation: number;
   clarity: number;
   growth: number;
   submitted: boolean;
-  energy?: number;
-  supply_chain?: number;
-  environmental?: number;
+  energy: number;
+  supplyChain: number;
+  environmental: number;
 }
 
-export interface IGenerateJudgingEntity {
+export type ScoreJudgeEntity = Omit<OrganizerEntity, "privilege">;
+export type ScoreProjectEntity = Omit<ProjectEntity, "hackathonId">;
+
+export interface ScoreDataEntity
+  extends Omit<ScoreEntity, "judgeId" | "projectId" | "hackathonId"> {
+  project: ScoreProjectEntity;
+  judge: ScoreJudgeEntity;
+}
+
+export interface ScoreBreakdownEntity extends Omit<ScoreDataEntity, "project"> {
+  total: number;
+}
+
+export interface ProjectBreakdownEntity
+  extends ProjectEntity,
+    Omit<ScoreEntity, "id" | "projectId" | "judgeId"> {
+  average: number;
+  scores: ScoreBreakdownEntity[];
+}
+
+export interface GenerateJudgingEntity {
   judges: string[];
   projectsPerOrganizer: number;
-}
-
-export interface IProjectEntity {
-  project: string;
-  uid: number;
-  hackathon: string;
 }

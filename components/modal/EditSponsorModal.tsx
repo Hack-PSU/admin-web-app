@@ -1,28 +1,34 @@
-import React, { FC, useCallback, useEffect, useMemo } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useRef } from "react";
 import {
-  CreateEntity,
   fetch,
-  ISponsorshipCreateEntity,
+  QueryEntity,
   QueryKeys,
+  SponsorEntity,
   updateSponsor,
 } from "api";
 import {
   Button,
+  ControlledDropzone,
   ControlledInput,
   ControlledSelect,
+  DropzonePlaceholder,
+  InputLabel,
+  LabelledDropzone,
   LabelledInput,
   LabelledSelect,
   Modal,
 } from "components/base";
 import { useModal } from "components/context";
 import { Grid } from "@mui/material";
-import { IOption } from "types/components";
-import { useForm, FormProvider } from "react-hook-form";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
+import { IOption } from "components/base/Select/types";
+import { SponsorLogoItem } from "components/sponsorship";
+import { DateTime } from "luxon";
 
 type Props = {
-  sponsor: ISponsorshipCreateEntity | null;
+  sponsor: SponsorEntity | null;
 };
 
 enum SponsorLevel {
@@ -86,6 +92,57 @@ const getSponsorshipLevelOption = (option: SponsorLevel) => {
   }
 };
 
+const PreviewLogo: FC<{ name: string; fallback: string }> = ({
+  name: watchName,
+  fallback,
+}) => {
+  const { watch, getValues } = useFormContext();
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const getImageUrl = useCallback((image: File) => {
+    const fr = new FileReader();
+    fr.onload = (event) => {
+      if (
+        imgRef.current !== null &&
+        event.target !== null &&
+        typeof event.target.result === "string"
+      ) {
+        imgRef.current.src = event.target.result;
+      }
+    };
+    fr.readAsDataURL(image);
+  }, []);
+
+  useEffect(() => {
+    return watch((value, { name }) => {
+      if (name === watchName) {
+        if (value[name].length === 0 && imgRef.current !== null) {
+          imgRef.current.src = `${
+            value[fallback]
+          }?m=${DateTime.now().toMillis()}`;
+        } else if (value[name].length > 0) {
+          getImageUrl(value[name][0]);
+        }
+      }
+    }).unsubscribe;
+  }, [fallback, getImageUrl, watch, watchName]);
+
+  useEffect(() => {
+    if (imgRef.current !== null) {
+      if (getValues(watchName).length === 0) {
+        imgRef.current.src = `${getValues(
+          fallback
+        )}?m=${DateTime.now().toMillis()}`;
+        console.log(getValues(fallback));
+      } else {
+        getImageUrl(getValues(watchName)[0]);
+      }
+    }
+  }, [fallback, getImageUrl, getValues, watchName]);
+
+  return <img ref={imgRef} width={"100%"} height={"auto"} />;
+};
+
 const EditSponsorModal: FC<Props> = ({ sponsor }) => {
   const { show, handleHide } = useModal("editSponsor");
 
@@ -93,14 +150,18 @@ const EditSponsorModal: FC<Props> = ({ sponsor }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const defaultValues = useMemo(() => {
+    console.log(sponsor);
     if (sponsor) {
       return {
         name: sponsor.name ?? "",
         level: getSponsorshipLevelOption(
           sponsor.level as SponsorLevel
         ) as IOption,
-        logo: sponsor.logo,
-        websiteLink: sponsor.websiteLink ?? "",
+        lightLogoUrl: sponsor.lightLogo ?? "",
+        lightLogo: [],
+        darkLogoUrl: sponsor.darkLogo ?? "",
+        darkLogo: [],
+        link: sponsor.link ?? "",
       };
     }
     return {};
@@ -110,11 +171,11 @@ const EditSponsorModal: FC<Props> = ({ sponsor }) => {
     defaultValues,
   });
 
-  const { handleSubmit, reset } = methods;
+  const { handleSubmit, reset, watch } = methods;
 
   const { mutateAsync } = useMutation(
-    ({ entity }: CreateEntity<ISponsorshipCreateEntity, "">) =>
-      fetch(() => updateSponsor(entity)),
+    ({ entity: { data, id } }: QueryEntity<{ data: FormData; id: number }>) =>
+      fetch(() => updateSponsor(data, { id })),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.sponsorship.all);
@@ -128,14 +189,24 @@ const EditSponsorModal: FC<Props> = ({ sponsor }) => {
   const onClickSubmit = useCallback(() => {
     if (sponsor) {
       handleSubmit(async (data) => {
+        const formData = new FormData();
+
+        formData.append("name", data.name);
+        formData.append("level", data.level.value);
+        formData.append("link", data.link);
+
+        if (data.lightLogo.length > 0) {
+          formData.append("lightLogo", data.lightLogo[0]);
+        }
+
+        if (data.darkLogo.length > 0) {
+          formData.append("darkLogo", data.darkLogo[0]);
+        }
+
         await mutateAsync({
           entity: {
-            uid: sponsor.uid,
-            order: sponsor.order,
-            name: data.name,
-            level: data.level.value,
-            websiteLink: data.websiteLink,
-            logo: data.logo,
+            data: formData,
+            id: sponsor.id,
           },
         });
         reset();
@@ -178,21 +249,58 @@ const EditSponsorModal: FC<Props> = ({ sponsor }) => {
             </Grid>
             <Grid item xs={12}>
               <ControlledInput
-                name={"logo"}
-                placeholder={"Enter link to logo"}
-                as={LabelledInput}
-                label={"Logo"}
-                showError
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ControlledInput
-                name={"websiteLink"}
+                name={"link"}
                 placeholder={"Enter sponsor's website"}
                 as={LabelledInput}
                 label={"Website"}
                 showError
               />
+            </Grid>
+            <Grid container item xs={6} flexDirection={"column"} gap={1}>
+              <InputLabel
+                id={"light-logo-preview"}
+                label={"Light Logo Preview"}
+              />
+              <Grid item>
+                <PreviewLogo name={"lightLogo"} fallback={"lightLogoUrl"} />
+              </Grid>
+            </Grid>
+            <Grid item xs={6}>
+              <ControlledDropzone
+                name={"lightLogo"}
+                as={LabelledDropzone}
+                id={"light-logo"}
+                label={"Replace Light Mode Logo"}
+              >
+                {watch("lightLogo", [])?.length > 0 ? (
+                  <SponsorLogoItem name={"lightLogo"} />
+                ) : (
+                  <DropzonePlaceholder />
+                )}
+              </ControlledDropzone>
+            </Grid>
+            <Grid container item xs={6} flexDirection={"column"} gap={1}>
+              <InputLabel
+                id={"dark-logo-preview"}
+                label={"Dark Logo Preview"}
+              />
+              <Grid item sx={{ backgroundColor: "common.black" }}>
+                <PreviewLogo name={"darkLogo"} fallback={"darkLogoUrl"} />
+              </Grid>
+            </Grid>
+            <Grid item xs={6}>
+              <ControlledDropzone
+                name={"darkLogo"}
+                as={LabelledDropzone}
+                id={"dark-logo"}
+                label={"Replace Dark Mode Logo"}
+              >
+                {watch("darkLogo", [])?.length > 0 ? (
+                  <SponsorLogoItem name={"darkLogo"} />
+                ) : (
+                  <DropzonePlaceholder />
+                )}
+              </ControlledDropzone>
             </Grid>
           </Grid>
           <Grid

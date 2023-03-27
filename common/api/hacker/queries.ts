@@ -1,30 +1,26 @@
-import { createQuery, CreateQueryReturn } from "api/utils";
-import { IGetAllHackersResponse } from "./entity";
+import {
+  createMutation,
+  CreateMutationReturn,
+  createQuery,
+  CreateQueryReturn,
+} from "api/utils";
+import { UserEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
-type GetAllHackersParams = {
-  type: string;
-  hackathon?: string;
-  allHackathons?: boolean;
-};
-
 /**
- * Get All Hackers
+ * Get All Users
  * @param params (optional)
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Statistics-Get_list_of_all_users
  */
-export const getAllHackers: CreateQueryReturn<
-  IGetAllHackersResponse[],
-  GetAllHackersParams
-> = (params, token) =>
-  createQuery<IGetAllHackersResponse[]>("/admin/data")(
-    {
-      type: "registration_stats",
-      ...params,
-    },
-    token
-  );
+export const getAllUsers: CreateQueryReturn<UserEntity[]> =
+  createQuery("/users");
+
+/**
+ * Create a User
+ */
+export const createUser: CreateMutationReturn<UserEntity> =
+  createMutation("/users");
 
 export const HackerKeys = {
   all: [{ entity: "hacker" }],

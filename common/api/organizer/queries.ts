@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { IOrganizerEntity } from "./entity";
+import { OrganizerEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -13,8 +13,8 @@ import { QueryAction, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Get_All_Organizers
  */
-export const getAllOrganizers: CreateQueryReturn<IOrganizerEntity[]> =
-  createQuery("/admin/organizers/all");
+export const getAllOrganizers: CreateQueryReturn<OrganizerEntity[]> =
+  createQuery("/organizers");
 
 /**
  * Gets an organizer using their Firebase UID
@@ -22,10 +22,8 @@ export const getAllOrganizers: CreateQueryReturn<IOrganizerEntity[]> =
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Get_Organizer
  */
-export const getOrganizer: CreateQueryReturn<
-  IOrganizerEntity,
-  { uid: string }
-> = createQuery("/admin/organizers");
+export const getOrganizer: CreateQueryReturn<OrganizerEntity, { id: string }> =
+  createQuery("/organizers/:id");
 
 /**
  * Creates an organizer
@@ -33,9 +31,8 @@ export const getOrganizer: CreateQueryReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Add_Organizer
  */
-export const createOrganizer: CreateMutationReturn<
-  Omit<IOrganizerEntity, "privilege">
-> = createMutation("/admin/organizers");
+export const createOrganizer: CreateMutationReturn<OrganizerEntity> =
+  createMutation("/organizers");
 
 /**
  * Updates an organizer
@@ -44,20 +41,10 @@ export const createOrganizer: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Delete_Organizer
  */
 export const updateOrganizer: CreateMutationReturn<
-  Partial<IOrganizerEntity>,
-  IOrganizerEntity
-> = createMutation("/admin/organizers/update");
-
-/**
- * Updates an organizer's privilege level
- * @param params (optional)
- * @param token (optional)
- * @link https://api.hackpsu.org/v2/doc/#api-Admin-Elevate_user
- */
-export const updateOrganizerPermissions: CreateMutationReturn<
-  { uid: string; privilege: number },
-  {}
-> = createMutation("/admin/makeadmin");
+  Partial<Omit<OrganizerEntity, "id">>,
+  OrganizerEntity,
+  { id: string }
+> = createMutation("/organizers/:id", "PATCH");
 
 export const OrganizerQueryKeys = {
   all: [{ entity: "organizer" }] as const,
@@ -85,12 +72,12 @@ export const OrganizerQueryKeys = {
         scope: QueryScope.NEW,
       },
     ] as const,
-  updateOne: () =>
+  updateOne: (...ids: (string | number)[]) =>
     [
       {
         ...OrganizerQueryKeys.all[0],
         action: QueryAction.update,
-        scope: QueryScope.ID,
+        scope: [...ids],
       },
     ] as const,
 };

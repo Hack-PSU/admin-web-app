@@ -5,11 +5,11 @@ import {
   NextPage,
 } from "next";
 import { useFirebase } from "components/context";
-import { AuthPermission } from "types/context";
 import UnauthorizedError from "components/base/Error/UnauthorizedError";
 import { DefaultLayout } from "components/layout";
-import { NextPageLayout } from "types/common";
 import nookies from "nookies";
+import { NextPageLayout } from "common/types";
+import { AuthPermission } from "components/context/FirebaseProvider";
 
 export function withProtectedRoute(
   Component: NextPage | NextPageLayout,
@@ -48,7 +48,7 @@ export function withServerSideProps<TProps>(
 
     if (cookies.idtoken) {
       if (getServerSideProps) {
-        return getServerSideProps(ctx, cookies.idtoken);
+        return getServerSideProps(ctx, cookies.token);
       } else {
         return {
           props: {},

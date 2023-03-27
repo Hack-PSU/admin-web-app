@@ -8,8 +8,8 @@ import React, {
   useState,
 } from "react";
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
-import { WithChildren } from "types/common";
 import { Menu } from "components/Menu";
+import { WithChildren } from "common/types";
 
 type MenuProviderHooks = {
   open: boolean;

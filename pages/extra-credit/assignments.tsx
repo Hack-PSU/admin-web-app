@@ -7,49 +7,33 @@ import { Table, useColumnDef, useTable } from "components/Table";
 import { ModalProvider } from "components/context";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  fetch,
-  getAllHackers,
-  QueryKeys,
-  getAllExtraCreditAssignments,
-  getAllExtraCreditClasses,
-} from "api";
+import { fetch, getAllExtraCreditAssignments, QueryKeys } from "api";
+import _ from "lodash";
 
 type DataRow = {
-  uid: number;
   userName: string;
   className?: string;
 };
 
 const ExtraCreditAssignments: NextPage = () => {
-  const { data: allUsers } = useQuery(QueryKeys.hacker.findAll(), () =>
-    fetch(getAllHackers)
-  );
-
-  const { data: allClasses } = useQuery(
-    QueryKeys.extraCreditClass.findAll(),
-    () => fetch(getAllExtraCreditClasses)
-  );
-
   const { data: allAssignments } = useQuery(
     QueryKeys.extraCreditAssignment.findAll(),
     () => fetch(getAllExtraCreditAssignments),
     {
       select: (data) => {
-        if (data && allClasses && allUsers) {
-          return data.map((d) => {
-            const user = allUsers.find((u) => u.uid === d.user_uid);
-            const ecClass = allClasses.find((c) => c.uid === d.class_uid);
-
-            return {
-              uid: d.uid,
-              userName: `${user?.firstname} ${user?.lastname}`,
-              className: ecClass?.class_name,
-            };
-          });
+        if (data) {
+          return _.chain(data)
+            .map((dataClass) => {
+              return dataClass.users.map((user) => ({
+                userName: `${user.firstName} ${user.lastName}`,
+                className: dataClass.name,
+              }));
+            })
+            .flatten()
+            .value();
         }
+        return [];
       },
-      enabled: !!allClasses && !!allUsers,
     }
   );
 

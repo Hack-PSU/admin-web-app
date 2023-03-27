@@ -1,15 +1,37 @@
 import React, { useMemo } from "react";
-import Creatable from "react-select/creatable";
+import Creatable, { CreatableProps } from "react-select/creatable";
 import { GroupBase, StylesConfig } from "react-select";
-import {
-  ControlledCreatableSelectProps,
-  CreatableSelectProps,
-  LabelledCreatableSelectProps,
-} from "types/components";
 import { selectStyles } from "components/base/Select/styles";
 import { Box, useTheme } from "@mui/material";
-import { InputLabel } from "components/base";
+import {
+  InputLabel,
+  InputLabelProps,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base";
 import { useController } from "react-hook-form";
+
+export type CreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = Omit<CreatableProps<TOption, TIsMulti, TGroup>, "styles"> & {
+  error?: boolean;
+};
+
+export type LabelledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithLabelledProps<CreatableSelectProps<TOption, TIsMulti, TGroup>>;
+
+export type ControlledCreatableSelectProps<
+  TOption,
+  TIsMulti extends boolean = false,
+  TGroup extends GroupBase<TOption> = GroupBase<TOption>
+> = WithControllerProps<
+  CreatableSelectProps<TOption, TIsMulti, TGroup> & Partial<InputLabelProps>
+>;
 
 function CreatableSelect<
   TOption,

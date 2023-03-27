@@ -36,14 +36,14 @@ const EventDropzoneItem: FC<IEventDropzoneItemProps> = ({ name }) => {
       gap={1}
     >
       <Grid container item justifyContent="space-between" alignItems="center">
-        <Grid item xs={1}>
+        <Grid item xs={1.2}>
           <EvaIcon
             name={"image"}
             fill={theme.palette.common.black}
             size="xlarge"
           />
         </Grid>
-        <Grid container item flexDirection={"column"} xs={10}>
+        <Grid container item flexDirection={"column"} xs={9.8}>
           <Grid item>
             <Typography
               variant="body1"

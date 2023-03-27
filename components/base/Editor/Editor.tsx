@@ -6,9 +6,9 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import EditorStyles from "components/base/Editor/EditorStyles";
 import { useController } from "react-hook-form";
-import { WithControllerProps } from "types/components";
 import EditorContextMenu from "components/base/Editor/EditorContextMenu";
 import Placeholder from "@tiptap/extension-placeholder";
+import { WithControllerProps } from "components/base";
 
 type Props = {
   onChange(newValue: string): void;
@@ -31,7 +31,8 @@ const EditorContainer = styled(Grid)(({ theme }) => ({
     outline: "none",
     "& p": {
       fontSize: theme.typography.pxToRem(15),
-      lineHeight: theme.spacing(1),
+      lineHeight: theme.spacing(3),
+      margin: 0,
       "&.is-editor-empty:first-child::before": {
         outline: "none",
         color: alpha(theme.palette.border.dark, 0.8),
@@ -91,8 +92,8 @@ const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
 
   return (
     <EditorContainer container flexDirection={"column"}>
-      <EditorStyles editor={editor} />
-      <EditorContextMenu editor={editor} />
+      {!disabled && <EditorStyles editor={editor} />}
+      {!disabled && <EditorContextMenu editor={editor} />}
       <Grid item>
         <EditorContent editor={editor} />
       </Grid>

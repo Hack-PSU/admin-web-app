@@ -10,20 +10,20 @@ import {
 } from "components/base";
 import { Grid } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { IOption } from "types/components";
 import {
-  CreateEntity,
   createOrganizer,
   fetch,
-  IOrganizerEntity,
+  OrganizerEntity,
+  QueryEntity,
   QueryKeys,
-  updateOrganizerPermissions,
+  updateOrganizer,
 } from "api";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { object } from "superstruct";
 import { Email, NonEmptySelect, NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
+import { IOption } from "components/base/Select/types";
 
 const PermissionOptions: IOption<number>[] = [
   {
@@ -64,7 +64,7 @@ const AddNewMemberModal: FC = () => {
 
   const methods = useForm({
     defaultValues: {
-      uid: "",
+      id: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -74,7 +74,7 @@ const AddNewMemberModal: FC = () => {
   });
 
   const { mutateAsync: mutateCreateOrganizer, isLoading } = useMutation(
-    ({ entity }: CreateEntity<IOrganizerEntity, "privilege">) =>
+    ({ entity }: QueryEntity<OrganizerEntity>) =>
       fetch(() => createOrganizer(entity)),
     {
       onSuccess: async () => {
@@ -87,8 +87,11 @@ const AddNewMemberModal: FC = () => {
   );
 
   const { mutateAsync: mutateSetPrivilege } = useMutation(
-    ({ entity }: CreateEntity<{ uid: string; privilege: number }, "">) =>
-      fetch(() => updateOrganizerPermissions(entity))
+    ({
+      entity: { id, ...data },
+    }: QueryEntity<
+      Partial<Omit<OrganizerEntity, "id">> & Pick<OrganizerEntity, "id">
+    >) => fetch(() => updateOrganizer(data, { id }))
   );
 
   const { handleSubmit, reset } = methods;
@@ -97,15 +100,10 @@ const AddNewMemberModal: FC = () => {
     handleSubmit(async (data) => {
       await mutateCreateOrganizer({
         entity: {
-          uid: data.uid,
+          id: data.id,
           email: data.email,
-          firstname: data.firstName,
-          lastname: data.lastName,
-        },
-      });
-      await mutateSetPrivilege({
-        entity: {
-          uid: data.uid,
+          firstName: data.firstName,
+          lastName: data.lastName,
           privilege: data.privilege.value,
         },
       });
@@ -117,15 +115,10 @@ const AddNewMemberModal: FC = () => {
     handleSubmit(async (data) => {
       await mutateCreateOrganizer({
         entity: {
-          uid: data.uid,
+          id: data.id,
           email: data.email,
-          firstname: data.firstName,
-          lastname: data.lastName,
-        },
-      });
-      await mutateSetPrivilege({
-        entity: {
-          uid: data.uid,
+          firstName: data.firstName,
+          lastName: data.lastName,
           privilege: data.privilege.value,
         },
       });

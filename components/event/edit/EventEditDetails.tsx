@@ -11,13 +11,11 @@ import {
   LabelledSelect,
 } from "components/base";
 import { useDateTimeRange } from "common/hooks";
-import {
-  LabelledDatePicker,
-  LabelledTimePicker,
-} from "components/base/Pickers";
-import { EventType } from "api";
-import { IOption } from "types/components";
 import { ControlledEditor } from "components/base/Editor";
+import { LabelledDatePicker } from "components/base/Pickers";
+import { EventType } from "api";
+import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
+import { IOption } from "components/base/Select/types";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -41,7 +39,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
       <Grid container item spacing={1} rowGap={1.5}>
         <Grid item xs={12}>
           <ControlledInput
-            name={"eventTitle"}
+            name={"name"}
             placeholder={"Enter event title"}
             as={LabelledInput}
             id="event-title"
@@ -53,7 +51,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         </Grid>
         <Grid item xs={6}>
           <ControlledCreatableSelect
-            name={"eventLocation"}
+            name={"location"}
             placeholder={"Select or create a location"}
             as={LabelledCreatableSelect}
             id="event-location"
@@ -63,7 +61,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         </Grid>
         <Grid item xs={6}>
           <ControlledSelect
-            name={"eventType"}
+            name={"type"}
             placeholder={"Select a type"}
             as={LabelledSelect}
             id={"event-type"}
@@ -75,7 +73,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
           <InputLabel id={"event-description"} label={"Description"} />
           <Box mt={0.6}>
             <ControlledEditor
-              name={"eventDescription"}
+              name={"description"}
               placeholder={"Enter a description"}
             />
           </Box>
@@ -101,29 +99,17 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
           />
         </Grid>
         <Grid item xs={6}>
-          <LabelledTimePicker
-            {...register("startTime")}
+          <LabelledTimeInput
             id={"start-time"}
             label={"Start Time"}
-            menuWidth="200px"
+            {...register("startTime")}
           />
         </Grid>
         <Grid item xs={6}>
-          <LabelledTimePicker
-            {...register("endTime")}
+          <LabelledTimeInput
             id={"end-time"}
             label={"End Time"}
-            menuWidth={"200px"}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <ControlledInput
-            name={"eventIcon"}
-            placeholder={"Enter event icon url"}
-            as={LabelledInput}
-            label={"Event Icon"}
-            id={"event-icon"}
-            showError
+            {...register("endTime")}
           />
         </Grid>
       </Grid>

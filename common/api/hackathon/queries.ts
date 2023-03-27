@@ -4,8 +4,8 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { IHackathonEntity } from "./entity";
-import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
+import { HackathonEntity } from "./entity";
+import { QueryAction, QueryScope } from "api/types";
 
 /**
  * Get All Hackathons
@@ -13,17 +13,11 @@ import { QueryAction, QueryKeyFactory, QueryScope } from "api/types";
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-Get_Hackathons
  */
-export const getAllHackathons: CreateQueryReturn<IHackathonEntity[]> =
-  createQuery("/admin/hackathon");
+export const getAllHackathons: CreateQueryReturn<HackathonEntity[]> =
+  createQuery("/hackathons");
 
-/**
- * Get Hackathon Count
- * @param params (optional)
- * @param token (optional)
- * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-get_count_of_hackathon
- */
-export const getHackathonCount: CreateQueryReturn<{ count: number }> =
-  createQuery("/admin/hackathon/count");
+export const getActiveHackathon: CreateQueryReturn<HackathonEntity[]> =
+  createQuery("/hackathons?active=true");
 
 /**
  * Create a Hackathon
@@ -33,9 +27,9 @@ export const getHackathonCount: CreateQueryReturn<{ count: number }> =
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-Add_new_hackathon
  */
 export const createHackathon: CreateMutationReturn<
-  Omit<IHackathonEntity, "uid" | "base_pin" | "active">,
-  IHackathonEntity
-> = createMutation("/admin/hackathon");
+  Omit<HackathonEntity, "id" | "active">,
+  HackathonEntity
+> = createMutation("/hackathons");
 
 /**
  * Update a Hackathon
@@ -45,21 +39,19 @@ export const createHackathon: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-Update_hackathon
  */
 export const updateHackathon: CreateMutationReturn<
-  Partial<IHackathonEntity>,
-  IHackathonEntity
-> = createMutation("/admin/hackathon/update");
+  Partial<Omit<HackathonEntity, "id">>,
+  HackathonEntity,
+  { id: string }
+> = createMutation("/hackathons/:id", "PATCH");
 
 /**
- * Update Active Hackathon
- * @param entity
- * @param params (optional)
- * @param token (optional)
- * @link https://api.hackpsu.org/v2/doc/#api-Admin_Hackathon-Add_Active_hackathon
+ * Mark hackathon as active
  */
-export const updateActiveHackathon: CreateMutationReturn<
-  Pick<IHackathonEntity, "uid">,
-  IHackathonEntity
-> = createMutation("/admin/hackathon/active");
+export const markActiveHackathon: CreateMutationReturn<
+  {},
+  HackathonEntity,
+  { id: string }
+> = createMutation("/hackathons/:id/active", "PATCH");
 
 export const HackathonKeys = {
   all: [{ entity: "hackathon" }] as const,

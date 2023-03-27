@@ -1,13 +1,34 @@
 import React, { FC, useState } from "react";
 import {
-  ControlledRadioProps,
-  IRadioProps,
-  ISelectItem,
-  LabelledRadioProps,
-} from "types/components";
-import { Grid, Radio as MuiRadio, Typography } from "@mui/material";
-import { InputLabel } from "components/base";
-import { useController } from "react-hook-form";
+  Grid,
+  Radio as MuiRadio,
+  RadioProps,
+  Typography,
+  TypographyProps,
+} from "@mui/material";
+import {
+  InputLabel,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base";
+import { useController, UseControllerReturn } from "react-hook-form";
+import { ISelectItem } from "components/base/Select/types";
+
+export interface IRadioProps
+  extends Omit<
+    RadioProps,
+    "name" | "defaultValue" | "placeholder" | "onChange"
+  > {
+  items: ISelectItem<string>[];
+  onChange: UseControllerReturn["field"]["onChange"];
+  labelProps?: TypographyProps;
+}
+
+export type LabelledRadioProps = WithLabelledProps<IRadioProps>;
+
+export type ControlledRadioProps = WithControllerProps<
+  Omit<IRadioProps, "value" | "onChange"> & Partial<LabelledRadioProps>
+>;
 
 const Radio: FC<IRadioProps> = ({ items, onChange, labelProps }) => {
   const [selected, setSelected] = useState<string>("");

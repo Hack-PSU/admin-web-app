@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import { InputLabel } from "components/base";
 import { Typography } from "@mui/material";
 
 interface IEventDetailProps {

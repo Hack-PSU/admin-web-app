@@ -1,7 +1,16 @@
-export interface IOrganizerEntity {
-  uid: string;
+export enum Role {
+  NONE,
+  VOLUNTEER,
+  TEAM,
+  EXEC,
+  TECH,
+  FINANCE,
+}
+
+export interface OrganizerEntity {
+  id: string;
   email: string;
-  firstname: string;
-  lastname: string;
-  privilege: number;
+  firstName: string;
+  lastName: string;
+  privilege: Role;
 }

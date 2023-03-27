@@ -7,9 +7,8 @@ import {
   deleteLocation,
   fetch,
   getAllLocations,
-  ILocationEntity,
-  ILocationUpdateEntity,
-  MutateEntity,
+  LocationEntity,
+  QueryEntity,
   QueryKeys,
   resolveError,
   updateLocation,
@@ -22,7 +21,7 @@ import {
   useTable,
 } from "components/Table";
 import { EvaIcon, GradientButton, SaveButton } from "components/base";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewLocationModal from "components/modal/AddNewLocationModal";
 import ConfirmModal from "components/modal/ConfirmModal";
@@ -30,7 +29,7 @@ import _ from "lodash";
 import { useSnackbar } from "notistack";
 
 interface ILocationsPageProps {
-  locations: ILocationEntity[];
+  locations: LocationEntity[];
 }
 
 const AddNewLocationButton: FC = () => {
@@ -70,8 +69,8 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            uid: d.uid,
-            name: d.location_name,
+            id: d.id,
+            name: d.name,
           }));
         }
       },
@@ -80,7 +79,11 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
 
   const { mutateAsync: mutateUpdateLocation, isLoading } = useMutation(
     QueryKeys.location.updateBatch(),
-    ({ entity }: MutateEntity<ILocationUpdateEntity>) => updateLocation(entity),
+    ({
+      entity: { id, name },
+    }: QueryEntity<
+      Pick<LocationEntity, "id"> & Partial<Omit<LocationEntity, "id">>
+    >) => updateLocation({ name }, { id }),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.location.all);
@@ -89,16 +92,16 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   );
 
   const { mutateAsync: mutateDeleteLocation } = useMutation(
-    ({ entity }: CreateEntity<Pick<ILocationEntity, "uid">, "">) =>
-      fetch(() => deleteLocation(entity))
+    ({ entity: { id } }: CreateEntity<Pick<LocationEntity, "id">, "">) =>
+      fetch(() => deleteLocation({}, { id }))
   );
 
   const defaultValues = useMemo(() => {
     if (locationsData) {
       return locationsData.reduce((obj, curr) => {
-        obj[String(curr.uid)] = curr;
+        obj[String(curr.id)] = curr;
         return obj;
-      }, {} as { [p: string]: { uid: number; name: string } });
+      }, {} as { [p: string]: { id: number; name: string } });
     }
     return {};
   }, [locationsData]);
@@ -124,16 +127,16 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
       );
 
       await Promise.all(
-        editedFields.map((uid) =>
+        editedFields.map((id) =>
           mutateUpdateLocation({
-            entity: { uid: data[uid].uid, locationName: data[uid].name },
+            entity: { id: data[id].id, name: data[id].name },
           })
         )
       );
     })();
   }, [formState, handleSubmit, mutateUpdateLocation]);
 
-  const defs = useColumnDef<{ uid: number; name: string }>({
+  const defs = useColumnDef<{ id: number; name: string }>({
     columns: [
       {
         id: "name",
@@ -159,7 +162,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
               {
                 icon: "refresh-outline",
                 onClick: () => {
-                  resetField(`${row.original.uid}.name`);
+                  resetField(`${row.original.id}.name`);
                 },
               },
             ]}
@@ -172,7 +175,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const table = useTable({
     ...defs,
     data: locationsData ?? [],
-    getRowId: (row) => String(row.uid),
+    getRowId: (row) => String(row.id),
     onRowSelectionChange: setRowSelection,
     state: {
       rowSelection,
@@ -192,9 +195,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         .value();
 
       await Promise.all(
-        selectedUids.map((uid) =>
+        selectedUids.map((id) =>
           mutateDeleteLocation(
-            { entity: { uid } },
+            { entity: { id } },
             {
               onSuccess: async () => {
                 await queryClient.invalidateQueries(QueryKeys.location.all);

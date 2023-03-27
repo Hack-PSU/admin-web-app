@@ -4,15 +4,14 @@ import { withSettingsLayout } from "components/settings";
 import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  fetch,
-  QueryKeys,
-  getAllOrganizers,
-  updateOrganizerPermissions,
   CreateEntity,
+  fetch,
+  getAllOrganizers,
+  QueryKeys,
+  updateOrganizer,
 } from "api";
 import { ControlledSelect, GradientButton } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
-import { IOption } from "types/components";
 import { useSnackbar } from "notistack";
 import _ from "lodash";
 import {
@@ -22,16 +21,17 @@ import {
 } from "components/context";
 import { Grid, useTheme } from "@mui/material";
 import AddNewMemberModal from "components/modal/AddNewMemberModal";
+import { IOption } from "components/base/Select/types";
 
 type OrganizerEntity = {
-  uid: string;
+  id: string;
   name: string;
   permission: IOption<number>;
   email: string;
 };
 
 type UpdateOrganizerEntity = {
-  uid: string;
+  id: string;
   privilege: number;
 };
 
@@ -98,8 +98,8 @@ const SettingsMembers: NextPage = () => {
               (p) => p.value === d.privilege
             );
             return {
-              uid: d.uid,
-              name: `${d.firstname} ${d.lastname}`,
+              id: d.id,
+              name: `${d.firstName} ${d.lastName}`,
               email: d.email,
               permission: permission ?? { value: 2, label: "Team Member" },
             };
@@ -111,7 +111,7 @@ const SettingsMembers: NextPage = () => {
 
   const data = useMemo(() => {
     if (user && allOrganizers) {
-      return _.filter(allOrganizers, (o) => o.uid !== user.uid);
+      return _.filter(allOrganizers, (o) => o.id !== user.uid);
     }
     return [];
   }, [allOrganizers, user]);
@@ -123,13 +123,13 @@ const SettingsMembers: NextPage = () => {
           (p) => p.value === curr.permission.value
         );
 
-        acc[curr.uid] = {
+        acc[curr.id] = {
           ...curr,
           permission: { value: 2, label: "Team Member" },
         };
 
         if (permission) {
-          acc[curr.uid].permission = permission;
+          acc[curr.id].permission = permission;
         }
 
         return acc;
@@ -146,8 +146,8 @@ const SettingsMembers: NextPage = () => {
 
   const { mutateAsync } = useMutation(
     QueryKeys.organizer.updateOne(),
-    ({ entity }: CreateEntity<UpdateOrganizerEntity, "">) =>
-      fetch(() => updateOrganizerPermissions(entity)),
+    ({ entity: { id, privilege } }: CreateEntity<UpdateOrganizerEntity, "">) =>
+      fetch(() => updateOrganizer({ privilege }, { id })),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.organizer.all);
@@ -175,16 +175,16 @@ const SettingsMembers: NextPage = () => {
     const subscription = watch((data, info) => {
       if (info.type === "change") {
         const entities: UpdateOrganizerEntity[] = _.chain(data)
-          .pickBy((value, uid) => {
+          .pickBy((value, id) => {
             if (value && value.permission) {
               return (
-                defaultValues[uid].permission?.value !== value.permission?.value
+                defaultValues[id].permission?.value !== value.permission?.value
               );
             }
             return false;
           })
-          .map((value, uid) => ({
-            uid: uid,
+          .map((value, id) => ({
+            id: id,
             privilege: value?.permission?.value ?? 2,
           }))
           .value();
@@ -225,8 +225,8 @@ const SettingsMembers: NextPage = () => {
         cell: ({ row, column }) => (
           <DefaultCell column={column}>
             <ControlledSelect
-              name={`${row.original.uid}.permission`}
-              key={row.original.uid}
+              name={`${row.original.id}.permission`}
+              key={row.original.id}
               options={PermissionOptions}
             />
           </DefaultCell>
@@ -237,7 +237,7 @@ const SettingsMembers: NextPage = () => {
 
   const table = useTable({
     ...defs,
-    getRowId: (row) => row.uid,
+    getRowId: (row) => row.id,
     data,
   });
 

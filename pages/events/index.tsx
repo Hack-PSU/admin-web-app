@@ -2,11 +2,12 @@ import { NextPage } from "next";
 import React, { FC } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import {
+  EventEntity,
+  EventLocation,
   EventType,
-  IGetAllEventsResponse,
+  fetch,
   getAllEvents,
   QueryKeys,
-  fetch,
   resolveError,
 } from "api";
 import { DateTime } from "luxon";
@@ -24,18 +25,15 @@ import {
 } from "components/Table";
 
 interface IEventsProps {
-  events: IGetAllEventsResponse[];
+  events: EventEntity[];
 }
 
 type EventRowValues = Pick<
-  IGetAllEventsResponse,
-  | "event_title"
-  | "location_name"
-  | "event_start_time"
-  | "event_end_time"
-  | "event_type"
-  | "uid"
->;
+  EventEntity,
+  "name" | "startTime" | "endTime" | "type" | "id"
+> & {
+  location: EventLocation["name"];
+};
 
 const DateTimeCell: FC<{ date: number }> = ({ date }) => {
   return (
@@ -46,7 +44,7 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
           color: "common.black",
         }}
       >
-        {DateTime.fromMillis(date).toLocaleString(DateTime.DATE_SHORT)}
+        {DateTime.fromMillis(date).toLocaleString(DateTime.TIME_SIMPLE)}
       </TextCell>
       <TextCell
         sx={{
@@ -54,7 +52,7 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
           color: "header.light",
         }}
       >
-        {DateTime.fromMillis(date).toLocaleString(DateTime.TIME_SIMPLE)}
+        {DateTime.fromMillis(date).toFormat("EEEE")}
       </TextCell>
     </DefaultCell>
   );
@@ -70,33 +68,33 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         id: "name",
         type: "text",
         header: "Name",
-        accessorKey: "event_title",
+        accessorKey: "name",
       },
       {
         id: "location",
         type: "text",
         header: "Location",
-        accessorKey: "location_name",
+        accessorKey: "location",
       },
       {
         id: "startDate",
         type: "text",
-        header: "Start Date",
-        accessorKey: "event_start_time",
+        header: "Start Time",
+        accessorKey: "startTime",
         cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
       },
       {
         id: "endDate",
         type: "text",
-        header: "End Date",
-        accessorKey: "event_end_time",
+        header: "End Time",
+        accessorKey: "endTime",
         cell: ({ cell }) => <DateTimeCell date={Number(cell.getValue())} />,
       },
       {
         id: "type",
         type: "text",
         header: "Type",
-        accessorKey: "event_type",
+        accessorKey: "type",
         format: (value) => {
           switch (value as EventType) {
             case EventType.WORKSHOP:
@@ -105,6 +103,8 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
               return "Food";
             case EventType.ACTIVITY:
               return "Activity";
+            case EventType.CHECKIN:
+              return "Check In";
           }
         },
       },
@@ -122,7 +122,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
             items={[
               {
                 icon: "edit-outline",
-                onClick: () => router.push(`/events/${row.original.uid}`),
+                onClick: () => router.push(`/events/${row.original.id}`),
               },
             ]}
           />
@@ -140,12 +140,12 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            uid: d.uid,
-            event_title: d.event_title,
-            location_name: d.location_name,
-            event_start_time: d.event_start_time,
-            event_end_time: d.event_end_time,
-            event_type: d.event_type,
+            id: d.id,
+            name: d.name,
+            location: d.location.name,
+            startTime: d.startTime,
+            endTime: d.endTime,
+            type: d.type,
           }));
         }
         return [];
