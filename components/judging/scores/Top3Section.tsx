@@ -2,11 +2,15 @@ import React, { FC, useCallback, useEffect, useState } from "react";
 import { Grid, styled, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { ControlledSelect } from "components/base";
-import { IOption } from "types/components";
-import { ScoreType, UseScoreResultsReturn, ResolvedData } from "./hooks";
 import { Text } from "@visx/text";
 import { LinearGradient } from "@visx/gradient";
 import { ParentSizeModern } from "@visx/responsive";
+import { IOption } from "components/base/Select/types";
+import {
+  RankedData,
+  ScoreType,
+  UseScoreResultsReturn,
+} from "components/judging/scores/use-score-results";
 
 const filterOptions: IOption[] = [
   {
@@ -47,11 +51,8 @@ const filterOptions: IOption[] = [
   },
 ];
 
-type Top3SectionProps = Omit<UseScoreResultsReturn, "allData">;
-type Top3CardProps = {
-  score: number;
-  project: string;
-};
+type Top3SectionProps = UseScoreResultsReturn;
+type Top3CardProps = RankedData;
 
 const StyledTop3Card = styled(Grid)(({ theme }) => ({
   boxShadow: theme.shadows[2],
@@ -131,7 +132,7 @@ const Top3Section: FC<Top3SectionProps> = ({
       },
     },
   });
-  const [selectedData, setSelectedData] = useState<ResolvedData[]>(top3Avg);
+  const [selectedData, setSelectedData] = useState<RankedData[]>(top3Avg);
   const filterType = methods.watch("filter");
 
   const applyFilter = useCallback(
@@ -197,11 +198,8 @@ const Top3Section: FC<Top3SectionProps> = ({
       </Grid>
       <Grid container item spacing={1.5} alignItems="stretch">
         {selectedData.map((d) => (
-          <Grid item xs={4} key={`top3-${filterType.value}-${d.projectName}`}>
-            <Top3Card
-              score={d[filterType.value] as number}
-              project={d.projectName}
-            />
+          <Grid item xs={4} key={`top3-${filterType.value}-${d.project}`}>
+            <Top3Card {...d} />
           </Grid>
         ))}
       </Grid>

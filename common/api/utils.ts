@@ -1,85 +1,112 @@
 import { api, ApiAxiosInstance } from "api/axios";
 import { AxiosError, AxiosResponse, Method } from "axios";
-import { ApiResponse } from "./types";
 import { GetServerSidePropsContext } from "next";
 
-type QueryReturn<TResponse> = AxiosResponse<ApiResponse<TResponse>>;
+type QueryReturn<TResponse> = AxiosResponse<TResponse>;
 
-export type CreateQueryByIdReturn<TResponse, TParam extends object = {}> = (
-  id: string | number,
-  params?: TParam,
-  token?: string
-) => Promise<QueryReturn<TResponse>>;
-export type CreateMutationByIdReturn<
-  TEntity,
+type PathParams = {
+  [key: string]: any;
+};
+
+export type CreateQueryReturn<
   TResponse,
-  TParam extends object = {}
+  TParams extends PathParams = {},
+  TQuery extends object = {}
 > = (
-  id: string | number,
+  params?: TParams,
+  query?: TQuery,
+  token?: string
+) => Promise<QueryReturn<TResponse>>;
+export type CreateMutationReturn<
+  TEntity,
+  TResponse = TEntity,
+  TParams extends PathParams = {},
+  TQuery extends object = {}
+> = (
   entity: TEntity,
-  param?: TParam,
+  params?: TParams,
+  query?: TQuery,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
 
-export type CreateQueryReturn<TResponse, TParam = {}> = (
-  params?: TParam,
-  token?: string
-) => Promise<QueryReturn<TResponse>>;
-export type CreateMutationReturn<TEntity, TResponse = TEntity, TParam = {}> = (
-  entity: TEntity,
-  params?: TParam,
-  token?: string
-) => Promise<QueryReturn<TResponse>>;
+function replacePathParams(path: string, params: PathParams) {
+  const replaceParams = Object.keys(params).reduce((acc, curr) => {
+    acc[`:${curr}`] = params[curr] as any;
+    return acc;
+  }, {} as { [key: string]: any });
 
-export function createQuery<TResponse, TParam = {}>(
+  const regex = new RegExp(Object.keys(replaceParams).join("|"), "gi");
+  return path.replace(regex, (match) => replaceParams[match]);
+}
+
+export function createQuery<
+  TResponse,
+  TParams extends PathParams = {},
+  TQuery extends object = {}
+>(
   url: string,
   instance: ApiAxiosInstance = api
-): CreateQueryReturn<TResponse, TParam> {
-  return (params, token) =>
-    instance.request<ApiResponse<TResponse>>({
-      url,
+): CreateQueryReturn<TResponse, TParams, TQuery> {
+  return (params, query, token) => {
+    let endpoint = url;
+
+    if (!!params) {
+      endpoint = replacePathParams(url, params);
+    }
+
+    return instance.request<TResponse>({
+      url: endpoint,
       method: "GET",
-      params: {
-        ...(params ?? {}),
-        ignoreCache: true,
-      },
+      params: query,
       ...(token
         ? {
             headers: {
-              idtoken: token,
+              Authorization: `Bearer ${token}`,
             },
           }
         : {}),
     });
+  };
 }
 
-export function createMutation<TEntity, TResponse, TParam = {}>(
+export function createMutation<
+  TEntity,
+  TResponse,
+  TParams,
+  TQuery extends object
+>(
   url: string,
   method: Method = "POST",
   instance: ApiAxiosInstance = api
-): CreateMutationReturn<TEntity, TResponse, TParam> {
-  return (entity, params, token) =>
-    instance.request<ApiResponse<TResponse>, QueryReturn<TResponse>, TEntity>({
-      url,
+): CreateMutationReturn<TEntity, TResponse, TParams, TQuery> {
+  return (entity, params, query, token) => {
+    let endpoint = url;
+    if (!!params) {
+      endpoint = replacePathParams(url, params);
+      console.log(endpoint);
+    }
+    return instance.request<TResponse, AxiosResponse<TResponse>, TEntity>({
+      url: endpoint,
       method,
       data: entity,
-      ...(params ? { params } : {}),
+      ...(query ? { params: query } : {}),
       ...(token
         ? {
             headers: {
-              idtoken: token,
+              Authorization: `Bearer ${token}`,
             },
           }
         : {}),
     });
+  };
 }
 
 export async function fetch<TResponse>(
   queryFn: () => Promise<QueryReturn<TResponse>>
 ): Promise<TResponse | undefined> {
   const resp = await queryFn();
-  if (resp && resp.data && resp.data.body && resp.data.body.data) {
-    return resp.data.body.data;
+  if (resp && resp.data) {
+    return resp.data;
   }
 }
 

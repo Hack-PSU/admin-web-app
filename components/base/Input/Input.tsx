@@ -1,12 +1,18 @@
 import React, { FC, forwardRef } from "react";
-import {
-  ControlledInputProps,
-  IInputProps,
-  LabelledInputProps,
-} from "types/components";
-import { alpha, Box, InputBase, styled } from "@mui/material";
-import InputLabel from "components/base/Input/InputLabel";
+import { alpha, Box, InputBase, InputProps, styled } from "@mui/material";
+import InputLabel, { InputLabelProps } from "./InputLabel";
 import { Controller } from "react-hook-form";
+import { WithControllerProps, WithLabelledProps } from "./types";
+
+export interface IInputProps extends Omit<InputProps, "name" | "placeholder"> {
+  placeholder: string;
+}
+
+export type LabelledInputProps = WithLabelledProps<IInputProps>;
+
+export type ControlledInputProps = WithControllerProps<
+  Omit<IInputProps, "defaultValue"> & Partial<InputLabelProps>
+>;
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   padding: theme.spacing(0.8, 1.8),

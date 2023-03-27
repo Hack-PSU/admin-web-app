@@ -1,32 +1,25 @@
 import { NextPage } from "next";
 import React from "react";
 import {
-  withProtectedRoute,
   withDefaultLayout,
+  withProtectedRoute,
   withServerSideProps,
 } from "common/HOCs";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { AuthPermission } from "types/context";
 import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
-import {
-  fetch,
-  getAllHackers,
-  IGetAllHackersResponse,
-  QueryKeys,
-  resolveError,
-} from "api";
+import { fetch, getAllUsers, QueryKeys, resolveError, UserEntity } from "api";
 import PageHeader from "components/Menu/PageHeader";
+import { AuthPermission } from "components/context/FirebaseProvider";
 
 interface IHackersPageProps {
-  hackers: IGetAllHackersResponse[];
+  hackers: UserEntity[];
 }
 
 type HackerEntity = {
   name: string;
-  pin: number;
   email: string;
   university: string;
 };
@@ -42,12 +35,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
         type: "text",
         header: "Name",
         accessorKey: "name",
-      },
-      {
-        id: "pin",
-        type: "text",
-        header: "Pin",
-        accessorKey: "pin",
       },
       {
         id: "email",
@@ -66,13 +53,12 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
   const { data: hackersData } = useQuery(
     QueryKeys.hacker.findAll(),
-    () => fetch(getAllHackers),
+    () => fetch(getAllUsers),
     {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            name: `${d.firstname} ${d.lastname}`,
-            pin: d.pin,
+            name: `${d.firstName} ${d.lastName}`,
             email: d.email,
             university: d.university,
           }));
@@ -173,7 +159,7 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
 
 export const getServerSideProps = withServerSideProps(async (context) => {
   try {
-    const hackers = await fetch(getAllHackers);
+    const hackers = await fetch(getAllUsers);
     if (hackers) {
       return {
         props: {
@@ -192,5 +178,5 @@ export const getServerSideProps = withServerSideProps(async (context) => {
 });
 
 export default withDefaultLayout(
-  withProtectedRoute(Hackers, AuthPermission.VOLUNTEER)
+  withProtectedRoute(Hackers, AuthPermission.TEAM)
 );

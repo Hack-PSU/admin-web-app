@@ -1,8 +1,7 @@
-export interface IHackathonEntity {
-  uid: string;
+export interface HackathonEntity {
+  id: string;
   name: string;
-  start_time: string;
-  end_time: string;
-  base_pin: number;
+  startTime: string;
+  endTime: string;
   active: boolean;
 }

@@ -14,8 +14,8 @@ import { RichText } from "components/base/RichText";
 import { useDateTimeRange } from "common/hooks";
 import { LabelledDatePicker } from "components/base/Pickers";
 import { EventType } from "api";
-import { IOption } from "types/components";
 import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
+import { IOption } from "components/base/Select/types";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -54,7 +54,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
       <Grid container item spacing={1} rowGap={1.5}>
         <Grid item xs={12}>
           <ControlledInput
-            name={"eventTitle"}
+            name={"name"}
             placeholder={"Enter event title"}
             as={LabelledInput}
             id="event-title"
@@ -66,7 +66,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         </Grid>
         <Grid item xs={6}>
           <ControlledCreatableSelect
-            name={"eventLocation"}
+            name={"location"}
             placeholder={"Select or create a location"}
             as={LabelledCreatableSelect}
             id="event-location"
@@ -76,7 +76,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         </Grid>
         <Grid item xs={6}>
           <ControlledSelect
-            name={"eventType"}
+            name={"type"}
             placeholder={"Select a type"}
             as={LabelledSelect}
             id={"event-type"}
@@ -89,7 +89,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
           <Box mt={0.6}>
             <RichText
               placeholder={"Enter a description"}
-              name={"eventDescription"}
+              name={"description"}
             />
           </Box>
         </Grid>
@@ -125,16 +125,6 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
             id={"end-time"}
             label={"End Time"}
             {...register("endTime")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <ControlledInput
-            name={"eventIcon"}
-            placeholder={"Enter event icon url"}
-            as={LabelledInput}
-            label={"Event Icon"}
-            id={"event-icon"}
-            showError
           />
         </Grid>
       </Grid>

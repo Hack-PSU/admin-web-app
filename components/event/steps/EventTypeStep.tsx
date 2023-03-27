@@ -3,15 +3,16 @@ import EventStep from "./EventStep";
 import { Grid } from "@mui/material";
 import { ControlledSelect, LabelledSelect, useStepper } from "components/base";
 import { EventType } from "api";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
-import { assert, enums, object, string } from "superstruct";
+import { enums, object, string } from "superstruct";
 import { useEventStore } from "common/store";
 
 const options = [
   { value: EventType.ACTIVITY, label: "Activity" },
   { value: EventType.WORKSHOP, label: "Workshop" },
   { value: EventType.FOOD, label: "Food" },
+  { value: EventType.CHECKIN, label: "Check In" },
 ];
 
 const schema = object({
@@ -22,12 +23,12 @@ const schema = object({
 });
 
 const EventTypeStep: FC = () => {
-  const { eventType, updateType } = useEventStore();
+  const { type, updateType } = useEventStore();
 
   const methods = useForm({
     resolver: superstructResolver(schema),
     defaultValues: {
-      type: eventType,
+      type,
     },
   });
 

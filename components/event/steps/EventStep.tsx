@@ -1,14 +1,18 @@
 import React, { FC } from "react";
 import { Grid, lighten, Typography, useTheme } from "@mui/material";
-import { WithChildren } from "types/common";
 import { Button } from "components/base";
+import { WithChildren } from "common/types";
 
 interface IEventStepProps {
   title: string;
+
   handleNext(): void;
+
   handleNextTitle?: string;
   handlePreviousTitle?: string;
+
   handlePrevious?(): void;
+
   active: boolean;
 }
 

@@ -1,8 +1,11 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { useModal } from "components/context";
 import {
+  ControlledDropzone,
   ControlledInput,
   ControlledSelect,
+  DropzonePlaceholder,
+  LabelledDropzone,
   LabelledInput,
   LabelledSelect,
   MenuButton,
@@ -10,15 +13,11 @@ import {
 } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import _ from "lodash";
-import { IOption } from "types/components";
 import { Grid } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import {
-  CreateEntity,
-  createSponsor,
-  fetch,
-  ISponsorshipCreateEntity,
-} from "api";
+import { createSponsor, fetch, QueryEntity } from "api";
+import { IOption } from "components/base/Select/types";
+import { SponsorLogoItem } from "components/sponsorship";
 
 enum SponsorLevel {
   BRONZE = "bronze",
@@ -51,7 +50,9 @@ const SponsorLevelOptions: IOption[] = [
   },
 ];
 
-const AddNewSponsorModal: FC = () => {
+const AddNewSponsorModal: FC<{ totalSponsors: number }> = ({
+  totalSponsors,
+}) => {
   const methods = useForm({
     defaultValues: {
       name: "",
@@ -59,46 +60,57 @@ const AddNewSponsorModal: FC = () => {
         value: SponsorLevel.GOLD,
         label: _.startCase(SponsorLevel.GOLD),
       } as IOption,
-      logo: "",
-      websiteLink: "",
+      lightLogo: [],
+      darkLogo: [],
+      link: "",
+      order: totalSponsors,
     },
   });
+
   const { show, handleHide } = useModal("addNewSponsor");
 
   const { mutateAsync } = useMutation(
-    ({ entity }: CreateEntity<ISponsorshipCreateEntity, "uid" | "order">) =>
-      fetch(() => createSponsor(entity)),
+    ({ entity }: QueryEntity<FormData>) => fetch(() => createSponsor(entity)),
     {}
   );
 
-  const { handleSubmit, reset } = methods;
+  const { handleSubmit, reset, watch, setValue } = methods;
 
-  const onClickSubmit = () => {
+  useEffect(() => {
+    setValue("order", totalSponsors);
+  }, [setValue, totalSponsors]);
+
+  const submitData = (next?: () => void) => {
     handleSubmit(async (data) => {
+      const formData = new FormData();
+
+      formData.append("name", data.name);
+      formData.append("level", data.level.value);
+      formData.append("link", data.link);
+      formData.append("order", String(data.order));
+
+      if (data.darkLogo.length > 0) {
+        formData.append("darkLogo", data.darkLogo[0]);
+      }
+
+      if (data.lightLogo.length > 0) {
+        formData.append("lightLogo", data.lightLogo[0]);
+      }
+
       await mutateAsync({
-        entity: {
-          name: data.name,
-          level: data.level.value,
-          logo: data.logo,
-          websiteLink: data.websiteLink,
-        },
+        entity: formData,
       });
-      handleHide();
+
+      next?.();
     })();
   };
 
+  const onClickSubmit = () => {
+    submitData(handleHide);
+  };
+
   const onClickSubmitCreate = () => {
-    handleSubmit(async (data) => {
-      await mutateAsync({
-        entity: {
-          name: data.name,
-          level: data.level.value,
-          logo: data.logo,
-          websiteLink: data.websiteLink,
-        },
-      });
-      reset();
-    })();
+    submitData(reset);
   };
 
   return (
@@ -129,21 +141,42 @@ const AddNewSponsorModal: FC = () => {
             </Grid>
             <Grid item xs={12}>
               <ControlledInput
-                name={"logo"}
-                placeholder={"Enter link to logo"}
-                as={LabelledInput}
-                label={"Logo"}
-                showError
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ControlledInput
-                name={"websiteLink"}
+                name={"link"}
                 placeholder={"Enter sponsor's website"}
                 as={LabelledInput}
                 label={"Website"}
                 showError
               />
+            </Grid>
+            <Grid item xs={6}>
+              <ControlledDropzone
+                name={"lightLogo"}
+                as={LabelledDropzone}
+                id={"light-logo"}
+                label={"Light Mode Logo"}
+                custom
+              >
+                {watch("lightLogo", []).length > 0 ? (
+                  <SponsorLogoItem name={"lightLogo"} />
+                ) : (
+                  <DropzonePlaceholder />
+                )}
+              </ControlledDropzone>
+            </Grid>
+            <Grid item xs={6}>
+              <ControlledDropzone
+                name={"darkLogo"}
+                as={LabelledDropzone}
+                id={"dark-logo"}
+                label={"Dark Mode Logo"}
+                custom
+              >
+                {watch("darkLogo", []).length > 0 ? (
+                  <SponsorLogoItem name={"darkLogo"} />
+                ) : (
+                  <DropzonePlaceholder />
+                )}
+              </ControlledDropzone>
             </Grid>
           </Grid>
           <Grid

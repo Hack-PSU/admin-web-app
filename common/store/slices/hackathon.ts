@@ -1,10 +1,11 @@
 import create from "zustand";
-import { IHackathonEntity } from "api";
+import { HackathonEntity } from "api";
 import { immer } from "zustand/middleware/immer";
 
 interface IHackathonSlice {
-  activeHackathon: IHackathonEntity | null;
-  updateActiveHackathon(hackathon: IHackathonEntity): void;
+  activeHackathon: HackathonEntity | null;
+
+  updateActiveHackathon(hackathon: HackathonEntity): void;
 }
 
 export const useHackathonStore = create<
@@ -13,7 +14,7 @@ export const useHackathonStore = create<
 >(
   immer((set) => ({
     activeHackathon: null,
-    updateActiveHackathon: (hackathon: IHackathonEntity) =>
+    updateActiveHackathon: (hackathon: HackathonEntity) =>
       set((draft) => {
         draft.activeHackathon = hackathon;
       }),

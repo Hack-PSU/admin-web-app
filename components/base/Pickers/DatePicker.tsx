@@ -1,18 +1,36 @@
-import { forwardRef, FC, useEffect } from "react";
+import { FC, forwardRef, useEffect } from "react";
 import BaseDatePicker, {
   ReactDatePickerCustomHeaderProps,
+  ReactDatePickerProps,
 } from "react-datepicker";
 import moment from "moment";
 import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
-import { EvaIcon, Input, InputLabel } from "components/base";
 import {
-  ControlledDatePickerProps,
-  IDatePickerProps,
-  IInputProps,
-  LabelledDatePickerProps,
-} from "types/components";
+  EvaIcon,
+  Input,
+  InputLabel,
+  InputLabelProps,
+  WithControllerProps,
+  WithLabelledProps,
+} from "components/base";
 import { useController } from "react-hook-form";
 import { DateTime } from "luxon";
+import { IInputProps } from "components/base/Input";
+
+export interface IDatePickerProps extends Omit<ReactDatePickerProps, "value"> {
+  value: Date;
+
+  onChange(value: Date): void;
+
+  placeholder?: string;
+  inputProps?: Omit<IInputProps, "placeholder" | "value" | "onChange">;
+}
+
+export type LabelledDatePickerProps = WithLabelledProps<IDatePickerProps>;
+
+export type ControlledDatePickerProps = WithControllerProps<
+  Omit<IDatePickerProps, "value" | "onChange"> & Partial<InputLabelProps>
+>;
 
 const DatePickerAdornment: FC = () => (
   <InputAdornment

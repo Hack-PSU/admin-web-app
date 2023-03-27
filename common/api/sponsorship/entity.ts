@@ -1,19 +1,15 @@
-export interface ISponsorshipCreateEntity {
-  uid: number;
+export interface SponsorEntity {
+  id: number;
   name: string;
   level: string;
-  logo: string;
+  lightLogo?: string;
+  darkLogo?: string;
   order: number;
-  websiteLink?: string;
-  hackathon?: string;
+  link?: string;
+  hackathonId?: string;
 }
 
-export interface ISponsorshipEntity {
-  uid: number;
-  name: string;
-  level: string;
-  logo: string;
-  order: number;
-  website_link?: string;
-  hackathon?: string;
-}
+export type PatchBatchSponsor = Partial<
+  Omit<SponsorEntity, "id" | "name" | "logo" | "hackathonId">
+> &
+  Pick<SponsorEntity, "id">;

@@ -1,10 +1,5 @@
 import { FC } from "react";
-import {
-  IInputProps,
-  LabelledInputProps,
-  WithControllerProps,
-} from "types/components";
-import { LabelledInput } from "components/base";
+import { LabelledInput, LabelledInputProps } from "components/base";
 
 const LabelledEventInput: FC<LabelledInputProps> = ({
   id,

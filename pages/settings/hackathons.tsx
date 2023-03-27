@@ -4,23 +4,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetch,
   getAllHackathons,
-  IHackathonEntity,
+  HackathonEntity,
+  markActiveHackathon,
+  QueryEntity,
   QueryKeys,
-  updateActiveHackathon,
 } from "api";
 import { useSnackbar } from "notistack";
 import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
 import { DateTime } from "luxon";
 import { Box, darken, Typography, useTheme } from "@mui/material";
 import { useCallback } from "react";
-
-type HackathonEntity = {
-  uid: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  active: boolean;
-};
+import _ from "lodash";
 
 const SettingsHackathons: NextPage = () => {
   const queryClient = useQueryClient();
@@ -33,13 +27,7 @@ const SettingsHackathons: NextPage = () => {
     {
       select: (data) => {
         if (data) {
-          return data.map((d) => ({
-            uid: d.uid,
-            name: d.name,
-            startDate: d.start_time,
-            endDate: d.end_time,
-            active: d.active,
-          }));
+          return _.sortBy(data, "startTime").reverse();
         }
       },
     }
@@ -47,8 +35,8 @@ const SettingsHackathons: NextPage = () => {
 
   const { mutateAsync } = useMutation(
     QueryKeys.hackathon.updateOne(),
-    ({ entity }: { entity: Pick<IHackathonEntity, "uid"> }) =>
-      fetch(() => updateActiveHackathon(entity)),
+    ({ entity: { id } }: QueryEntity<{ id: string }>) =>
+      fetch(() => markActiveHackathon({}, { id })),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.hackathon.all);
@@ -60,9 +48,9 @@ const SettingsHackathons: NextPage = () => {
   );
 
   const setActiveHackathon = useCallback(
-    (uid: string) => {
+    (id: string) => {
       return async () => {
-        await mutateAsync({ entity: { uid } });
+        await mutateAsync({ entity: { id } });
       };
     },
     [mutateAsync]
@@ -79,7 +67,7 @@ const SettingsHackathons: NextPage = () => {
       {
         id: "startDate",
         type: "text",
-        accessorKey: "startDate",
+        accessorKey: "startTime",
         header: "Start Date",
         format: (value) =>
           DateTime.fromMillis(Number(value)).toLocaleString(
@@ -89,7 +77,7 @@ const SettingsHackathons: NextPage = () => {
       {
         id: "endDate",
         type: "text",
-        accessorKey: "endDate",
+        accessorKey: "endTime",
         header: "End Date",
         format: (value) =>
           DateTime.fromMillis(Number(value)).toLocaleString(
@@ -102,7 +90,7 @@ const SettingsHackathons: NextPage = () => {
         header: "",
         size: 50,
         cell: ({ column, row }) => (
-          <DefaultCell key={row.original.uid} column={column}>
+          <DefaultCell key={row.original.id} column={column}>
             <Box
               sx={{
                 width: "100%",
@@ -125,7 +113,7 @@ const SettingsHackathons: NextPage = () => {
               }}
               onClick={
                 !row.original.active
-                  ? setActiveHackathon(row.original.uid)
+                  ? setActiveHackathon(row.original.id)
                   : undefined
               }
             >
@@ -149,7 +137,7 @@ const SettingsHackathons: NextPage = () => {
   const table = useTable({
     ...defs,
     data: allHackathons ?? [],
-    getRowId: (row) => row.uid,
+    getRowId: (row) => row.id,
   });
 
   const onRefresh = useCallback(() => {

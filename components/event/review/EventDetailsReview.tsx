@@ -3,7 +3,7 @@ import { Box, Grid, styled } from "@mui/material";
 import { InputLabel } from "components/base";
 import EventDetail from "./EventDetail";
 import { DateTime } from "luxon";
-import { ContentState, convertFromRaw, Editor, EditorState } from "draft-js";
+import { convertFromRaw, Editor, EditorState } from "draft-js";
 import { decorator } from "components/base/RichText/decorators";
 import { useEventStore } from "common/store";
 
@@ -16,22 +16,18 @@ const ReadOnlyEditor = styled(Box)(({ theme }) => ({
 }));
 
 const EventDetailsReview: FC = () => {
-  const { eventName, eventType, eventLocation, eventDescription, eventDate } =
-    useEventStore();
+  const { name, type, location, description, date } = useEventStore();
 
   return (
     <>
       <Grid item xs={4}>
-        <EventDetail detail={eventName} label={"Event Name"} />
+        <EventDetail detail={name} label={"Event Name"} />
       </Grid>
       <Grid item xs={4}>
-        <EventDetail label={"Event Type"} detail={eventType?.label ?? ""} />
+        <EventDetail label={"Event Type"} detail={type?.label ?? ""} />
       </Grid>
       <Grid item xs={4}>
-        <EventDetail
-          label={"Event Location"}
-          detail={eventLocation?.label ?? ""}
-        />
+        <EventDetail label={"Event Location"} detail={location?.label ?? ""} />
       </Grid>
       <Grid item xs={12}>
         <InputLabel id={"Description"} label={"Description"} />
@@ -39,7 +35,7 @@ const EventDetailsReview: FC = () => {
           <Editor
             onChange={() => null}
             editorState={EditorState.createWithContent(
-              convertFromRaw(eventDescription),
+              convertFromRaw(description),
               decorator
             )}
             readOnly={true}
@@ -49,7 +45,7 @@ const EventDetailsReview: FC = () => {
       <Grid item xs={3}>
         <EventDetail
           label={"Start Date"}
-          detail={DateTime.fromJSDate(eventDate.start).toLocaleString(
+          detail={DateTime.fromJSDate(date.start).toLocaleString(
             DateTime.DATE_SHORT
           )}
         />
@@ -57,7 +53,7 @@ const EventDetailsReview: FC = () => {
       <Grid item xs={3}>
         <EventDetail
           label={"Start Time"}
-          detail={DateTime.fromJSDate(eventDate.start).toLocaleString(
+          detail={DateTime.fromJSDate(date.start).toLocaleString(
             DateTime.TIME_SIMPLE
           )}
         />
@@ -65,7 +61,7 @@ const EventDetailsReview: FC = () => {
       <Grid item xs={3}>
         <EventDetail
           label={"End Date"}
-          detail={DateTime.fromJSDate(eventDate.end).toLocaleString(
+          detail={DateTime.fromJSDate(date.end).toLocaleString(
             DateTime.DATE_SHORT
           )}
         />
@@ -73,7 +69,7 @@ const EventDetailsReview: FC = () => {
       <Grid item xs={3}>
         <EventDetail
           label={"End Time"}
-          detail={DateTime.fromJSDate(eventDate.end).toLocaleString(
+          detail={DateTime.fromJSDate(date.end).toLocaleString(
             DateTime.TIME_SIMPLE
           )}
         />

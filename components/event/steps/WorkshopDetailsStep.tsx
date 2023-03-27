@@ -1,20 +1,20 @@
 import React, { FC } from "react";
 import {
-  useStepper,
-  ControlledCreateOnlyInput,
-  LabelledCreateOnlyInput,
   ControlledCreatableSelect,
+  ControlledCreateOnlyInput,
   LabelledCreatableSelect,
+  LabelledCreateOnlyInput,
+  useStepper,
 } from "components/base";
 import EventStep from "components/event/steps/EventStep";
 import { Grid } from "@mui/material";
 import { DownloadLinks } from "components/event/forms";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { array, object, optional, string } from "superstruct";
 import { NonEmptySelect, NonEmptySelectArray } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useEventStore } from "common/store";
-import { IOption } from "types/components";
+import { IOption } from "components/base/Select/types";
 
 const link = object({
   link: string(),

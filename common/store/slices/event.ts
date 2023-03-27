@@ -1,22 +1,15 @@
 import { EventType } from "api";
 import { RawDraftContentState } from "draft-js";
-import {
-  ModelSlice,
-  State,
-  StoreAction,
-  StoreDispatch,
-} from "common/store/types";
-import { IOption } from "types/components";
-import produce from "immer";
 import create from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { IOption } from "components/base/Select/types";
 
 interface IEventBaseModel {
-  eventType: IOption<EventType> | null;
-  eventName: string;
-  eventLocation: IOption<number> | null;
-  eventDescription: RawDraftContentState;
-  eventDate: {
+  type: IOption<EventType> | null;
+  name: string;
+  location: IOption<number> | null;
+  description: RawDraftContentState;
+  date: {
     start: Date;
     end: Date;
   };
@@ -27,38 +20,33 @@ interface IWorkshopModel {
   wsSkillLevel: IOption | undefined;
   wsRelevantSkills: IOption[] | undefined;
   wsUrls: string[] | undefined;
-  eventImage: File | undefined;
-  eventIcon: string | undefined;
+  icon: File | undefined;
 }
 
 type EventModel = IEventBaseModel & IWorkshopModel;
 
 type EventSlice = EventModel & {
   updateType(type: IOption<EventType>): void;
-  updateDetails(details: Omit<IEventBaseModel, "eventType">): void;
-  updateWorkshop(
-    details: Omit<IWorkshopModel, "eventImage" | "eventIcon">
-  ): void;
-  updateImage(image: IWorkshopModel["eventImage"]): void;
-  updateIcon(icon: IWorkshopModel["eventIcon"]): void;
+  updateDetails(details: Omit<IEventBaseModel, "type">): void;
+  updateWorkshop(details: Omit<IWorkshopModel, "icon">): void;
+  updateIcon(icon: IWorkshopModel["icon"]): void;
   clear(): void;
 };
 
 const eventSliceDefaults: EventModel = {
-  eventType: { value: EventType.ACTIVITY, label: "Activity" },
-  eventName: "",
-  eventLocation: null,
-  eventDate: {
+  type: { value: EventType.ACTIVITY, label: "Activity" },
+  name: "",
+  location: null,
+  date: {
     start: new Date(),
     end: new Date(),
   },
-  eventDescription: { blocks: [], entityMap: {} },
+  description: { blocks: [], entityMap: {} },
   wsPresenterNames: undefined,
   wsSkillLevel: undefined,
   wsUrls: [],
   wsRelevantSkills: undefined,
-  eventImage: undefined,
-  eventIcon: undefined,
+  icon: undefined,
 };
 
 export const useEventStore = create<EventSlice, [["zustand/immer", never]]>(
@@ -66,14 +54,14 @@ export const useEventStore = create<EventSlice, [["zustand/immer", never]]>(
     ...eventSliceDefaults,
     updateType: (type) =>
       set((draft) => {
-        draft.eventType = type;
+        draft.type = type;
       }),
     updateDetails: (details) =>
       set((draft) => {
-        draft.eventName = details.eventName;
-        draft.eventLocation = details.eventLocation;
-        draft.eventDescription = details.eventDescription;
-        draft.eventDate = details.eventDate;
+        draft.name = details.name;
+        draft.location = details.location;
+        draft.description = details.description;
+        draft.date = details.date;
       }),
     updateWorkshop: (details) =>
       set((draft) => {
@@ -82,105 +70,22 @@ export const useEventStore = create<EventSlice, [["zustand/immer", never]]>(
         draft.wsPresenterNames = details.wsPresenterNames;
         draft.wsUrls = details.wsUrls;
       }),
-    updateImage: (image) =>
-      set((draft) => {
-        draft.eventImage = image;
-      }),
     updateIcon: (icon) =>
       set((draft) => {
-        draft.eventIcon = icon;
+        draft.icon = icon;
       }),
     clear: () =>
       set((draft) => {
-        draft.eventType = eventSliceDefaults.eventType;
-        draft.eventName = eventSliceDefaults.eventName;
-        draft.eventLocation = eventSliceDefaults.eventLocation;
-        draft.eventDescription = eventSliceDefaults.eventDescription;
-        draft.eventDate = eventSliceDefaults.eventDate;
+        draft.type = eventSliceDefaults.type;
+        draft.name = eventSliceDefaults.name;
+        draft.location = eventSliceDefaults.location;
+        draft.description = eventSliceDefaults.description;
+        draft.date = eventSliceDefaults.date;
         draft.wsPresenterNames = eventSliceDefaults.wsPresenterNames;
         draft.wsSkillLevel = eventSliceDefaults.wsSkillLevel;
         draft.wsRelevantSkills = eventSliceDefaults.wsRelevantSkills;
         draft.wsUrls = eventSliceDefaults.wsUrls;
-        draft.eventImage = eventSliceDefaults.eventImage;
-        draft.eventIcon = eventSliceDefaults.eventIcon;
+        draft.icon = eventSliceDefaults.icon;
       }),
   }))
 );
-
-// export const eventStoreSlice: ModelSlice<IEventModel> = {
-//   eventType: { value: EventType.ACTIVITY, label: "Activity" },
-//   eventName: "",
-//   eventLocation: null,
-//   eventDate: {
-//     start: new Date(),
-//     end: new Date(),
-//   },
-//   eventDescription: { blocks: [], entityMap: {} },
-//   wsPresenterNames: undefined,
-//   wsSkillLevel: undefined,
-//   wsUrls: [],
-//   wsRelevantSkills: undefined,
-//   eventImage: undefined,
-//   eventIcon: undefined,
-// };
-//
-// export const eventStoreAction: StoreAction<EventActions> = (set) => {
-//   return (action, payload) => {
-//     set(
-//       produce((state: State) => {
-//         const currentState = state.eventStore;
-//         switch (action) {
-//           case "UPDATE_TYPE":
-//             if (payload) {
-//               currentState.eventType = payload.type;
-//             }
-//             break;
-//           case "UPDATE_DETAILS":
-//             if (payload) {
-//               currentState.eventName = payload.eventName;
-//               currentState.eventLocation = payload.eventLocation;
-//               currentState.eventDescription = payload.eventDescription;
-//               currentState.eventDate = payload.eventDate;
-//             }
-//             break;
-//           case "UPDATE_WORKSHOP":
-//             if (payload) {
-//               currentState.wsRelevantSkills = payload.wsRelevantSkills;
-//               currentState.wsSkillLevel = payload.wsSkillLevel;
-//               currentState.wsPresenterNames = payload.wsPresenterNames;
-//               currentState.wsUrls = payload.wsUrls;
-//             }
-//             break;
-//           case "UPDATE_IMAGE":
-//             if (payload) {
-//               currentState.eventImage = payload.eventImage;
-//             }
-//             break;
-//           case "UPDATE_ICON":
-//             if (payload) {
-//               currentState.eventIcon = payload.eventIcon;
-//             }
-//             break;
-//           case "CLEAR":
-//             currentState.eventType = eventStoreSlice.eventType;
-//             currentState.eventName = eventStoreSlice.eventName;
-//             currentState.eventLocation = eventStoreSlice.eventLocation;
-//             currentState.eventDescription = eventStoreSlice.eventDescription;
-//             currentState.eventDate = eventStoreSlice.eventDate;
-//             currentState.wsPresenterNames = eventStoreSlice.wsPresenterNames;
-//             currentState.wsSkillLevel = eventStoreSlice.wsSkillLevel;
-//             currentState.wsRelevantSkills = eventStoreSlice.wsRelevantSkills;
-//             currentState.wsUrls = eventStoreSlice.wsUrls;
-//             currentState.eventImage = eventStoreSlice.eventImage;
-//             currentState.eventIcon = eventStoreSlice.eventIcon;
-//             break;
-//         }
-//       })
-//     );
-//   };
-// };
-//
-// export type EventStore = {
-//   eventStore: ModelSlice<IEventModel>;
-//   eventDispatch: StoreDispatch<EventActions>;
-// };

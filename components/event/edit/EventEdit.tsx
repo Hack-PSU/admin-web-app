@@ -1,6 +1,6 @@
 import { FC } from "react";
-import { WithChildren } from "types/common";
 import { Grid, Typography, useTheme } from "@mui/material";
+import { WithChildren } from "common/types";
 
 interface IEventEditProps {
   title: string;
