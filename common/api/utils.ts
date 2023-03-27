@@ -35,7 +35,7 @@ function replacePathParams(path: string, params: PathParams) {
     return acc;
   }, {} as { [key: string]: any });
 
-  const regex = new RegExp(Object.keys(replaceParams).join("|"));
+  const regex = new RegExp(Object.keys(replaceParams).join("|"), "gi");
   return path.replace(regex, (match) => replaceParams[match]);
 }
 
@@ -83,6 +83,7 @@ export function createMutation<
     let endpoint = url;
     if (!!params) {
       endpoint = replacePathParams(url, params);
+      console.log(endpoint);
     }
     return instance.request<TResponse, AxiosResponse<TResponse>, TEntity>({
       url: endpoint,

@@ -52,7 +52,7 @@ export const createExtraCreditClass: CreateMutationReturn<
 export const assignExtraCreditClass: CreateMutationReturn<
   {},
   {},
-  { id: string; classId: number }
+  { id: string; classId: string }
 > = createMutation("/users/:id/extra-credit/assign/:classId");
 
 /**

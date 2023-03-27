@@ -1,7 +1,7 @@
 export interface ExtraCreditClassEntity {
   id: number;
   name: string;
-  hackathonId: string;
+  hackathonId?: string;
 }
 
 export interface ECClassAssignedUser {

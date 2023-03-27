@@ -12,8 +12,13 @@ import { object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreateEntity, fetch, QueryKeys } from "api";
-import { createExtraCreditClass, IExtraCreditClassCreateEntity } from "api";
+import {
+  createExtraCreditClass,
+  ExtraCreditClassEntity,
+  fetch,
+  QueryEntity,
+  QueryKeys,
+} from "api";
 
 const schema = object({
   name: NonEmptyString,
@@ -32,7 +37,7 @@ const AddExtraCreditClassModal: FC = () => {
 
   const { mutateAsync, isLoading } = useMutation(
     QueryKeys.extraCreditClass.createOne(),
-    ({ entity }: CreateEntity<IExtraCreditClassCreateEntity>) =>
+    ({ entity }: QueryEntity<Omit<ExtraCreditClassEntity, "id">>) =>
       fetch(() => createExtraCreditClass(entity)),
     {
       onSuccess: async () => {
@@ -43,14 +48,14 @@ const AddExtraCreditClassModal: FC = () => {
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { className: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       handleHide();
     })();
   };
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { className: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       methods.reset();
     });
   };

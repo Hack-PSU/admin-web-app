@@ -7,23 +7,22 @@ import {
   Modal,
   SaveButton,
 } from "components/base";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Box, Grid, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  CreateEntity,
-  fetch,
-  getAllHackers,
-  QueryKeys,
   assignExtraCreditClass,
+  fetch,
   getAllExtraCreditAssignments,
-  IAssignExtraCreditClassEntity,
+  getAllUsers,
+  QueryEntity,
+  QueryKeys,
 } from "api";
-import { IOption } from "types/components";
 import { object } from "superstruct";
 import { NonEmptySelectArray } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import _ from "lodash";
+import { IOption } from "components/base/Select/types";
 
 interface IAssignExtraCreditClassModalProps {
   selectedRows: Record<string, boolean>;
@@ -47,14 +46,13 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
 
   const { data: allUsers } = useQuery(
     QueryKeys.hacker.findAll(),
-    () => fetch(getAllHackers),
+    () => fetch(getAllUsers),
     {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            uid: d.uid,
-            name: `${d.firstname} ${d.lastname}`,
-            pin: d.pin,
+            id: d.id,
+            name: `${d.firstName} ${d.lastName}`,
           }));
         }
       },
@@ -68,8 +66,10 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
 
   const { mutateAsync, isLoading } = useMutation(
     QueryKeys.extraCreditAssignment.createOne(),
-    ({ entity }: CreateEntity<IAssignExtraCreditClassEntity, "">) =>
-      fetch(() => assignExtraCreditClass(entity)),
+    ({
+      entity: { id, classId },
+    }: QueryEntity<{ id: string; classId: string }>) =>
+      fetch(() => assignExtraCreditClass({}, { id, classId })),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(
@@ -82,24 +82,23 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
   const selectItems: IOption[] = useMemo(() => {
     if (allUsers && selectedRows) {
       const selectedClasses = Object.keys(selectedRows);
-      const hackersAssignedAllSelectedClasses = _.chain(allAssignments)
-        .groupBy("user_uid")
-        .pickBy((assignment) => {
-          const userAssignments = _.map(assignment, (a) => String(a.class_uid));
-          // check if all selectedClasses are already assigned
-          // return true if user has all selectedClasses
-          return _.every(selectedClasses, (classUid) =>
-            userAssignments.includes(classUid)
-          );
-        })
-        .map((_, user) => user)
+      const selectedClassAssignments = _.filter(allAssignments, (a) =>
+        selectedClasses.includes(String(a.id))
+      );
+      const usersAssignedAllSelectedClasses = _.chain(allUsers)
+        .pickBy((user) =>
+          _.every(selectedClassAssignments, (ecClass) =>
+            _.map(ecClass.users, "id").includes(user.id)
+          )
+        )
+        .map("id")
         .value();
 
       return allUsers
-        .filter((u) => !hackersAssignedAllSelectedClasses.includes(u.uid))
+        .filter((u) => !usersAssignedAllSelectedClasses.includes(u.id))
         .map((u) => ({
-          label: `${u.name} [${u.pin}]`,
-          value: u.uid,
+          label: u.name,
+          value: u.id,
         }));
     }
     return [];
@@ -107,32 +106,30 @@ const AssignExtraCreditClassModal: FC<IAssignExtraCreditClassModalProps> = ({
 
   const onClickSubmit = () => {
     methods.handleSubmit(async (data) => {
-      if (selectedRows) {
+      if (selectedRows && allAssignments) {
         const selectedHackers = data.hackers.map((h) => h.value);
-        const assignedHackers = _.groupBy(allAssignments, "user_uid");
+        const classUsers = allAssignments.reduce((acc, curr) => {
+          acc[String(curr.id)] = _.map(curr.users, "id");
+          return acc;
+        }, {} as { [key: string]: string[] });
         const selectedClasses = Object.keys(selectedRows);
 
         // returns an object where the key is the userUid and the value is an
         // array of classes not yet assigned to the hacker
-        const mutateHackers = selectedHackers.reduce((acc, curr) => {
-          const userAssignments = _.map(assignedHackers[curr], (a) =>
-            String(a.class_uid)
-          );
-          // gather assignments not yet assigned to hacker
-          const remainingAssignments = _.filter(
-            selectedClasses,
-            (uid) => !userAssignments.includes(uid)
-          );
-          acc[curr] = _.map(remainingAssignments, String);
+        const mutateUsers = selectedHackers.reduce((acc, curr) => {
+          // gather all classIds that have not been assigned to a user
+          acc[curr] = _.chain(selectedClasses)
+            .filter((classId) => !classUsers[classId].includes(curr))
+            .value();
           return acc;
         }, {} as { [key: string]: string[] });
 
         await Promise.all(
-          _.entries(mutateHackers).map(([hacker, classes]) =>
+          _.entries(mutateUsers).map(([hacker, classes]) =>
             Promise.all(
               classes.map((uid) =>
                 mutateAsync({
-                  entity: { classUid: uid, userUid: hacker },
+                  entity: { classId: uid, id: hacker },
                 })
               )
             )
