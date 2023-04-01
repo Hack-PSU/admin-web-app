@@ -72,7 +72,6 @@ const EventDetailsStep: FC = () => {
 
   const handleNext = useCallback(() => {
     methods.handleSubmit((data, errors) => {
-      console.log(data, errors);
       if (!errors) {
         let locationData = data.location;
 

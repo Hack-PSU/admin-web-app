@@ -38,8 +38,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
     defaultValues: {
       name: event.name,
       location: {
-        value: event.location.id,
-        label: event.location.name,
+        value: event.location?.id,
+        label: event.location?.name,
       },
       type: {
         value: event.type,
@@ -215,8 +215,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
           </Button>
         </Grid>
         <Grid container item spacing={2}>
-          <Grid container item xs={4} flexDirection="column">
-            <Grid item sx={{ height: "50%" }}>
+          <Grid container item xs={4} flexDirection={"column"}>
+            <Grid item sx={{ width: "100%" }}>
               <EventIconPreview />
             </Grid>
           </Grid>

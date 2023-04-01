@@ -1,4 +1,4 @@
-import { api, ApiAxiosInstance } from "api/axios";
+import { api } from "api/axios";
 import { AxiosError, AxiosResponse, Method } from "axios";
 import { GetServerSidePropsContext } from "next";
 
@@ -43,10 +43,7 @@ export function createQuery<
   TResponse,
   TParams extends PathParams = {},
   TQuery extends object = {}
->(
-  url: string,
-  instance: ApiAxiosInstance = api
-): CreateQueryReturn<TResponse, TParams, TQuery> {
+>(url: string): CreateQueryReturn<TResponse, TParams, TQuery> {
   return (params, query, token) => {
     let endpoint = url;
 
@@ -54,7 +51,7 @@ export function createQuery<
       endpoint = replacePathParams(url, params);
     }
 
-    return instance.request<TResponse>({
+    return api.request<TResponse>({
       url: endpoint,
       method: "GET",
       params: query,
@@ -76,16 +73,14 @@ export function createMutation<
   TQuery extends object
 >(
   url: string,
-  method: Method = "POST",
-  instance: ApiAxiosInstance = api
+  method: Method = "POST"
 ): CreateMutationReturn<TEntity, TResponse, TParams, TQuery> {
   return (entity, params, query, token) => {
     let endpoint = url;
     if (!!params) {
       endpoint = replacePathParams(url, params);
-      console.log(endpoint);
     }
-    return instance.request<TResponse, AxiosResponse<TResponse>, TEntity>({
+    return api.request<TResponse, AxiosResponse<TResponse>, TEntity>({
       url: endpoint,
       method,
       data: entity,

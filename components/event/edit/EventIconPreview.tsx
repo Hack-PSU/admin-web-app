@@ -46,8 +46,13 @@ const EventIconPreview: FC = () => {
 
   return (
     <EventEdit title={"Event Icon Preview"}>
-      <Grid item>
-        <img ref={imgRef} width={"100%"} height={"100%"} />
+      <Grid item sx={{ width: "100%", height: "100%" }}>
+        <img
+          ref={imgRef}
+          width={"100%"}
+          height={"100%"}
+          style={{ objectFit: "contain" }}
+        />
       </Grid>
     </EventEdit>
   );

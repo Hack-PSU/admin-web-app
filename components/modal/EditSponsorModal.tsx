@@ -133,7 +133,6 @@ const PreviewLogo: FC<{ name: string; fallback: string }> = ({
         imgRef.current.src = `${getValues(
           fallback
         )}?m=${DateTime.now().toMillis()}`;
-        console.log(getValues(fallback));
       } else {
         getImageUrl(getValues(watchName)[0]);
       }
@@ -150,7 +149,6 @@ const EditSponsorModal: FC<Props> = ({ sponsor }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const defaultValues = useMemo(() => {
-    console.log(sponsor);
     if (sponsor) {
       return {
         name: sponsor.name ?? "",

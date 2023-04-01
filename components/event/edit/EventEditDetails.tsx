@@ -21,6 +21,7 @@ const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
   { value: EventType.WORKSHOP, label: "Workshop" },
   { value: EventType.FOOD, label: "Food" },
+  { value: EventType.CHECKIN, label: "Check In" },
 ];
 
 type Props = {
@@ -32,7 +33,7 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
     startDateTime: startDate,
     endDateTime: endDate,
     register,
-  } = useDateTimeRange("eventDate", { isMultiple: true });
+  } = useDateTimeRange("date", { isMultiple: true });
 
   return (
     <EventEdit title={"Basic Details"}>

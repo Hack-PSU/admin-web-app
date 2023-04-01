@@ -1,9 +1,8 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { WithLabelledProps } from "types/components";
 import { UseControllerReturn } from "react-hook-form";
 import { Box, Grid, GridProps, styled } from "@mui/material";
 import { DateTime } from "luxon";
-import { EvaIcon, InputLabel } from "components/base";
+import { EvaIcon, InputLabel, WithLabelledProps } from "components/base";
 import TimeComponent from "components/base/Pickers/TimeInput/TimeComponent";
 
 type Props = GridProps & {

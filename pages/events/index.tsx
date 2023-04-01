@@ -23,6 +23,7 @@ import {
   useColumnDef,
   useTable,
 } from "components/Table";
+import _ from "lodash";
 
 interface IEventsProps {
   events: EventEntity[];
@@ -135,18 +136,20 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     QueryKeys.event.findAll(),
     () => fetch(getAllEvents),
     {
-      keepPreviousData: true,
-      initialData: events,
       select: (data) => {
         if (data) {
-          return data.map((d) => ({
-            id: d.id,
-            name: d.name,
-            location: d.location.name,
-            startTime: d.startTime,
-            endTime: d.endTime,
-            type: d.type,
-          }));
+          return _.chain(data)
+            .map((d) => {
+              return {
+                id: d.id,
+                name: d.name,
+                location: d.location?.name ?? "",
+                startTime: d.startTime,
+                endTime: d.endTime,
+                type: d.type,
+              };
+            })
+            .value();
         }
         return [];
       },
