@@ -46,7 +46,7 @@ export function withServerSideProps<TProps>(
   return async (ctx: GetServerSidePropsContext) => {
     const cookies = nookies.get(ctx);
 
-    if (cookies.idtoken) {
+    if (cookies.token) {
       if (getServerSideProps) {
         return getServerSideProps(ctx, cookies.token);
       } else {
