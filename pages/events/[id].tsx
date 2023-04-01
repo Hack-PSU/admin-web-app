@@ -24,12 +24,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import EventEditIcon from "components/event/edit/EventEditIcon";
 import EventIconPreview from "components/event/edit/EventIconPreview";
+import { useRouter } from "next/router";
 
 interface IEventPageProps {
   event: EventEntity;
 }
 
 const EventPage: NextPage<IEventPageProps> = ({ event }) => {
+  const router = useRouter();
   const theme = useTheme();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
@@ -101,6 +103,7 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
         enqueueSnackbar("Successfully updated event", {
           variant: "success",
         });
+        await router.back();
       },
     }
   );
