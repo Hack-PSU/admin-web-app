@@ -13,10 +13,10 @@ import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  CreateEntity,
   createProject,
   fetch,
-  IProjectEntity,
+  ProjectEntity,
+  QueryEntity,
   QueryKeys,
 } from "api";
 
@@ -37,7 +37,7 @@ const AddNewJudgingProjectModal: FC = () => {
 
   const { mutateAsync, isLoading } = useMutation(
     QueryKeys.judgingProject.createOne(),
-    ({ entity }: CreateEntity<IProjectEntity, "uid" | "hackathon">) =>
+    ({ entity }: QueryEntity<Omit<ProjectEntity, "id">>) =>
       fetch(() => createProject(entity)),
     {
       onSuccess: async () => {
@@ -48,14 +48,14 @@ const AddNewJudgingProjectModal: FC = () => {
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { project: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       handleHide();
     })();
   };
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { project: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       methods.reset();
     })();
   };
