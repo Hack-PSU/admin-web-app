@@ -39,15 +39,15 @@ const filterOptions: IOption[] = [
   },
   {
     value: ScoreType.ENERGY,
-    label: "Energy Challenge",
+    label: "Entertainment Challenge",
   },
   {
     value: ScoreType.ENVIRONMENTAL,
-    label: "Environmental Challenge",
+    label: "Social Impact Challenge",
   },
   {
     value: ScoreType.SUPPLY_CHAIN,
-    label: "Supply Chain Challenge",
+    label: "New Frontier Challenge",
   },
 ];
 
