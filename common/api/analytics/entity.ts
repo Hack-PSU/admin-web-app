@@ -1,3 +1,5 @@
+import { EventType } from "api/event";
+
 interface CountsResponse {
   count: number;
 }
@@ -29,4 +31,18 @@ export interface AnalyticsSummaryResponse {
   race: RaceCounts[];
   academicYear: AcademicYearCounts[];
   codingExp: CodingExpCounts[];
+}
+
+export interface AnalyticsEventsResponse {
+  id: string;
+  name: string;
+  type: EventType;
+  count: number;
+}
+
+export interface AnalyticsScansResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  count: number;
 }

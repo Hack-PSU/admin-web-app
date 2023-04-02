@@ -50,13 +50,9 @@ export const createProject: CreateMutationReturn<
 
 /**
  * Generate judging assignments
- * @param entity (required)
- * @param param (optional)
- * @param token (optional)
- * @link https://api.hackpsu.org/v2/doc/#api-Judging-Generate_Judging_Assignments
  */
 export const generateJudging: CreateMutationReturn<GenerateJudgingEntity, {}> =
-  createMutation("/judging/scores/assign");
+  createMutation("/judging/assign");
 
 export const JudgingProjectQueryKeys = {
   all: [{ entity: "judging_project" }] as const,

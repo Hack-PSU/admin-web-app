@@ -42,6 +42,7 @@ export interface ProjectBreakdownEntity
 }
 
 export interface GenerateJudgingEntity {
-  judges: string[];
-  projectsPerOrganizer: number;
+  users: string[];
+  projects: number[];
+  projectsPerUser: number;
 }

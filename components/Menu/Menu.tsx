@@ -130,11 +130,21 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
           label={"Sponsorship"}
           to={"/sponsorship"}
         />
-        <MenuItem
-          icon={"bar-chart-2-outline"}
-          label={"Analytics"}
+        <CollapsibleMenuItem
+          nestedItems={[
+            { label: "Summary", to: "/analytics/summary" },
+            { label: "Events", to: "/analytics/events" },
+            { label: "Organizers", to: "/analytics/organizers" },
+          ]}
           to={"/analytics"}
+          label={"Analytics"}
+          icon={"bar-chart-2-outline"}
         />
+        {/*<MenuItem*/}
+        {/*  icon={"bar-chart-2-outline"}*/}
+        {/*  label={"Analytics"}*/}
+        {/*  to={"/analytics"}*/}
+        {/*/>*/}
         <MenuItem icon={"settings-2"} to={"/settings"} label={"Settings"} />
       </List>
     </Drawer>

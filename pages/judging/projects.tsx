@@ -104,18 +104,6 @@ const ManageProjectsPage: NextPage = () => {
     }
   );
 
-  // const { mutateAsync: mutatePushJudging } = useMutation(
-  //   ({ entity }: CreateEntity<IWSPushJudgingEntity, "">) =>
-  //     pushJudgingFlag(entity),
-  //   {
-  //     onSuccess: () => {
-  //       enqueueSnackbar("Successfully notified clients", {
-  //         variant: "success",
-  //       });
-  //     },
-  //   },
-  // );
-
   const onConfirmEnableJudging = useCallback(async () => {
     await mutateAppFlags({
       entity: {
@@ -123,15 +111,6 @@ const ManageProjectsPage: NextPage = () => {
         isEnabled: true,
       },
     });
-
-    // await mutatePushJudging({
-    //   entity: {
-    //     to: "ADMIN",
-    //     data: {
-    //       isEnabled: true,
-    //     },
-    //   },
-    // });
   }, [mutateAppFlags]);
 
   return (

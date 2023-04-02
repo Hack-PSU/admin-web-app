@@ -1,5 +1,9 @@
 import { createQuery, CreateQueryReturn } from "api/utils";
-import { AnalyticsSummaryResponse } from "api/analytics/entity";
+import {
+  AnalyticsEventsResponse,
+  AnalyticsScansResponse,
+  AnalyticsSummaryResponse,
+} from "api/analytics/entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -7,6 +11,18 @@ import { QueryAction, QueryScope } from "api/types";
  */
 export const getAnalyticsSummary: CreateQueryReturn<AnalyticsSummaryResponse> =
   createQuery("/analytics/summary");
+
+/**
+ * Get all analytics for events
+ */
+export const getAnalyticsEvents: CreateQueryReturn<AnalyticsEventsResponse[]> =
+  createQuery("/analytics/events");
+
+/**
+ * get all analytics for scans
+ */
+export const getAnalyticsScans: CreateQueryReturn<AnalyticsScansResponse[]> =
+  createQuery("/analytics/scans");
 
 export const AnalyticsQueryKeys = {
   all: [{ entity: "analytics" }],
@@ -16,6 +32,14 @@ export const AnalyticsQueryKeys = {
         ...AnalyticsQueryKeys.all[0],
         action: QueryAction.query,
         scope: QueryScope.ALL,
+      },
+    ] as const,
+  findOne: (endpoint: string) =>
+    [
+      {
+        ...AnalyticsQueryKeys.all[0],
+        action: QueryAction.query,
+        scope: endpoint,
       },
     ] as const,
 };

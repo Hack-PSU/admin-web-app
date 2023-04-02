@@ -6,28 +6,28 @@ import {
   ControlledSelect,
   InputLabel,
   LabelledInput,
-  LabelledRadio,
   LabelledSelect,
   Loading,
   Modal,
 } from "components/base";
 import { useModal, useModalContext } from "components/context";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Grid } from "@mui/material";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  CreateEntity,
   fetch,
   generateJudging,
+  GenerateJudgingEntity,
   getAllAppFlags,
   getAllOrganizers,
-  IGenerateJudgingEntity,
+  getAllProjects,
+  QueryEntity,
   QueryKeys,
 } from "api";
 import { useSnackbar } from "notistack";
 import _ from "lodash";
-import { IOption } from "types/components";
 import { AxiosError } from "axios";
+import { IOption } from "components/base/Select/types";
 
 enum FilterType {
   INCLUDE = "include",
@@ -58,9 +58,11 @@ const AssignJudgingProjectsModal: FC = () => {
 
   const methods = useForm({
     defaultValues: {
-      judges: [] as IOption[],
-      filter: { value: FilterType.EXCLUDE },
-      projectsPerOrganizer: "2",
+      users: [] as IOption[],
+      projects: [] as IOption<number>[],
+      filterUsers: { value: FilterType.EXCLUDE },
+      filterProjects: { value: FilterType.EXCLUDE },
+      projectsPerUser: "2",
     },
   });
 
@@ -71,8 +73,23 @@ const AssignJudgingProjectsModal: FC = () => {
       select: (data) => {
         if (data) {
           return data.map((d) => ({
-            value: d.email,
-            label: `${d.firstname} ${d.lastname}`.trim(),
+            value: d.id,
+            label: `${d.firstName} ${d.lastName}`.trim(),
+          }));
+        }
+      },
+    }
+  );
+
+  const { data: projectOptions } = useQuery(
+    QueryKeys.judgingProject.findAll(),
+    () => fetch(getAllProjects),
+    {
+      select: (data) => {
+        if (data) {
+          return data.map((d) => ({
+            value: d.id,
+            label: d.name,
           }));
         }
       },
@@ -80,7 +97,7 @@ const AssignJudgingProjectsModal: FC = () => {
   );
 
   const { mutateAsync: mutateGenerateJudging } = useMutation(
-    ({ entity }: CreateEntity<IGenerateJudgingEntity>) =>
+    ({ entity }: QueryEntity<GenerateJudgingEntity>) =>
       fetch(() => generateJudging(entity)),
     {
       onSuccess: async () => {
@@ -108,24 +125,36 @@ const AssignJudgingProjectsModal: FC = () => {
   const onClickSubmit = useCallback(() => {
     handleSubmit(async (data) => {
       // starts as including all
-      const selectedJudges = _.map(data.judges, "value");
+      const selectedJudges = _.map(data.users, "value");
+      const selectedProjects = _.map(data.projects, "value");
 
-      let judges = selectedJudges;
+      let users = selectedJudges;
+      let projects = selectedProjects;
 
-      if (data.filter.value === FilterType.EXCLUDE) {
+      if (data.filterUsers.value === FilterType.EXCLUDE) {
         // if filter type is exclude, make selectedJudges the excluding filter
         const excludedJudges = new Set(selectedJudges);
 
-        judges = _.chain(organizerOptions)
+        users = _.chain(organizerOptions)
           .map((o) => o.value)
           .filter((value) => !excludedJudges.has(value))
           .value();
       }
 
+      if (data.filterProjects.value === FilterType.EXCLUDE) {
+        const excludeProjects = new Set(selectedProjects);
+
+        projects = _.chain(projectOptions)
+          .map((p) => p.value)
+          .filter((value) => !excludeProjects.has(value))
+          .value();
+      }
+
       await mutateGenerateJudging({
         entity: {
-          judges,
-          projectsPerOrganizer: parseInt(data.projectsPerOrganizer),
+          users,
+          projects,
+          projectsPerUser: parseInt(data.projectsPerUser),
         },
       });
 
@@ -141,6 +170,7 @@ const AssignJudgingProjectsModal: FC = () => {
     handleHide,
     flagEnabledMap,
     organizerOptions,
+    projectOptions,
     showModal,
   ]);
 
@@ -154,10 +184,10 @@ const AssignJudgingProjectsModal: FC = () => {
         <Modal.Header>Assign Projects</Modal.Header>
         <Modal.Body>
           <Grid item>
-            <InputLabel id={"filter"} label={"Filter"} />
+            <InputLabel id={"filterUsers"} label={"Filter Users"} />
             <Grid container>
               <ControlledRadio
-                name={"filter"}
+                name={"filterUsers"}
                 items={[
                   {
                     type: "option",
@@ -176,23 +206,54 @@ const AssignJudgingProjectsModal: FC = () => {
           <Grid item>
             <ControlledSelect
               isMulti
-              name={"judges"}
+              name={"users"}
               options={organizerOptions}
               as={LabelledSelect}
-              id={"judges"}
+              id={"users"}
               showError
-              label={"Judges"}
+              label={"Users"}
+            />
+          </Grid>
+          <Grid item mt={1}>
+            <InputLabel id={"filterProjects"} label={"Filter Projects"} />
+            <Grid container>
+              <ControlledRadio
+                name={"filterProjects"}
+                items={[
+                  {
+                    type: "option",
+                    value: FilterType.INCLUDE,
+                    display: "Include",
+                  },
+                  {
+                    type: "option",
+                    value: FilterType.EXCLUDE,
+                    display: "Exclude",
+                  },
+                ]}
+              />
+            </Grid>
+          </Grid>
+          <Grid item>
+            <ControlledSelect
+              isMulti
+              name={"projects"}
+              options={projectOptions}
+              as={LabelledSelect}
+              id={"projects"}
+              showError
+              label={"Projects"}
             />
           </Grid>
           <Grid item mt={2}>
             <ControlledInput
-              name={"projectsPerOrganizer"}
+              name={"projectsPerUser"}
               placeholder={"Enter the number of projects per organizer"}
               type={"number"}
               as={LabelledInput}
               showError
-              id={"projects-per-organizer"}
-              label={"Projects Per Organizer"}
+              id={"projects-per-user"}
+              label={"Projects Per User"}
             />
           </Grid>
           <Grid container item mt={2} xs={12} justifyContent={"center"}>
