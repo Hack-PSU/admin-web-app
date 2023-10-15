@@ -15,8 +15,6 @@ export function getEnvironment() {
       appId: String(process.env.NEXT_PUBLIC_FIREBASE_APP_ID),
     },
     baseURL: String(process.env.NEXT_PUBLIC_BASE_URL),
-    notificationBaseURL: String(process.env.NEXT_PUBLIC_NOTIFICATION_BASE_URL),
-    wsBaseURL: String(process.env.NEXT_PUBLIC_WS_BASE_URL),
   };
 }
 

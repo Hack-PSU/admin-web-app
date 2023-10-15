@@ -26,14 +26,6 @@ const api = axios.create({
   baseURL: config.baseURL,
 }) as ApiAxiosInstance;
 
-// const notificationApi = axios.create({
-//   baseURL: config.notificationBaseURL,
-// }) as ApiAxiosInstance;
-//
-// const wsApi = axios.create({
-//   baseURL: config.wsBaseURL,
-// }) as ApiAxiosInstance;
-
 const shouldRefreshToken = (config: ApiAxiosRequestConfig) => {
   const token = config.headers.authorization?.split("Bearer ")[0] ?? "";
   const expiration = config.headers.exp;
