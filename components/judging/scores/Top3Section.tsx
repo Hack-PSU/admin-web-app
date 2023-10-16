@@ -38,16 +38,16 @@ const filterOptions: IOption[] = [
     label: "Technical Skills",
   },
   {
-    value: ScoreType.ENERGY,
-    label: "Entertainment Challenge",
-  },
-  {
-    value: ScoreType.ENVIRONMENTAL,
+    value: ScoreType.CHALLENGE1,
     label: "Social Impact Challenge",
   },
   {
-    value: ScoreType.SUPPLY_CHAIN,
-    label: "New Frontier Challenge",
+    value: ScoreType.CHALLENGE2,
+    label: "Entrepreneurship Challenge",
+  },
+  {
+    value: ScoreType.CHALLENGE3,
+    label: "Generative AI Challenge",
   },
 ];
 
@@ -91,7 +91,7 @@ const Top3Card: FC<Top3CardProps> = ({ score, project }) => {
                 verticalAnchor={"start"}
                 fill={"url(#sunset-accent)"}
               >
-                {Number.isInteger(score) ? score : score.toFixed(2)}
+                {score ? score.toFixed(2) : "0.00"}
               </Text>
             </svg>
           )}
@@ -116,13 +116,13 @@ const Top3Card: FC<Top3CardProps> = ({ score, project }) => {
 const Top3Section: FC<Top3SectionProps> = ({
   top3Avg,
   top3Creativity,
-  top3Environmental,
+  top3Challenge3,
   top3Growth,
   top3Implementation,
-  top3Energy,
+  top3Challenge1,
   top3Technical,
   top3Clarity,
-  top3SupplyChain,
+  top3Challenge2,
 }) => {
   const methods = useForm({
     defaultValues: {
@@ -156,25 +156,25 @@ const Top3Section: FC<Top3SectionProps> = ({
         case ScoreType.GROWTH:
           setSelectedData(top3Growth);
           break;
-        case ScoreType.ENERGY:
-          setSelectedData(top3Energy);
+        case ScoreType.CHALLENGE1:
+          setSelectedData(top3Challenge1);
           break;
-        case ScoreType.SUPPLY_CHAIN:
-          setSelectedData(top3SupplyChain);
+        case ScoreType.CHALLENGE2:
+          setSelectedData(top3Challenge2);
           break;
-        case ScoreType.ENVIRONMENTAL:
-          setSelectedData(top3Environmental);
+        case ScoreType.CHALLENGE3:
+          setSelectedData(top3Challenge3);
           break;
       }
     },
     [
-      top3SupplyChain,
+      top3Challenge2,
       top3Avg,
       top3Creativity,
-      top3Environmental,
+      top3Challenge3,
       top3Growth,
       top3Implementation,
-      top3Energy,
+      top3Challenge1,
       top3Technical,
       top3Clarity,
     ]

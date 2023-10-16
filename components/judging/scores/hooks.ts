@@ -27,9 +27,9 @@
 //   top3Implementation: ResolvedData[];
 //   top3Clarity: ResolvedData[];
 //   top3Growth: ResolvedData[];
-//   top3Energy: ResolvedData[];
-//   top3Environmental: ResolvedData[];
-//   top3SupplyChain: ResolvedData[];
+//   top3Challenge1: ResolvedData[];
+//   top3Challenge2: ResolvedData[];
+//   top3Challenge3: ResolvedData[];
 //   allData: AllResolvedData[];
 // };
 //
@@ -40,9 +40,9 @@
 //   IMPLEMENTATION = "implementation",
 //   CLARITY = "clarity",
 //   GROWTH = "growth",
-//   ENERGY = "energy",
-//   SUPPLY_CHAIN = "supply_chain",
-//   ENVIRONMENTAL = "environmental",
+//   CHALLENGE1 = "challenge1",
+//   CHALLENGE2 = "challenge2",
+//   CHALLENGE3 = "challenge3",
 // }
 //
 // export function useScoreResults(
@@ -90,9 +90,9 @@
 //           const clarity = _.meanBy(scores, "clarity");
 //           const growth = _.meanBy(scores, "growth");
 //
-//           const energy = _.meanBy(scores, "energy");
-//           const supply_chain = _.meanBy(scores, "supply_chain");
-//           const environmental = _.meanBy(scores, "environmental");
+//           const challenge1 = _.meanBy(scores, "challenge1");
+//           const challenge2 = _.meanBy(scores, "challenge2");
+//           const challenge3 = _.meanBy(scores, "challenge3");
 //
 //           const avg =
 //             creativity + technical + implementation + clarity + growth;
@@ -104,10 +104,10 @@
 //             clarity,
 //             technical,
 //             projectName: project,
-//             environmental,
-//             energy,
+//             challenge3,
+//             challenge1,
 //             implementation,
-//             supply_chain,
+//             challenge2,
 //           } as ResolvedData;
 //         })
 //         .value();
@@ -176,12 +176,12 @@
 //       top3Avg: getTop3(ScoreType.AVG),
 //       top3Clarity: getTop3(ScoreType.CLARITY),
 //       top3Creativity: getTop3(ScoreType.CREATIVITY),
-//       top3Environmental: getTop3(ScoreType.ENVIRONMENTAL),
+//       top3Challenge3: getTop3(ScoreType.CHALLENGE3),
 //       top3Growth: getTop3(ScoreType.GROWTH),
-//       top3Energy: getTop3(ScoreType.ENERGY),
+//       top3Challenge1: getTop3(ScoreType.CHALLENGE1),
 //       top3Implementation: getTop3(ScoreType.IMPLEMENTATION),
 //       top3Technical: getTop3(ScoreType.TECHNICAL),
-//       top3SupplyChain: getTop3(ScoreType.SUPPLY_CHAIN),
+//       top3Challenge2: getTop3(ScoreType.CHALLENGE2),
 //     }),
 //     [getTop3, allData],
 //   );

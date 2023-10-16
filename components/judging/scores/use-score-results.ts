@@ -19,9 +19,9 @@ export type UseScoreResultsReturn = {
   top3Implementation: RankedData[];
   top3Clarity: RankedData[];
   top3Growth: RankedData[];
-  top3Energy: RankedData[];
-  top3Environmental: RankedData[];
-  top3SupplyChain: RankedData[];
+  top3Challenge1: RankedData[];
+  top3Challenge3: RankedData[];
+  top3Challenge2: RankedData[];
 };
 
 export enum ScoreType {
@@ -31,9 +31,9 @@ export enum ScoreType {
   IMPLEMENTATION = "implementation",
   CLARITY = "clarity",
   GROWTH = "growth",
-  ENERGY = "energy",
-  SUPPLY_CHAIN = "supplyChain",
-  ENVIRONMENTAL = "environmental",
+  CHALLENGE1 = "challenge1",
+  CHALLENGE2 = "challenge2",
+  CHALLENGE3 = "challenge3",
 }
 
 export function useScoreResults(
@@ -58,12 +58,12 @@ export function useScoreResults(
       top3Avg: getTop3(ScoreType.AVG),
       top3Clarity: getTop3(ScoreType.CLARITY),
       top3Creativity: getTop3(ScoreType.CREATIVITY),
-      top3Environmental: getTop3(ScoreType.ENVIRONMENTAL),
+      top3Challenge3: getTop3(ScoreType.CHALLENGE3),
       top3Growth: getTop3(ScoreType.GROWTH),
-      top3Energy: getTop3(ScoreType.ENERGY),
+      top3Challenge1: getTop3(ScoreType.CHALLENGE1),
       top3Implementation: getTop3(ScoreType.IMPLEMENTATION),
       top3Technical: getTop3(ScoreType.TECHNICAL),
-      top3SupplyChain: getTop3(ScoreType.SUPPLY_CHAIN),
+      top3Challenge2: getTop3(ScoreType.CHALLENGE2),
     }),
     [getTop3]
   );

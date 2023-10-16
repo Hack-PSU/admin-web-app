@@ -16,9 +16,9 @@ export interface ScoreEntity {
   clarity: number;
   growth: number;
   submitted: boolean;
-  energy: number;
-  supplyChain: number;
-  environmental: number;
+  challenge1: number;
+  challenge2: number;
+  challenge3: number;
 }
 
 export type ScoreJudgeEntity = Omit<OrganizerEntity, "privilege">;

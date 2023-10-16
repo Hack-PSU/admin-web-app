@@ -92,9 +92,9 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
               growth,
               clarity,
               technical,
-              energy,
-              supplyChain,
-              environmental,
+              challenge1,
+              challenge2,
+              challenge3,
             } = data;
 
             const average = _.sum([
@@ -123,9 +123,9 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
                 <BreakdownCell score={format(growth)} />
                 <BreakdownCell score={format(clarity)} />
                 <BreakdownCell score={format(technical)} />
-                <BreakdownCell score={format(energy ?? 0)} />
-                <BreakdownCell score={format(supplyChain ?? 0)} />
-                <BreakdownCell score={format(environmental ?? 0)} />
+                <BreakdownCell score={format(challenge1 ?? 0)} />
+                <BreakdownCell score={format(challenge2 ?? 0)} />
+                <BreakdownCell score={format(challenge3 ?? 0)} />
               </DefaultRow>
             );
           })}
