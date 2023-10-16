@@ -50,7 +50,7 @@ const PermissionOptions: IOption<number>[] = [
   },
   {
     value: 4,
-    label: "Tech-Exec",
+    label: "Tech Developer",
   },
   {
     value: 5,

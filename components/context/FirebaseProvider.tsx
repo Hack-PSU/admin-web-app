@@ -88,7 +88,7 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
       const validToken = userToken || token || "";
       if (validToken) {
         const decoded = jwtDecode<IJwtToken>(validToken);
-        if (decoded.iss && decoded.iss.includes("hackpsu18")) {
+        if (decoded.iss && decoded.iss.includes("ninth-expanse-396918")) {
           setPermission(decoded.privilege);
           if (decoded.privilege && decoded.privilege >= privilege) {
             return true;
