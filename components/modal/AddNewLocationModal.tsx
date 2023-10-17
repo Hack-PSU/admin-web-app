@@ -48,14 +48,14 @@ const AddNewLocationModal: FC = () => {
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { locationName: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       methods.reset();
     })();
   };
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { locationName: data.name } });
+      await mutateAsync({ entity: { name: data.name } });
       handleHide();
     })();
   };
