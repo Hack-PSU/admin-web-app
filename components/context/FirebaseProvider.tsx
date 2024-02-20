@@ -28,7 +28,8 @@ export interface IFirebaseProviderProps {
 }
 
 export interface IJwtToken extends JwtPayload {
-  privilege: number;
+  production?: number;
+  staging?: number;
 }
 
 export enum AuthPermission {
@@ -89,8 +90,11 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
       if (validToken) {
         const decoded = jwtDecode<IJwtToken>(validToken);
         if (decoded.iss && decoded.iss.includes("hackpsu-408118")) {
-          setPermission(decoded.privilege);
-          if (decoded.privilege && decoded.privilege >= privilege) {
+          if (decoded.staging && decoded.staging >= privilege) {
+            setPermission(decoded.staging);
+            return true;
+          } else if (decoded.production && decoded.production >= privilege) {
+            setPermission(decoded.production);
             return true;
           }
         }
