@@ -1,7 +1,9 @@
 import { NextPage } from "next";
-import React, { FC } from "react";
+import React, { FC, useCallback, useState } from "react";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
 import {
+  CreateEntity,
+  deleteEvent,
   EventEntity,
   EventLocation,
   EventType,
@@ -13,7 +15,7 @@ import {
 import { DateTime } from "luxon";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { GradientButton } from "components/base";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import {
   DefaultActionCell,
@@ -24,6 +26,7 @@ import {
   useTable,
 } from "components/Table";
 import _ from "lodash";
+import { enqueueSnackbar } from "notistack";
 
 interface IEventsProps {
   events: EventEntity[];
@@ -62,6 +65,8 @@ const DateTimeCell: FC<{ date: number }> = ({ date }) => {
 const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const router = useRouter();
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+  const queryClient = useQueryClient();
 
   const defs = useColumnDef<EventRowValues>({
     columns: [
@@ -156,18 +161,59 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     }
   );
 
+  // const table = useTable({
+  //   data: eventsData ?? [],
+  //   ...defs,
+  // });
+
   const table = useTable({
-    data: eventsData ?? [],
     ...defs,
+    data: eventsData ?? [],
+    getRowId: (row) => String(row.id),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      rowSelection,
+    },
   });
 
   const onRefresh = () => {
     return undefined;
   };
 
-  const onDelete = () => {
-    return undefined;
-  };
+  // const onDelete = () => {
+  //   return undefined;
+  // };
+
+  const { mutateAsync: mutateDeleteEvent } = useMutation(
+    ({ entity: { id } }: CreateEntity<Pick<EventEntity, "id">, "">) =>
+      fetch(() => deleteEvent({}, { id }))
+  );
+
+  const onDelete = useCallback(async () => {
+    if (Object.keys(rowSelection).length > 0) {
+      const selectedUids = _.chain(rowSelection)
+        .pickBy((selected) => selected)
+        .keys()
+        .value();
+      console.log(selectedUids);
+
+      await Promise.all(
+        selectedUids.map((id) =>
+          mutateDeleteEvent(
+            { entity: { id } },
+            {
+              onSuccess: async () => {
+                await queryClient.invalidateQueries(QueryKeys.event.all);
+                enqueueSnackbar("Successfully removed event", {
+                  variant: "success",
+                });
+              },
+            }
+          )
+        )
+      );
+    }
+  }, [rowSelection, mutateDeleteEvent, queryClient]);
 
   return (
     <Grid container gap={1.5}>

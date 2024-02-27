@@ -60,7 +60,7 @@ export const updateEvent: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Delete_Event
  */
 export const deleteEvent: CreateMutationReturn<{}, {}, { id: string }> =
-  createMutation("/events/:id");
+  createMutation("/events/:id", "DELETE");
 
 export const EventKeys = {
   all: [{ entity: "event" }] as const,
