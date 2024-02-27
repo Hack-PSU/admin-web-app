@@ -195,7 +195,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
         .pickBy((selected) => selected)
         .keys()
         .value();
-      console.log(selectedUids);
 
       await Promise.all(
         selectedUids.map((id) =>
