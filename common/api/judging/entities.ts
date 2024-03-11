@@ -3,6 +3,7 @@ import { OrganizerEntity } from "common/api/organizer/entity";
 export interface ProjectEntity {
   id: number;
   name: string;
+  categories?: string;
   hackathonId?: string;
 }
 
@@ -35,7 +36,7 @@ export interface ScoreBreakdownEntity extends Omit<ScoreDataEntity, "project"> {
 }
 
 export interface ProjectBreakdownEntity
-  extends ProjectEntity,
+  extends Omit<ProjectEntity, "categories">,
     Omit<ScoreEntity, "id" | "projectId" | "judgeId"> {
   average: number;
   scores: ScoreBreakdownEntity[];

@@ -1,6 +1,8 @@
 import { FC } from "react";
 import {
+  ControlledCheckbox,
   ControlledInput,
+  LabelledCheckbox,
   LabelledInput,
   MenuButton,
   Modal,
@@ -8,7 +10,7 @@ import {
 import { useModal } from "components/context";
 import { FormProvider, useForm } from "react-hook-form";
 import { Box, Grid } from "@mui/material";
-import { object } from "superstruct";
+import { any, boolean, object, string } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,9 +22,22 @@ import {
   QueryKeys,
 } from "api";
 
+const CHALLENGE_NAMES = ["Entrepreneurship", "Sustainability", "Generative AI"];
+
 const schema = object({
   name: NonEmptyString,
+  categories: object({
+    challenge1: boolean(),
+    challenge2: boolean(),
+    challenge3: boolean(),
+  }),
 });
+
+type CategorySchema = {
+  challenge1: boolean;
+  challenge2: boolean;
+  challenge3: boolean;
+};
 
 const AddNewJudgingProjectModal: FC = () => {
   const queryClient = useQueryClient();
@@ -31,6 +46,11 @@ const AddNewJudgingProjectModal: FC = () => {
   const methods = useForm({
     defaultValues: {
       name: "",
+      categories: {
+        challenge1: false,
+        challenge2: false,
+        challenge3: false,
+      },
     },
     resolver: superstructResolver(schema),
   });
@@ -48,14 +68,30 @@ const AddNewJudgingProjectModal: FC = () => {
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+      const challengeString =
+        Object.keys(data.categories)
+          .filter((key: string) => {
+            return data.categories[key as keyof CategorySchema] === true;
+          })
+          .join(",") || undefined;
+      await mutateAsync({
+        entity: { name: data.name, categories: challengeString },
+      });
       handleHide();
     })();
   };
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+      const challengeString =
+        Object.keys(data.categories)
+          .filter((key: string) => {
+            data.categories[key as keyof CategorySchema] === true;
+          })
+          .join(",") || undefined;
+      await mutateAsync({
+        entity: { name: data.name, categories: challengeString },
+      });
       methods.reset();
     })();
   };
@@ -73,6 +109,31 @@ const AddNewJudgingProjectModal: FC = () => {
                 as={LabelledInput}
                 label={"Name"}
                 id={"name"}
+                showError
+              />
+              <br />
+              <ControlledCheckbox
+                id={"categories"}
+                name={"categories"}
+                items={[
+                  {
+                    value: "challenge1",
+                    type: "option",
+                    display: CHALLENGE_NAMES[0],
+                  },
+                  {
+                    value: "challenge2",
+                    type: "option",
+                    display: CHALLENGE_NAMES[1],
+                  },
+                  {
+                    value: "challenge3",
+                    type: "option",
+                    display: CHALLENGE_NAMES[2],
+                  },
+                ]}
+                as={LabelledCheckbox}
+                label={"categories"}
                 showError
               />
             </Grid>
