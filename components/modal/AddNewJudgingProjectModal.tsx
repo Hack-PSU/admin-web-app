@@ -22,7 +22,11 @@ import {
   QueryKeys,
 } from "api";
 
-const CHALLENGE_NAMES = ["Entrepreneurship", "Sustainability", "Generative AI"];
+const CHALLENGE_NAMES = [
+  "Sustainability",
+  "Entrepreneurship",
+  "Generative A.I.",
+];
 
 const schema = object({
   name: NonEmptyString,
@@ -133,7 +137,7 @@ const AddNewJudgingProjectModal: FC = () => {
                   },
                 ]}
                 as={LabelledCheckbox}
-                label={"categories"}
+                label={"Categories"}
                 showError
               />
             </Grid>

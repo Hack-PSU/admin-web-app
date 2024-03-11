@@ -39,15 +39,15 @@ const filterOptions: IOption[] = [
   },
   {
     value: ScoreType.CHALLENGE1,
-    label: "Social Impact Challenge",
+    label: "Sustainability",
   },
   {
     value: ScoreType.CHALLENGE2,
-    label: "Entrepreneurship Challenge",
+    label: "Entrepreneurship",
   },
   {
     value: ScoreType.CHALLENGE3,
-    label: "Generative AI Challenge",
+    label: "Generative A.I.",
   },
 ];
 
