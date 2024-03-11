@@ -138,18 +138,24 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     {
       select: (data) => {
         if (data) {
-          return _.chain(data)
-            .map((d) => {
-              return {
-                id: d.id,
-                name: d.name,
-                location: d.location?.name ?? "",
-                startTime: d.startTime,
-                endTime: d.endTime,
-                type: d.type,
-              };
-            })
-            .value();
+          return (
+            _.chain(data)
+              .map((d) => {
+                return {
+                  id: d.id,
+                  name: d.name,
+                  location: d.location?.name ?? "",
+                  startTime: d.startTime,
+                  endTime: d.endTime,
+                  type: d.type,
+                };
+              })
+              .value()
+              // Underlying sort by start time is generally useful, even when sorting by other fields.
+              .sort((event1, event2) => {
+                return event1.startTime - event2.startTime;
+              })
+          );
         }
         return [];
       },
