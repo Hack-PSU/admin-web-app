@@ -65,9 +65,9 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ data, refetch }) => {
         accessorKey: "technical",
       },
       {
-        id: "social_impact",
+        id: "sustainability",
         type: "text",
-        header: "Social..",
+        header: "Sustain..",
         format: formatScore,
         accessorKey: "challenge1",
       },
