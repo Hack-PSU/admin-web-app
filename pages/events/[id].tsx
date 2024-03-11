@@ -1,5 +1,12 @@
-import React, { useCallback, useMemo } from "react";
+import { Grid, lighten, Typography, useTheme } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import _ from "lodash";
+import { DateTime } from "luxon";
 import { NextPage } from "next";
+import Router, { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
+import React, { useCallback, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   createLocation,
   EventEntity,
@@ -13,15 +20,9 @@ import {
   updateEvent,
 } from "api";
 import { withDefaultLayout, withServerSideProps } from "common/HOCs";
-import { Grid, lighten, Typography, useTheme } from "@mui/material";
-import { FormProvider, useForm } from "react-hook-form";
-import EventEditDetails from "components/event/edit/EventEditDetails";
-import { DateTime } from "luxon";
-import EventEditWorkshop from "components/event/edit/EventEditWorkshop";
-import _ from "lodash";
 import { Button } from "components/base";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSnackbar } from "notistack";
+import EventEditDetails from "components/event/edit/EventEditDetails";
+import EventEditWorkshop from "components/event/edit/EventEditWorkshop";
 import EventEditIcon from "components/event/edit/EventEditIcon";
 import EventIconPreview from "components/event/edit/EventIconPreview";
 
@@ -31,6 +32,7 @@ interface IEventPageProps {
 
 const EventPage: NextPage<IEventPageProps> = ({ event }) => {
   const theme = useTheme();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -176,6 +178,8 @@ const EventPage: NextPage<IEventPageProps> = ({ event }) => {
             id: event.id,
           },
         });
+
+        router.push("/events");
       }
     })();
   }, [
