@@ -151,9 +151,12 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
                 };
               })
               .value()
-              // Underlying sort by start time is generally useful, even when sorting by other fields.
+              // Underlying sort by start time and location name is generally useful, even when sorting by other fields.
               .sort((event1, event2) => {
-                return event1.startTime - event2.startTime;
+                if (event1.startTime != event2.startTime) {
+                  return event1.startTime - event2.startTime;
+                }
+                return event1.location > event2.location ? 1 : -1;
               })
           );
         }
