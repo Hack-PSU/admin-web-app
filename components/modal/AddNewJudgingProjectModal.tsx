@@ -10,7 +10,7 @@ import {
 import { useModal } from "components/context";
 import { FormProvider, useForm } from "react-hook-form";
 import { Box, Grid } from "@mui/material";
-import { any, boolean, object, string } from "superstruct";
+import { boolean, object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,11 +22,7 @@ import {
   QueryKeys,
 } from "api";
 
-const CHALLENGE_NAMES = [
-  "Sustainability",
-  "Entrepreneurship",
-  "Generative A.I.",
-];
+const CHALLENGE_NAMES = ["Sustainability", "Generative A.I.", "Unused"];
 
 const schema = object({
   name: NonEmptyString,

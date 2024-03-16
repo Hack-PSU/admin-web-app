@@ -72,19 +72,19 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ data, refetch }) => {
         accessorKey: "challenge1",
       },
       {
-        id: "entrepreneurship",
-        type: "text",
-        header: "Entre..",
-        format: formatScore,
-        accessorKey: "challenge2",
-      },
-      {
         id: "generative_ai",
         type: "text",
         header: "AI..",
         format: formatScore,
-        accessorKey: "challenge3",
+        accessorKey: "challenge2",
       },
+      // {
+      //   id: "entrepreneurship",
+      //   type: "text",
+      //   header: "Entre..",
+      //   format: formatScore,
+      //   accessorKey: "challenge3",
+      // },
     ],
   });
 

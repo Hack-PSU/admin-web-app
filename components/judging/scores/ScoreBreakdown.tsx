@@ -94,7 +94,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
               technical,
               challenge1,
               challenge2,
-              challenge3,
+              // challenge3,
             } = data;
 
             const average = _.sum([
@@ -125,7 +125,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
                 <BreakdownCell score={format(technical)} />
                 <BreakdownCell score={format(challenge1 ?? 0)} />
                 <BreakdownCell score={format(challenge2 ?? 0)} />
-                <BreakdownCell score={format(challenge3 ?? 0)} />
+                {/* <BreakdownCell score={format(challenge3 ?? 0)} /> */}
               </DefaultRow>
             );
           })}

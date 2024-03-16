@@ -43,12 +43,12 @@ const filterOptions: IOption[] = [
   },
   {
     value: ScoreType.CHALLENGE2,
-    label: "Entrepreneurship",
-  },
-  {
-    value: ScoreType.CHALLENGE3,
     label: "Generative A.I.",
   },
+  // {
+  //   value: ScoreType.CHALLENGE3,
+  //   label: "Unused",
+  // },
 ];
 
 type Top3SectionProps = UseScoreResultsReturn;
@@ -115,14 +115,14 @@ const Top3Card: FC<Top3CardProps> = ({ score, project }) => {
 
 const Top3Section: FC<Top3SectionProps> = ({
   top3Avg,
+  top3Clarity,
   top3Creativity,
-  top3Challenge3,
   top3Growth,
   top3Implementation,
-  top3Challenge1,
   top3Technical,
-  top3Clarity,
+  top3Challenge1,
   top3Challenge2,
+  // top3Challenge3,
 }) => {
   const methods = useForm({
     defaultValues: {
@@ -162,21 +162,21 @@ const Top3Section: FC<Top3SectionProps> = ({
         case ScoreType.CHALLENGE2:
           setSelectedData(top3Challenge2);
           break;
-        case ScoreType.CHALLENGE3:
-          setSelectedData(top3Challenge3);
-          break;
+        // case ScoreType.CHALLENGE3:
+        //   setSelectedData(top3Challenge3);
+        //   break;
       }
     },
     [
-      top3Challenge2,
       top3Avg,
+      top3Clarity,
       top3Creativity,
-      top3Challenge3,
       top3Growth,
       top3Implementation,
-      top3Challenge1,
       top3Technical,
-      top3Clarity,
+      top3Challenge1,
+      top3Challenge2,
+      // top3Challenge3,
     ]
   );
 

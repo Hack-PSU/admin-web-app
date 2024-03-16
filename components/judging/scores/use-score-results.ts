@@ -20,8 +20,8 @@ export type UseScoreResultsReturn = {
   top3Clarity: RankedData[];
   top3Growth: RankedData[];
   top3Challenge1: RankedData[];
-  top3Challenge3: RankedData[];
   top3Challenge2: RankedData[];
+  // top3Challenge3: RankedData[];
 };
 
 export enum ScoreType {
@@ -33,7 +33,7 @@ export enum ScoreType {
   GROWTH = "growth",
   CHALLENGE1 = "challenge1",
   CHALLENGE2 = "challenge2",
-  CHALLENGE3 = "challenge3",
+  // CHALLENGE3 = "challenge3",
 }
 
 export function useScoreResults(
@@ -58,11 +58,11 @@ export function useScoreResults(
       top3Avg: getTop3(ScoreType.AVG),
       top3Clarity: getTop3(ScoreType.CLARITY),
       top3Creativity: getTop3(ScoreType.CREATIVITY),
-      top3Challenge3: getTop3(ScoreType.CHALLENGE3),
+      // top3Challenge3: getTop3(ScoreType.CHALLENGE3),
       top3Growth: getTop3(ScoreType.GROWTH),
-      top3Challenge1: getTop3(ScoreType.CHALLENGE1),
       top3Implementation: getTop3(ScoreType.IMPLEMENTATION),
       top3Technical: getTop3(ScoreType.TECHNICAL),
+      top3Challenge1: getTop3(ScoreType.CHALLENGE1),
       top3Challenge2: getTop3(ScoreType.CHALLENGE2),
     }),
     [getTop3]
