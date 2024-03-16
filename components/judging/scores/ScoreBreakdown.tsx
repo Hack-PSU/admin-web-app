@@ -79,7 +79,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
             <BreakdownHeader header={"Clarity"} score />
             <BreakdownHeader header={"Technical"} score />
             <BreakdownHeader header={"Sustainability"} score />
-            <BreakdownHeader header={"Entrepreneurship"} score />
+            {/* <BreakdownHeader header={"Entrepreneurship"} score /> */}
             <BreakdownHeader header={"Generative A.I."} score />
           </DefaultRow>
         </TableHead>
