@@ -155,7 +155,7 @@ const AddNewMemberModal: FC = () => {
                 showError
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <ControlledSelect
                 name={"privilege"}
                 placeholder={"Select a permission level"}
