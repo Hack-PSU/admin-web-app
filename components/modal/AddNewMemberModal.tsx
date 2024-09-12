@@ -53,7 +53,6 @@ const schema = object({
   lastName: NonEmptyString,
   email: Email,
   privilege: NonEmptySelect,
-  uid: NonEmptyString,
 });
 
 const AddNewMemberModal: FC = () => {
@@ -64,7 +63,6 @@ const AddNewMemberModal: FC = () => {
 
   const methods = useForm({
     defaultValues: {
-      id: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -74,7 +72,7 @@ const AddNewMemberModal: FC = () => {
   });
 
   const { mutateAsync: mutateCreateOrganizer, isLoading } = useMutation(
-    ({ entity }: QueryEntity<OrganizerEntity>) =>
+    ({ entity }: QueryEntity<Omit<OrganizerEntity, "id">>) =>
       fetch(() => createOrganizer(entity)),
     {
       onSuccess: async () => {
@@ -86,36 +84,31 @@ const AddNewMemberModal: FC = () => {
     }
   );
 
-  const { mutateAsync: mutateSetPrivilege } = useMutation(
-    ({
-      entity: { id, ...data },
-    }: QueryEntity<
-      Partial<Omit<OrganizerEntity, "id">> & Pick<OrganizerEntity, "id">
-    >) => fetch(() => updateOrganizer(data, { id }))
-  );
-
   const { handleSubmit, reset } = methods;
 
-  const onClickSubmit = useCallback(() => {
-    handleSubmit(async (data) => {
-      await mutateCreateOrganizer({
-        entity: {
-          id: data.id,
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          privilege: data.privilege.value,
-        },
-      });
-      handleHide();
-    })();
-  }, [handleHide, handleSubmit, mutateCreateOrganizer, mutateSetPrivilege]);
+  const onClickSubmit = () => {
+    handleSubmit(
+      async (data) => {
+        await mutateCreateOrganizer({
+          entity: {
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            privilege: data.privilege.value,
+          },
+        });
+        reset();
+      },
+      (error) => {
+        console.error(error);
+      }
+    )();
+  };
 
   const onClickSubmitAndCreate = useCallback(() => {
     handleSubmit(async (data) => {
       await mutateCreateOrganizer({
         entity: {
-          id: data.id,
           email: data.email,
           firstName: data.firstName,
           lastName: data.lastName,
@@ -124,7 +117,7 @@ const AddNewMemberModal: FC = () => {
       });
       reset();
     })();
-  }, [handleSubmit, mutateCreateOrganizer, mutateSetPrivilege, reset]);
+  }, [handleSubmit, mutateCreateOrganizer, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -149,16 +142,6 @@ const AddNewMemberModal: FC = () => {
                 as={LabelledInput}
                 id={"last-name"}
                 label={"Last Name"}
-                showError
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <ControlledInput
-                name={"uid"}
-                placeholder={"Enter Firebase user uid"}
-                as={LabelledInput}
-                id={"uid"}
-                label={"Firebase UID"}
                 showError
               />
             </Grid>
