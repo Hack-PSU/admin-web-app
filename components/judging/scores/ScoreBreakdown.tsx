@@ -61,7 +61,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
     <TableContainer
       sx={{
         padding: theme.spacing(1, 2, 1.5),
-        width: "100%",
+        width: "500%",
       }}
     >
       <MuiTable sx={{ width: "100%" }}>
