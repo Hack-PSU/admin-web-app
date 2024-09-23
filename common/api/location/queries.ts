@@ -46,7 +46,7 @@ export const updateLocation: CreateMutationReturn<
  * @param params
  */
 export const deleteLocation: CreateMutationReturn<{}, {}, { id: number }> =
-  createMutation("/locations/:id");
+  createMutation("/locations/:id", "DELETE");
 
 export const LocationKeys = {
   all: [{ entity: "location" }] as const,
