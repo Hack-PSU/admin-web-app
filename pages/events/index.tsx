@@ -15,7 +15,6 @@ import {
 import { DateTime } from "luxon";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { GradientButton } from "components/base";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import {
   DefaultActionCell,
@@ -27,6 +26,7 @@ import {
 } from "components/Table";
 import _ from "lodash";
 import { enqueueSnackbar } from "notistack";
+import { useGetEventsData, useDeleteEvent } from "api/hooks";
 
 interface IEventsProps {
   events: EventEntity[];
@@ -66,7 +66,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const theme = useTheme();
   const router = useRouter();
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-  const queryClient = useQueryClient();
 
   const defs = useColumnDef<EventRowValues>({
     columns: [
@@ -137,38 +136,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     ],
   });
 
-  const { data: eventsData } = useQuery(
-    QueryKeys.event.findAll(),
-    () => fetch(getAllEvents),
-    {
-      select: (data) => {
-        if (data) {
-          return (
-            _.chain(data)
-              .map((d) => {
-                return {
-                  id: d.id,
-                  name: d.name,
-                  location: d.location?.name ?? "",
-                  startTime: d.startTime,
-                  endTime: d.endTime,
-                  type: d.type,
-                };
-              })
-              .value()
-              // Underlying sort by start time and location name is generally useful, even when sorting by other fields.
-              .sort((event1, event2) => {
-                if (event1.startTime != event2.startTime) {
-                  return event1.startTime - event2.startTime;
-                }
-                return event1.location > event2.location ? 1 : -1;
-              })
-          );
-        }
-        return [];
-      },
-    }
-  );
+  const { data: eventsData } = useGetEventsData();
 
   // const table = useTable({
   //   data: eventsData ?? [],
@@ -189,14 +157,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     return undefined;
   };
 
-  // const onDelete = () => {
-  //   return undefined;
-  // };
-
-  const { mutateAsync: mutateDeleteEvent } = useMutation(
-    ({ entity: { id } }: CreateEntity<Pick<EventEntity, "id">, "">) =>
-      fetch(() => deleteEvent({}, { id }))
-  );
+  const { mutateAsync: mutateDeleteEvent } = useDeleteEvent();
 
   const onDelete = useCallback(async () => {
     if (Object.keys(rowSelection).length > 0) {
@@ -207,21 +168,15 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
 
       await Promise.all(
         selectedUids.map((id) =>
-          mutateDeleteEvent(
-            { entity: { id } },
-            {
-              onSuccess: async () => {
-                await queryClient.invalidateQueries(QueryKeys.event.all);
-                enqueueSnackbar("Successfully removed event", {
-                  variant: "success",
-                });
-              },
-            }
-          )
+          mutateDeleteEvent({ id }).then(() => {
+            enqueueSnackbar("Successfully removed event", {
+              variant: "success",
+            });
+          })
         )
       );
     }
-  }, [rowSelection, mutateDeleteEvent, queryClient]);
+  }, [rowSelection, mutateDeleteEvent]);
 
   return (
     <Grid container gap={1.5}>

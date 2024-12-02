@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { withSettingsLayout } from "components/settings";
 import { Grid, lighten, Typography, useTheme } from "@mui/material";
 import { Button } from "components/base";
-import { useFirebase } from "components/context";
+import { useFirebase } from "api/providers/FirebaseProvider";
 
 const Profile: FC = () => {
   const theme = useTheme();

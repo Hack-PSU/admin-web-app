@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { withDefaultLayout, withProtectedRoute } from "common/HOCs";
-import { AuthPermission } from "components/context/FirebaseProvider";
+import { AuthPermission } from "api/providers/FirebaseProvider";
 import { Grid, Typography } from "@mui/material";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { useQuery } from "@tanstack/react-query";

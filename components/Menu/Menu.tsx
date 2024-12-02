@@ -3,10 +3,10 @@ import { Drawer, Grid, List, styled, Typography } from "@mui/material";
 import MenuItem, { CollapsibleMenuItem } from "./MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
-import { useQuery } from "@tanstack/react-query";
-import { fetch, getActiveHackathon, HackathonEntity, QueryKeys } from "api";
+import { HackathonEntity } from "api";
 import { DateTime } from "luxon";
 import { useHackathonStore } from "common/store";
+import { useGetActiveHackathon } from "api/hooks";
 
 const DrawerHeader = styled(Grid)(({ theme }) => ({
   alignItems: "center",
@@ -25,14 +25,7 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
   const { activeHackathon: hackathon, updateActiveHackathon } =
     useHackathonStore();
 
-  const { data: hackathonData } = useQuery(
-    QueryKeys.hackathon.findById(0),
-    () => fetch(getActiveHackathon),
-    {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    }
-  );
+  const { data: hackathonData } = useGetActiveHackathon();
 
   const activeHackathon = useMemo(() => {
     if (hackathonData) {

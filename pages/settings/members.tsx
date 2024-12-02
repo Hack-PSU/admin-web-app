@@ -14,11 +14,8 @@ import { ControlledSelect, GradientButton } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import _ from "lodash";
-import {
-  ModalProvider,
-  useFirebase,
-  useModalContext,
-} from "components/context";
+import { ModalProvider, useModalContext } from "components/context";
+import { useFirebase } from "api/providers/FirebaseProvider";
 import { Grid, useTheme } from "@mui/material";
 import AddNewMemberModal from "components/modal/AddNewMemberModal";
 import { IOption } from "components/base/Select/types";

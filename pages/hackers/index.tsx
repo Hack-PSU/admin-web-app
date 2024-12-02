@@ -7,12 +7,12 @@ import {
 } from "common/HOCs";
 import { Table, useColumnDef, useTable } from "components/Table";
 import { Grid, useTheme } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
-import { fetch, getAllUsers, QueryKeys, resolveError, UserEntity } from "api";
+import { fetch, getAllUsers, resolveError, UserEntity } from "api";
 import PageHeader from "components/Menu/PageHeader";
-import { AuthPermission } from "components/context/FirebaseProvider";
+import { AuthPermission } from "api/providers/FirebaseProvider";
+import { useGetHackersData } from "api/hooks";
 
 interface IHackersPageProps {
   hackers: UserEntity[];
@@ -51,22 +51,7 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
     ],
   });
 
-  const { data: hackersData } = useQuery(
-    QueryKeys.hacker.findAll(),
-    () => fetch(getAllUsers),
-    {
-      select: (data) => {
-        if (data) {
-          return data.map((d) => ({
-            name: `${d.firstName} ${d.lastName}`,
-            email: d.email,
-            university: d.university,
-          }));
-        }
-      },
-      initialData: hackers,
-    }
-  );
+  const { data: hackersData } = useGetHackersData(hackers);
 
   const table = useTable({
     data: hackersData ?? [],

@@ -4,12 +4,12 @@ import {
   GetServerSidePropsResult,
   NextPage,
 } from "next";
-import { useFirebase } from "components/context";
+import { useFirebase } from "api/providers/FirebaseProvider";
 import UnauthorizedError from "components/base/Error/UnauthorizedError";
 import { DefaultLayout } from "components/layout";
 import nookies from "nookies";
 import { NextPageLayout } from "common/types";
-import { AuthPermission } from "components/context/FirebaseProvider";
+import { AuthPermission } from "api/providers/FirebaseProvider";
 
 export function withProtectedRoute(
   Component: NextPage | NextPageLayout,
