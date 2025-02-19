@@ -3,6 +3,8 @@ import {
   CreateMutationReturn,
   createQuery,
   CreateQueryReturn,
+  deleteQuery,
+  DeleteQueryReturn,
 } from "api/utils";
 import { EventEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
@@ -59,8 +61,8 @@ export const updateEvent: CreateMutationReturn<
  * @param token (optional)
  * @link https://api.hackpsu.org/v2/doc/#api-Events-Delete_Event
  */
-export const deleteEvent: CreateMutationReturn<{}, {}, { id: string }> =
-  createMutation("/events/:id", "DELETE");
+
+export const deleteEvent = deleteQuery<{ id: string }>("events/:id");
 
 export const EventKeys = {
   all: [{ entity: "event" }] as const,

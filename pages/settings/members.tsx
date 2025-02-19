@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
 import { withSettingsLayout } from "components/settings";
 import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
@@ -7,6 +7,7 @@ import {
   CreateEntity,
   fetch,
   getAllOrganizers,
+  deleteQuery,
   QueryKeys,
   updateOrganizer,
 } from "api";
@@ -86,6 +87,7 @@ const SettingsMembers: NextPage = () => {
 
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
   const { data: allOrganizers, refetch } = useQuery(
     QueryKeys.organizer.findAll(),
@@ -144,7 +146,7 @@ const SettingsMembers: NextPage = () => {
 
   const { reset, watch } = methods;
 
-  const { mutateAsync } = useMutation(
+  const { mutateAsync: updateMutateAsync } = useMutation(
     QueryKeys.organizer.updateOne(),
     ({ entity: { id, privilege } }: CreateEntity<UpdateOrganizerEntity, "">) =>
       fetch(() => updateOrganizer({ privilege }, { id })),
@@ -166,9 +168,11 @@ const SettingsMembers: NextPage = () => {
 
   const submitOrganizerUpdate = useCallback(
     async (entities: UpdateOrganizerEntity[]) => {
-      await Promise.all(_.map(entities, (entity) => mutateAsync({ entity })));
+      await Promise.all(
+        _.map(entities, (entity) => updateMutateAsync({ entity }))
+      );
     },
-    [mutateAsync]
+    [updateMutateAsync]
   );
 
   useEffect(() => {
@@ -201,6 +205,43 @@ const SettingsMembers: NextPage = () => {
   useEffect(() => {
     reset({ ...defaultValues });
   }, [reset, defaultValues]);
+
+  const { mutateAsync: deleteMutateAsync } = useMutation(
+    ({ id }: { id: string }) => deleteQuery(`organizers/:id`)({ id }),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.organizer.all);
+        enqueueSnackbar("Successfully deleted organizer", {
+          variant: "success",
+        });
+      },
+      onError: (error: AxiosError) => {
+        console.error("Delete Organizer Error:", error.response?.data);
+        enqueueSnackbar("Failed to delete organizer", { variant: "error" });
+      },
+    }
+  );
+
+  const onDelete = useCallback(async () => {
+    const selectedIds = Object.keys(selectedRows).filter(
+      (key) => selectedRows[key]
+    );
+    if (selectedIds.length === 0) {
+      enqueueSnackbar("No organizers selected for deletion", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete the selected organizers?"
+    );
+    if (!confirmed) return;
+
+    await Promise.all(selectedIds.map((id) => deleteMutateAsync({ id })));
+
+    setSelectedRows({});
+  }, [selectedRows, deleteMutateAsync, enqueueSnackbar]);
 
   const defs = useColumnDef<OrganizerEntity>({
     columns: [
@@ -239,15 +280,15 @@ const SettingsMembers: NextPage = () => {
     ...defs,
     getRowId: (row) => row.id,
     data,
+    onRowSelectionChange: setSelectedRows,
+    state: {
+      rowSelection: selectedRows,
+    },
   });
 
   const onRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
-
-  const onDelete = useCallback(() => {
-    return null;
-  }, []);
 
   return (
     <ModalProvider>

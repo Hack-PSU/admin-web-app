@@ -26,7 +26,7 @@ import {
   useTable,
 } from "components/Table";
 import _ from "lodash";
-import { enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 
 interface IEventsProps {
   events: EventEntity[];
@@ -67,6 +67,7 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
   const router = useRouter();
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const queryClient = useQueryClient();
+  const { enqueueSnackbar } = useSnackbar();
 
   const defs = useColumnDef<EventRowValues>({
     columns: [
@@ -130,6 +131,10 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
                 icon: "edit-outline",
                 onClick: () => router.push(`/events/${row.original.id}`),
               },
+              {
+                icon: "trash-outline",
+                onClick: () => onDeleteEvent(row.original.id),
+              },
             ]}
           />
         ),
@@ -170,11 +175,6 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     }
   );
 
-  // const table = useTable({
-  //   data: eventsData ?? [],
-  //   ...defs,
-  // });
-
   const table = useTable({
     ...defs,
     data: eventsData ?? [],
@@ -185,43 +185,59 @@ const Events: NextPage<IEventsProps> = ({ events }) => {
     },
   });
 
-  const onRefresh = () => {
-    return undefined;
-  };
-
-  // const onDelete = () => {
-  //   return undefined;
-  // };
-
   const { mutateAsync: mutateDeleteEvent } = useMutation(
-    ({ entity: { id } }: CreateEntity<Pick<EventEntity, "id">, "">) =>
-      fetch(() => deleteEvent({}, { id }))
+    ({ id }: { id: string }) => deleteEvent({ id }),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.event.all);
+        enqueueSnackbar("Successfully removed event", {
+          variant: "success",
+        });
+      },
+      onError: (error: AxiosError) => {
+        console.error("Delete Event Error:", error.response?.data);
+        enqueueSnackbar("Failed to delete event", { variant: "error" });
+      },
+    }
   );
 
   const onDelete = useCallback(async () => {
-    if (Object.keys(rowSelection).length > 0) {
-      const selectedUids = _.chain(rowSelection)
-        .pickBy((selected) => selected)
-        .keys()
-        .value();
-
-      await Promise.all(
-        selectedUids.map((id) =>
-          mutateDeleteEvent(
-            { entity: { id } },
-            {
-              onSuccess: async () => {
-                await queryClient.invalidateQueries(QueryKeys.event.all);
-                enqueueSnackbar("Successfully removed event", {
-                  variant: "success",
-                });
-              },
-            }
-          )
-        )
-      );
+    const selectedIds = Object.keys(rowSelection).filter(
+      (key) => rowSelection[key]
+    );
+    if (selectedIds.length === 0) {
+      enqueueSnackbar("No events selected for deletion", {
+        variant: "warning",
+      });
+      return;
     }
-  }, [rowSelection, mutateDeleteEvent, queryClient]);
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete the selected events?"
+    );
+    if (!confirmed) return;
+
+    await Promise.all(selectedIds.map((id) => mutateDeleteEvent({ id })));
+
+    setRowSelection({});
+  }, [rowSelection, mutateDeleteEvent, enqueueSnackbar]);
+
+  const onDeleteEvent = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this event?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await mutateDeleteEvent({ id });
+    } catch (error) {
+      console.error("Delete Event Error:", error);
+    }
+  };
+
+  const onRefresh = () => {
+    refetch();
+  };
 
   return (
     <Grid container gap={1.5}>

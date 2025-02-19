@@ -93,7 +93,15 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
 
   const { mutateAsync: mutateDeleteLocation } = useMutation(
     ({ entity: { id } }: CreateEntity<Pick<LocationEntity, "id">, "">) =>
-      fetch(() => deleteLocation({}, { id }))
+      fetch(() => deleteLocation({}, { id })),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.location.all);
+        enqueueSnackbar("Successfully removed location", {
+          variant: "success",
+        });
+      },
+    }
   );
 
   const defaultValues = useMemo(() => {
@@ -165,6 +173,18 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
                   resetField(`${row.original.id}.name`);
                 },
               },
+              {
+                icon: "trash-outline",
+                onClick: () => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete this location?"
+                    )
+                  ) {
+                    mutateDeleteLocation({ entity: { id: row.original.id } });
+                  }
+                },
+              },
             ]}
           />
         ),
@@ -195,22 +215,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         .value();
 
       await Promise.all(
-        selectedUids.map((id) =>
-          mutateDeleteLocation(
-            { entity: { id } },
-            {
-              onSuccess: async () => {
-                await queryClient.invalidateQueries(QueryKeys.location.all);
-                enqueueSnackbar("Successfully removed location", {
-                  variant: "success",
-                });
-              },
-            }
-          )
-        )
+        selectedUids.map((id) => mutateDeleteLocation({ entity: { id } }))
       );
     }
-  }, [rowSelection, mutateDeleteLocation, queryClient, enqueueSnackbar]);
+  }, [rowSelection, mutateDeleteLocation]);
 
   return (
     <FormProvider {...methods}>

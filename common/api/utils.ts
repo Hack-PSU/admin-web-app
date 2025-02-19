@@ -17,6 +17,7 @@ export type CreateQueryReturn<
   query?: TQuery,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
+
 export type CreateMutationReturn<
   TEntity,
   TResponse = TEntity,
@@ -28,6 +29,15 @@ export type CreateMutationReturn<
   query?: TQuery,
   token?: string
 ) => Promise<QueryReturn<TResponse>>;
+
+export type DeleteQueryReturn<
+  TParams extends PathParams = {},
+  TQuery extends object = {}
+> = (
+  params?: TParams,
+  query?: TQuery,
+  token?: string
+) => Promise<QueryReturn<void>>;
 
 function replacePathParams(path: string, params: PathParams) {
   const replaceParams = Object.keys(params).reduce((acc, curr) => {
@@ -96,6 +106,29 @@ export function createMutation<
   };
 }
 
+export function deleteQuery<
+  TParams extends PathParams = {},
+  TQuery extends object = {}
+>(url: string): DeleteQueryReturn<TParams, TQuery> {
+  return (params, query, token) => {
+    let endpoint = url;
+    if (!!params) {
+      endpoint = replacePathParams(url, params);
+    }
+    return api.request<void>({
+      url: endpoint,
+      method: "DELETE",
+      ...(query ? { params: query } : {}),
+      ...(token
+        ? {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        : {}),
+    });
+  };
+}
 export async function fetch<TResponse>(
   queryFn: () => Promise<QueryReturn<TResponse>>
 ): Promise<TResponse | undefined> {
