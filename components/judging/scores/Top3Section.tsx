@@ -39,16 +39,16 @@ const filterOptions: IOption[] = [
   },
   {
     value: ScoreType.CHALLENGE1,
-    label: "Sustainability",
+    label: "Machine Learning",
   },
   {
     value: ScoreType.CHALLENGE2,
-    label: "Generative A.I.",
+    label: "Entrepreneurship",
   },
-  // {
-  //   value: ScoreType.CHALLENGE3,
-  //   label: "Unused",
-  // },
+  {
+    value: ScoreType.CHALLENGE3,
+    label: "Timeless Tech",
+  },
 ];
 
 type Top3SectionProps = UseScoreResultsReturn;
@@ -122,7 +122,7 @@ const Top3Section: FC<Top3SectionProps> = ({
   top3Technical,
   top3Challenge1,
   top3Challenge2,
-  // top3Challenge3,
+  top3Challenge3,
 }) => {
   const methods = useForm({
     defaultValues: {
@@ -162,9 +162,9 @@ const Top3Section: FC<Top3SectionProps> = ({
         case ScoreType.CHALLENGE2:
           setSelectedData(top3Challenge2);
           break;
-        // case ScoreType.CHALLENGE3:
-        //   setSelectedData(top3Challenge3);
-        //   break;
+        case ScoreType.CHALLENGE3:
+          setSelectedData(top3Challenge3);
+          break;
       }
     },
     [
@@ -176,7 +176,7 @@ const Top3Section: FC<Top3SectionProps> = ({
       top3Technical,
       top3Challenge1,
       top3Challenge2,
-      // top3Challenge3,
+      top3Challenge3,
     ]
   );
 

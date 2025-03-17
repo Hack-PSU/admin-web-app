@@ -78,9 +78,9 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
             <BreakdownHeader header={"Growth"} score />
             <BreakdownHeader header={"Clarity"} score />
             <BreakdownHeader header={"Technical"} score />
-            <BreakdownHeader header={"Sustainability"} score />
-            {/* <BreakdownHeader header={"Entrepreneurship"} score /> */}
-            <BreakdownHeader header={"Generative A.I."} score />
+            <BreakdownHeader header={"Machine Learning"} score />
+            <BreakdownHeader header={"Entrepreneurship"} score />
+            <BreakdownHeader header={"Timeless Tech"} score />
           </DefaultRow>
         </TableHead>
         <TableBody>
@@ -94,7 +94,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
               technical,
               challenge1,
               challenge2,
-              // challenge3,
+              challenge3,
             } = data;
 
             const average = _.sum([
@@ -125,7 +125,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
                 <BreakdownCell score={format(technical)} />
                 <BreakdownCell score={format(challenge1 ?? 0)} />
                 <BreakdownCell score={format(challenge2 ?? 0)} />
-                {/* <BreakdownCell score={format(challenge3 ?? 0)} /> */}
+                <BreakdownCell score={format(challenge3 ?? 0)} />
               </DefaultRow>
             );
           })}

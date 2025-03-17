@@ -65,26 +65,26 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ data, refetch }) => {
         accessorKey: "technical",
       },
       {
-        id: "sustainability",
+        id: "machine_learning",
         type: "text",
-        header: "Sustain..",
+        header: "ML..",
         format: formatScore,
         accessorKey: "challenge1",
       },
       {
-        id: "generative_ai",
+        id: "entrepreneurship",
         type: "text",
-        header: "AI..",
+        header: "Entre..",
         format: formatScore,
         accessorKey: "challenge2",
       },
-      // {
-      //   id: "entrepreneurship",
-      //   type: "text",
-      //   header: "Entre..",
-      //   format: formatScore,
-      //   accessorKey: "challenge3",
-      // },
+      {
+        id: "timeless_tech",
+        type: "text",
+        header: "Time..",
+        format: formatScore,
+        accessorKey: "challenge3",
+      },
     ],
   });
 

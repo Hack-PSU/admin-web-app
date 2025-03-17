@@ -22,7 +22,11 @@ import {
   QueryKeys,
 } from "api";
 
-const CHALLENGE_NAMES = ["Sustainability", "Generative A.I.", "Unused"];
+const CHALLENGE_NAMES = [
+  "Machine Learning",
+  "Entrepreneurship",
+  "Timeless Tech",
+];
 
 const schema = object({
   name: NonEmptyString,
