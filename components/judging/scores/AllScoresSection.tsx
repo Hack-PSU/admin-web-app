@@ -60,7 +60,7 @@ const AllScoresSection: FC<AllScoresSectionProps> = ({ data, refetch }) => {
       {
         id: "technical",
         type: "text",
-        header: "Tech..",
+        header: "Impact",
         format: formatScore,
         accessorKey: "technical",
       },

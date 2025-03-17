@@ -77,7 +77,7 @@ const ScoreBreakdown: FC<IScoreBreakdownProps> = ({ row }) => {
             <BreakdownHeader header={"Implementation"} score />
             <BreakdownHeader header={"Growth"} score />
             <BreakdownHeader header={"Clarity"} score />
-            <BreakdownHeader header={"Technical"} score />
+            <BreakdownHeader header={"Impact"} score />
             <BreakdownHeader header={"Machine Learning"} score />
             <BreakdownHeader header={"Entrepreneurship"} score />
             <BreakdownHeader header={"Timeless Tech"} score />
