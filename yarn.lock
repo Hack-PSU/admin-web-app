@@ -5430,21 +5430,21 @@ __metadata:
   linkType: hard
 
 "lottie-react@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "lottie-react@npm:2.2.1"
+  version: 2.4.1
+  resolution: "lottie-react@npm:2.4.1"
   dependencies:
-    lottie-web: ^5.8.1
+    lottie-web: ^5.10.2
   peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 37ca04e2baf0ae18def7e82b1746175a742410e8adcadd2d8c0f4206eee4dac65a4ba1d14709134fac2d8251d514b866af1d62e6d87fea345eb7af383e569efa
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: ac79931d98ea38fd3a9139139fb976d24a3e4e0ede86c74d69c5571b971122ee7e98432949f0f4af33f48b736fe8448918f124d48548dd46925bab484c09e73f
   languageName: node
   linkType: hard
 
-"lottie-web@npm:^5.8.1":
-  version: 5.9.4
-  resolution: "lottie-web@npm:5.9.4"
-  checksum: b7da159779791c92dc45bd7861bf37babef43a7139a6b12d0c1596773fbc338562e4547df766a42ce73516fe82ec790e8ddcebe7d4c9d7fa2ee4d42e0072904c
+"lottie-web@npm:^5.10.2":
+  version: 5.12.2
+  resolution: "lottie-web@npm:5.12.2"
+  checksum: af5bc3bc405fd760de8b17a36158d5a8c3e8c586c711d0c63681ddf056b65bc6b54ea36b1fcad782fb02dbe12e696a40e0ba72daf41b8f10ab5b5d1113793636
   languageName: node
   linkType: hard
 
