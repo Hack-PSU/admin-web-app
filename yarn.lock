@@ -3095,7 +3095,6 @@ __metadata:
     is-email: ^1.0.2
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
-    lottie-react: ^2.2.1
     lucide-react: ^0.121.0
     luxon: ^2.4.0
     match-sorter: ^6.3.1
@@ -5426,25 +5425,6 @@ __metadata:
   bin:
     loose-envify: cli.js
   checksum: 6517e24e0cad87ec9888f500c5b5947032cdfe6ef65e1c1936a0c48a524b81e65542c9c3edc91c97d5bddc806ee2a985dbc79be89215d613b1de5db6d1cfe6f4
-  languageName: node
-  linkType: hard
-
-"lottie-react@npm:^2.2.1":
-  version: 2.4.1
-  resolution: "lottie-react@npm:2.4.1"
-  dependencies:
-    lottie-web: ^5.10.2
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: ac79931d98ea38fd3a9139139fb976d24a3e4e0ede86c74d69c5571b971122ee7e98432949f0f4af33f48b736fe8448918f124d48548dd46925bab484c09e73f
-  languageName: node
-  linkType: hard
-
-"lottie-web@npm:^5.10.2":
-  version: 5.12.2
-  resolution: "lottie-web@npm:5.12.2"
-  checksum: af5bc3bc405fd760de8b17a36158d5a8c3e8c586c711d0c63681ddf056b65bc6b54ea36b1fcad782fb02dbe12e696a40e0ba72daf41b8f10ab5b5d1113793636
   languageName: node
   linkType: hard
 

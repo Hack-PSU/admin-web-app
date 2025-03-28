@@ -1,7 +1,5 @@
 import React, { FC } from "react";
-import { Grid, Typography } from "@mui/material";
-import Lottie from "lottie-react";
-import Spinner from "assets/lottie/spinner.json";
+import { Grid, Typography, CircularProgress } from "@mui/material";
 
 const Loading: FC = () => {
   return (
@@ -10,21 +8,13 @@ const Loading: FC = () => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      sx={{
-        height: "100vh",
-        width: "100%",
-      }}
+      sx={{ height: "100vh", width: "100%" }}
     >
       <Grid item>
-        <Lottie
-          animationData={Spinner}
-          loop
-          autoplay
-          style={{ height: "250px" }}
-        />
+        <CircularProgress size={250} sx={{ color: "#1976d2" }} />
       </Grid>
       <Grid item>
-        <Typography variant="h2" sx={{ fontWeight: 600 }}>
+        <Typography variant="h2" sx={{ fontWeight: 600, mt: 2 }}>
           Loading
         </Typography>
       </Grid>
