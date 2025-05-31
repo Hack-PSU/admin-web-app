@@ -104,6 +104,7 @@ const SettingsMembers: NextPage = () => {
               name: `${d.firstName} ${d.lastName}`,
               email: d.email,
               permission: permission ?? { value: 2, label: "Team Member" },
+              isActive: d.isActive,
             };
           });
         }
@@ -113,7 +114,7 @@ const SettingsMembers: NextPage = () => {
 
   const data = useMemo(() => {
     if (user && allOrganizers) {
-      return _.filter(allOrganizers, (o) => o.id !== user.uid);
+      return _.filter(allOrganizers, (o) => o.id !== user.uid && o.isActive);
     }
     return [];
   }, [allOrganizers, user]);

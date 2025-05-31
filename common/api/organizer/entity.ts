@@ -13,4 +13,5 @@ export interface OrganizerEntity {
   firstName: string;
   lastName: string;
   privilege: Role;
+  isActive: boolean;
 }
