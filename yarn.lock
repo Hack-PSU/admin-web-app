@@ -3645,7 +3645,7 @@ __metadata:
     moment: ^2.29.3
     next: 15.3.5
     nookies: ^2.5.2
-    notistack: 3.0.0-alpha.7
+    notistack: 3.0.2
     prettier: ^2.6.2
     react: 18.1.0
     react-beautiful-dnd: ^13.1.1
@@ -7167,16 +7167,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"notistack@npm:3.0.0-alpha.7":
-  version: 3.0.0-alpha.7
-  resolution: "notistack@npm:3.0.0-alpha.7"
+"notistack@npm:3.0.2":
+  version: 3.0.2
+  resolution: "notistack@npm:3.0.2"
   dependencies:
     clsx: ^1.1.0
     goober: ^2.0.33
   peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 974319b2b99cb14efb63ce41a2fabe4a26500033c768695fb28cb5626dc822f96025ad8925c7ba95f00c3fb9fa2a806fc6ea979899875f0fec78fd705f7e9227
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: f7d6d2edb43496a1132b9dd10d1f3b962567c92edf4d577b28ff4e6c9877cf0a50cc0a16f6d7834e3772093051597192a620dd36d4108597b118e8a2ad47d048
   languageName: node
   linkType: hard
 
