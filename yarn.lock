@@ -2805,11 +2805,11 @@ __metadata:
   linkType: hard
 
 "@types/react-table@npm:^7.7.12":
-  version: 7.7.12
-  resolution: "@types/react-table@npm:7.7.12"
+  version: 7.7.20
+  resolution: "@types/react-table@npm:7.7.20"
   dependencies:
     "@types/react": "*"
-  checksum: 287ea68e75b56c2e70e6d6491cd172348c7302b032789047eb2dca1b25b240684e48a60f58140575828b790f95724b9f3ec4d3adce82fc1c05d994def1449009
+  checksum: 940b65995c54dd29a6d4a1023fb56343152938c0567a2766baf7edebd186e380a72c780cafeafabbf3d77ea4eacb384f0ec03f55daa0a82fd56064d437758be3
   languageName: node
   linkType: hard
 
