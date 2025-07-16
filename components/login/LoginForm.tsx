@@ -36,14 +36,17 @@ const LoginForm: FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      // kick off to the central auth server, with your returnTo
-      const returnTo = encodeURIComponent("https://admin.hackpsu.org/");
-      window.location.href = `https://auth.hackpsu.org/login?returnTo=${returnTo}`;
-    } else {
-      // already signed in—send them on into your app
-      router.push("/");
-    }
+    const timer = setTimeout(() => {
+      if (!isAuthenticated) {
+        // kick off to the central auth server, with your returnTo
+        const returnTo = encodeURIComponent("https://admin.hackpsu.org/");
+        window.location.href = `https://auth.hackpsu.org/login?returnTo=${returnTo}`;
+      } else {
+        // already signed in—send them on into your app
+        router.push("/");
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [isAuthenticated, router]);
 
   return (
