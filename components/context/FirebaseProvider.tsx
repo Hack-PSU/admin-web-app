@@ -1,3 +1,5 @@
+"use client";
+
 import {
   createContext,
   FC,
@@ -12,9 +14,10 @@ import {
   onAuthStateChanged,
   onIdTokenChanged,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
   signOut,
   User,
-} from "@firebase/auth";
+} from "firebase/auth";
 import jwtDecode, { JwtPayload } from "jwt-decode";
 import { FirebaseError } from "@firebase/util";
 import nookies from "nookies";
@@ -80,23 +83,28 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<AuthError>(AuthError.NONE);
 
-  const getUserIdToken = useCallback(async (user: User) => {
-    return await getIdToken(user);
+  // NEW FLAGS for session logic
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const getUserIdToken = useCallback(async (usr: User) => {
+    return await getIdToken(usr);
   }, []);
 
   const validatePermissions = useCallback(
     (privilege: number, userToken?: string) => {
-      const validToken = userToken || token || "";
-      if (validToken) {
-        const decoded = jwtDecode<IJwtToken>(validToken);
-        if (decoded.iss && decoded.iss.includes("hackpsu-408118")) {
-          if (decoded.staging && decoded.staging >= privilege) {
-            setPermission(decoded.staging);
-            return true;
-          } else if (decoded.production && decoded.production >= privilege) {
-            setPermission(decoded.production);
-            return true;
-          }
+      const validToken = userToken || token;
+      if (!validToken) return false;
+
+      const decoded = jwtDecode<IJwtToken>(validToken);
+      if (decoded.iss?.includes("hackpsu-408118")) {
+        if ((decoded.staging ?? 0) >= privilege) {
+          setPermission(decoded.staging!);
+          return true;
+        }
+        if ((decoded.production ?? 0) >= privilege) {
+          setPermission(decoded.production!);
+          return true;
         }
       }
       setError(AuthError.NONE);
@@ -106,59 +114,113 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
   );
 
   const validateToken = useCallback(
-    async (user: User) => {
-      const token = await getUserIdToken(user);
-      setToken(token);
-      nookies.set(undefined, "token", token, { path: "/" });
-
-      return validatePermissions(AuthPermission.TEAM, token);
+    async (usr: User) => {
+      const idToken = await getUserIdToken(usr);
+      setToken(idToken);
+      nookies.set(undefined, "token", idToken, { path: "/" });
+      return validatePermissions(AuthPermission.TEAM, idToken);
     },
     [getUserIdToken, validatePermissions]
   );
 
+  const resolveAuthError = useCallback((code: string) => {
+    switch (code) {
+      case AuthError.INVALID_PASSWORD:
+        setError(AuthError.INVALID_PASSWORD);
+        break;
+      case AuthError.INVALID_EMAIL:
+        setError(AuthError.INVALID_EMAIL);
+        break;
+      default:
+        setError(AuthError.NONE);
+    }
+  }, []);
+
+  // **MERGED** resolveAuthState, now handles both:
+  //  - "user" passed in from onAuthStateChanged
+  //  - initial session check via /api/sessionUser
   const resolveAuthState = useCallback(
-    async (user?: User) => {
-      if (user) {
-        if (await validateToken(user)) {
-          setUser(user);
+    async (usr?: User) => {
+      if (isLoggingOut) return;
+      let currentUser = usr;
+
+      // if no firebase user given, try session endpoint
+      if (!currentUser) {
+        try {
+          const res = await fetch(
+            "https://auth.hackpsu.org/api/sessionUser",
+            { method: "GET", credentials: "include" }
+          );
+          if (!res.ok) throw new Error(`Session check ${res.status}`);
+          const data = await res.json();
+          if (!data.customToken) throw new Error("No customToken");
+
+          const cred = await signInWithCustomToken(auth, data.customToken);
+          currentUser = cred.user;
+          setToken(data.customToken);
+          setError(AuthError.NONE);
+        } catch {
+          // no valid session → clear everything
+          nookies.set(undefined, "token", "", { path: "/" });
+          setUser(undefined);
+          setToken("");
+          setPermission(AuthPermission.NONE);
+          setIsAuthenticated(false);
+          setError(AuthError.NONE);
+          return;
+        }
+      }
+
+      // now if we have a firebase User, validate and set state
+      if (currentUser) {
+        if (await validateToken(currentUser)) {
+          setUser(currentUser);
           setIsAuthenticated(true);
         } else {
           setUser(undefined);
           setIsAuthenticated(false);
           setError(AuthError.NO_PERMISSION);
         }
-      } else {
-        nookies.set(undefined, "token", "", { path: "/" });
-        setUser(undefined);
-        setIsAuthenticated(false);
-        setError(AuthError.NONE);
       }
     },
-    [validateToken]
+    [auth, validateToken, isLoggingOut]
   );
 
-  const resolveAuthError = useCallback((error: string) => {
-    switch (error) {
-      case "auth/wrong-password":
-        setError(AuthError.INVALID_PASSWORD);
-        break;
-      case "auth/missing-email":
-        setError(AuthError.INVALID_EMAIL);
-        break;
+  // initial session check on mount
+  useEffect(() => {
+    if (!hasInitialized && !isLoggingOut) {
+      resolveAuthState(undefined).finally(() => setHasInitialized(true));
     }
-  }, []);
+  }, [hasInitialized, isLoggingOut, resolveAuthState]);
 
+  // subscribe to firebase auth changes
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (usr) => {
+      resolveAuthState(usr ?? undefined);
+    });
+    return unsub;
+  }, [auth, resolveAuthState]);
+
+  // keep axios initialized on token change
+  useEffect(() => {
+    const unsub = onIdTokenChanged(auth, async (usr) => {
+      if (usr) {
+        await initApi(usr);
+      } else {
+        resetApi();
+      }
+    });
+    return unsub;
+  }, [auth]);
+
+  // email/password login stays the same
   const loginWithEmailAndPassword = useCallback(
     async (email: string, password: string) => {
       setError(AuthError.NONE);
       try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        if (userCredential.user) {
-          await resolveAuthState(userCredential.user);
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        if (cred.user) {
+          await resolveAuthState(cred.user);
         }
       } catch (e) {
         resolveAuthError((e as FirebaseError).code);
@@ -167,33 +229,35 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
     [auth, resolveAuthError, resolveAuthState]
   );
 
+  // LOGOUT now also calls sessionLogout
   const logout = useCallback(async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await fetch("https://auth.hackpsu.org/api/sessionLogout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (e) {
+      console.error("sessionLogout failed", e);
+    }
     try {
       await signOut(auth);
-      setToken("");
-      setIsAuthenticated(false);
-
-      await router.push("/login");
     } catch (e) {
       console.error(e);
     }
-  }, [auth, router]);
 
-  useEffect(() => {
-    return onAuthStateChanged(auth, async (user) => {
-      await resolveAuthState(user ?? undefined);
-    });
-  }, [auth, resolveAuthState]);
+    // clear all client state/cookie
+    nookies.set(undefined, "token", "", { path: "/" });
+    setUser(undefined);
+    setToken("");
+    setPermission(AuthPermission.NONE);
+    setIsAuthenticated(false);
+    setError(AuthError.NONE);
 
-  useEffect(() => {
-    return onIdTokenChanged(auth, async (user) => {
-      if (user) {
-        await initApi(user);
-      } else {
-        resetApi();
-      }
-    });
-  }, [auth]);
+    await router.push("/login");
+    setIsLoggingOut(false);
+  }, [auth, isLoggingOut, router]);
 
   const value = useMemo(
     () => ({
