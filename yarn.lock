@@ -3633,7 +3633,7 @@ __metadata:
     "@visx/text": ^2.10.0
     "@visx/tooltip": ^2.10.0
     "@visx/xychart": ^2.11.1
-    axios: ^0.30.0
+    axios: ^1.0.0
     colorjs.io: ^0.5.0
     d3-scale-chromatic: ^3.0.0
     eslint: 8.16.0
@@ -3935,14 +3935,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.30.0":
-  version: 0.30.0
-  resolution: "axios@npm:0.30.0"
+"axios@npm:^1.0.0":
+  version: 1.10.0
+  resolution: "axios@npm:1.10.0"
   dependencies:
-    follow-redirects: ^1.15.4
+    follow-redirects: ^1.15.6
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 5179e93f4d8a4f8fc6fce3d46b4087aff60d1f2aeb36fad289e506dfd327c3436aafe1a91b371f47ffc2ef1b0a3f7ea278a24f6b1af88216d691b1e6c262b32f
+  checksum: b5fd840d499469bf968e44b8ac96f4b363c6aa4c791a50834c086a7cffbc2d77fe24f27af1aba46c3e1f4840aaf991461fc27537990596b93dea0f4df3245a86
   languageName: node
   linkType: hard
 
@@ -5567,7 +5567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.4":
+"follow-redirects@npm:^1.15.6":
   version: 1.15.9
   resolution: "follow-redirects@npm:1.15.9"
   peerDependenciesMeta:
