@@ -3634,7 +3634,7 @@ __metadata:
     "@visx/tooltip": ^2.10.0
     "@visx/xychart": ^2.11.1
     axios: ^0.30.0
-    colorjs.io: ^0.3.0
+    colorjs.io: ^0.5.0
     d3-scale-chromatic: ^3.0.0
     eslint: 8.16.0
     eslint-config-next: ^15.0.0
@@ -4278,10 +4278,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colorjs.io@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "colorjs.io@npm:0.3.0"
-  checksum: c3e246bbb8e96735f4985893e3fb7a3c2dcc80ee42eab0cd80d4f7564dfe005b8b47f24e88cee5cf5db67ae9eb67fbd5ccd99b0575e1da6bcc962aca5a11c7dd
+"colorjs.io@npm:^0.5.0":
+  version: 0.5.2
+  resolution: "colorjs.io@npm:0.5.2"
+  checksum: f4ad8a0ead4e7eb74612a5fed9ae999201116b215b2eac70660c1f643e21980922741641209bdbd010723923762e8e80bd499250acf7505605309f01b76f53fa
   languageName: node
   linkType: hard
 

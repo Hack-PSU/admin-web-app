@@ -45,7 +45,7 @@
     "@visx/tooltip": "^2.10.0",
     "@visx/xychart": "^2.11.1",
     "axios": "^0.30.0",
-    "colorjs.io": "^0.3.0",
+    "colorjs.io": "^0.5.0",
     "d3-scale-chromatic": "^3.0.0",
     "firebase": "^9.8.1",
     "framer-motion": "^6.3.11",
