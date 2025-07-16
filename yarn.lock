@@ -1139,8 +1139,8 @@ __metadata:
   linkType: hard
 
 "@hookform/devtools@npm:^4.2.2":
-  version: 4.2.2
-  resolution: "@hookform/devtools@npm:4.2.2"
+  version: 4.4.0
+  resolution: "@hookform/devtools@npm:4.4.0"
   dependencies:
     "@emotion/react": ^11.1.5
     "@emotion/styled": ^11.3.0
@@ -1151,9 +1151,9 @@ __metadata:
     use-deep-compare-effect: ^1.8.1
     uuid: ^8.3.2
   peerDependencies:
-    react: ">=17.0.2"
-    react-dom: ">=17.0.2"
-  checksum: ba66205da7a68029b1f5cab7f590cb1a53cbf51c09afdfbccab25acd3d5f2a6f713f8766e969a64e7f29374523ed81d5c350761ade70d52e8db2b9bd114c8bd9
+    react: ^16.8.0 || ^17 || ^18 || ^19
+    react-dom: ^16.8.0 || ^17 || ^18 || ^19
+  checksum: 7dc7093b7a59200aa60a903c2027f923bade28647f16afc8a978f89af1abd595ffa757597d59e892af2c1d7b6fa663e1ed28b6958afbf723042665ba04f273e6
   languageName: node
   linkType: hard
 
