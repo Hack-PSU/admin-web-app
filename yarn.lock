@@ -3743,6 +3743,8 @@ __metadata:
     next: 15.3.5
     nookies: ^2.5.2
     notistack: 3.0.2
+    posthog-js: ^1.257.0
+    posthog-node: ^5.5.1
     prettier: ^2.6.2
     react: 18.1.0
     react-beautiful-dnd: ^13.1.1
@@ -4395,6 +4397,13 @@ __metadata:
   version: 0.4.2
   resolution: "cookie@npm:0.4.2"
   checksum: a00833c998bedf8e787b4c342defe5fa419abd96b32f4464f718b91022586b8f1bafbddd499288e75c037642493c83083da426c6a9080d309e3bd90fd11baa9b
+  languageName: node
+  linkType: hard
+
+"core-js@npm:^3.38.1":
+  version: 3.44.0
+  resolution: "core-js@npm:3.44.0"
+  checksum: 1a9fca319aaeb8ae58764f9566a92d5fe7f609749dd1e5e0af4e1a0e4c6f0402d51b5ad379decb6ee722df0a65f0897a1ed1da397888e53437a52d3c105724a5
   languageName: node
   linkType: hard
 
@@ -5520,6 +5529,13 @@ __metadata:
     picomatch:
       optional: true
   checksum: fe9f3014901d023cf631831dcb9eae5447f4d7f69218001dd01ecf007eccc40f6c129a04411b5cc273a5f93c14e02e971e17270afc9022041c80be924091eb6f
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.4.8":
+  version: 0.4.8
+  resolution: "fflate@npm:0.4.8"
+  checksum: 29d8cbe44d5e7f53e7f5a160ac7f9cc025480c7b3bfd85c5f898cbe20dfa2dad4732daa534982664bf30b35896a90af44ea33ede5d94c5ffd1b8b0c0a0a56ca2
   languageName: node
   linkType: hard
 
@@ -7452,6 +7468,40 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
   checksum: 1d8611341b073143ad90486fcdfeab49edd243377b1f51834dc4f6d028e82ce5190e4f11bb2633276864503654fb7cab28e67abdc0fbf9d1f88cad4a0ff0beea
+  languageName: node
+  linkType: hard
+
+"posthog-js@npm:^1.257.0":
+  version: 1.257.0
+  resolution: "posthog-js@npm:1.257.0"
+  dependencies:
+    core-js: ^3.38.1
+    fflate: ^0.4.8
+    preact: ^10.19.3
+    web-vitals: ^4.2.4
+  peerDependencies:
+    "@rrweb/types": 2.0.0-alpha.17
+    rrweb-snapshot: 2.0.0-alpha.17
+  peerDependenciesMeta:
+    "@rrweb/types":
+      optional: true
+    rrweb-snapshot:
+      optional: true
+  checksum: 4f09f3399005ebdb5790a6a5f2815501b06c21c4be843563825eb7e1f00fe0b9fc39081dea8f772ae5e69670784cfd40e6e2495872a024a7bdec295d973a7c92
+  languageName: node
+  linkType: hard
+
+"posthog-node@npm:^5.5.1":
+  version: 5.5.1
+  resolution: "posthog-node@npm:5.5.1"
+  checksum: 99d4ed6c789ec25cc189974da166aca238f459dfb78dc7046a789d042cfc61f6b7468eb5332b407e6ab0daa4eb787e9778ebf677d0e0ef264741a6fa0109631a
+  languageName: node
+  linkType: hard
+
+"preact@npm:^10.19.3":
+  version: 10.26.9
+  resolution: "preact@npm:10.26.9"
+  checksum: d5a9c521ca4ab35414bd9c7874e2ac4eaf0561875e2a5bb9f3c4c67e6e3d6971e122f763d19333f9b616a5f280b5d22cde526bb9c9fd9820bee15600a2f7269b
   languageName: node
   linkType: hard
 
@@ -9426,6 +9476,13 @@ __metadata:
   dependencies:
     loose-envify: ^1.0.0
   checksum: 4f2cb6a9575e4faf71ddad9ad1ae7a00d0a75d24521c193fa464f30e6b04027bd97aa5d9546b0e13d3a150ab402eda216d59c1d0f2d6ca60124d96cd40dfa35c
+  languageName: node
+  linkType: hard
+
+"web-vitals@npm:^4.2.4":
+  version: 4.2.4
+  resolution: "web-vitals@npm:4.2.4"
+  checksum: 5b3ffe1db33f23aebf8cc8560ac574401a95939baafde5841835c1bb1c01f9a2478442f319f77aa0d7914739fc2f6b020c5d5b128c16c5c77ca6be2f9dfbbde6
   languageName: node
   linkType: hard
 

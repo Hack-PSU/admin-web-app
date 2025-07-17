@@ -25,6 +25,7 @@ import { initApi, resetApi } from "api/axios";
 import { useRouter } from "next/router";
 import { Auth } from "@firebase/auth/dist/node-esm";
 import { WithChildren } from "common/types";
+import posthog from 'posthog-js';
 
 export interface IFirebaseProviderProps {
   auth: Auth;
@@ -159,6 +160,10 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
           currentUser = cred.user;
           setToken(data.customToken);
           setError(AuthError.NONE);
+
+          posthog.identify(cred.user.uid, {
+            email: cred.user.email || undefined,
+          });
         } catch {
           // no valid session → clear everything
           nookies.set(undefined, "token", "", { path: "/" });
@@ -221,6 +226,9 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
         const cred = await signInWithEmailAndPassword(auth, email, password);
         if (cred.user) {
           await resolveAuthState(cred.user);
+          posthog.identify(cred.user.uid, {
+            email: cred.user.email || undefined,
+          });
         }
       } catch (e) {
         resolveAuthError((e as FirebaseError).code);
@@ -246,6 +254,8 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
     } catch (e) {
       console.error(e);
     }
+
+    posthog.reset();
 
     // clear all client state/cookie
     nookies.set(undefined, "token", "", { path: "/" });
