@@ -3711,7 +3711,7 @@ __metadata:
     is-email: ^1.0.2
     jwt-decode: ^3.1.2
     lint-staged: ">=10"
-    lucide-react: ^0.121.0
+    lucide-react: ^0.525.0
     luxon: ^2.4.0
     match-sorter: ^6.3.1
     moment: ^2.29.3
@@ -6829,12 +6829,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.121.0":
-  version: 0.121.0
-  resolution: "lucide-react@npm:0.121.0"
+"lucide-react@npm:^0.525.0":
+  version: 0.525.0
+  resolution: "lucide-react@npm:0.525.0"
   peerDependencies:
-    react: ^16.5.1 || ^17.0.0 || ^18.0.0
-  checksum: a7b3e87a3cfc0180db009adc6c5b1103ed547391aab31577ac987a43cc15d44a58350332504b8021bddf81f03acfcb73771730506acc4ade403e1defef16af21
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: eef781bfcfd211dac1ca93d0e7c5830aec1bacef72f4af3994807ac04d2a0fe327aca1a77234daf7f13e06ea47e5585766c927c8e1f2e7dcb982e4dc55aeda5e
   languageName: node
   linkType: hard
 
