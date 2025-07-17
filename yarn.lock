@@ -3757,7 +3757,7 @@ __metadata:
     styled-components: ^5.3.5
     superstruct: ^0.16.0
     typescript: 4.9.5
-    use-immer: ^0.7.0
+    use-immer: ^0.11.0
     yup: ^0.32.11
     zustand: ^4.1.0
   languageName: unknown
@@ -9341,13 +9341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-immer@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "use-immer@npm:0.7.0"
+"use-immer@npm:^0.11.0":
+  version: 0.11.0
+  resolution: "use-immer@npm:0.11.0"
   peerDependencies:
-    immer: ">=2.0.0"
-    react: ^16.8.0 || ^17.0.1 || ^18.0.0
-  checksum: 4711403fa2c3648c06b8e6795433eb43adb2c6e9bd00f45971ce6948ba8fc1c3e3cf73820a8d597b22979caa6445d0b791508e147975c3cc435a1ec1e5ce47db
+    immer: ">=8.0.0"
+    react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
+  checksum: 09ddbddec5bd5a939dc462de4c9d1ce47989bc60daa712c5235664650b132e246b8e61b6bd3dc8179649445b7cf389065373c75f23829a676dbda6b5d2428928
   languageName: node
   linkType: hard
 
