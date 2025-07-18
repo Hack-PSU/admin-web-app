@@ -63,7 +63,7 @@
     "posthog-node": "^5.5.1",
     "react": "19.1.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-datepicker": "^4.8.0",
+    "react-datepicker": "^8.0.0",
     "react-dom": "19.1.0",
     "react-dropzone": "^14.2.1",
     "react-eva-icons": "^0.0.8",
