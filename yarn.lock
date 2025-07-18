@@ -2764,10 +2764,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:^2.3.2":
-  version: 2.4.0
-  resolution: "@types/luxon@npm:2.4.0"
-  checksum: eeb16a1bfe5440464c1a9635700d103cd18d3cd8da6063a1938478e435cfba6ab8e893aa80c95a407e541187c1e997c3e4481322726bc1258551cb8606d0e5ad
+"@types/luxon@npm:^3.0.0":
+  version: 3.6.2
+  resolution: "@types/luxon@npm:3.6.2"
+  checksum: fa7bf7d74544c77c2010739337d359c5d6f9b0424de0e0eb273f7bae203996168cc33c2ad6f3b35771eac8fea8b7e5bcce72b91d129924d0f84b91dc216de42e
   languageName: node
   linkType: hard
 
@@ -3582,7 +3582,7 @@ __metadata:
     "@tiptap/react": ^3.0.0
     "@tiptap/starter-kit": ^3.0.0
     "@types/d3-scale-chromatic": ^3.0.0
-    "@types/luxon": ^2.3.2
+    "@types/luxon": ^3.0.0
     "@types/node": 22.16.4
     "@types/react": 19.1.8
     "@types/react-beautiful-dnd": ^13.1.2
@@ -3616,7 +3616,7 @@ __metadata:
     jwt-decode: ^4.0.0
     lint-staged: ">=10"
     lucide-react: ^0.525.0
-    luxon: ^2.4.0
+    luxon: ^3.0.0
     match-sorter: ^6.3.1
     moment: ^2.29.3
     next: 15.4.1
@@ -6678,10 +6678,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:^2.4.0":
-  version: 2.5.2
-  resolution: "luxon@npm:2.5.2"
-  checksum: d8b671ffd2ff0b438af862ac11082a81b3aedd9f8b6a4ca636f944224f8dd381125cd4d274ca0a8aedcaf2cfca0fc2ca96fe4cc1b16a28b7af701afb95c0bff8
+"luxon@npm:^3.0.0":
+  version: 3.7.1
+  resolution: "luxon@npm:3.7.1"
+  checksum: 19e5b20304f2e558b1e5e1f4f04f227419642d373f7c10ccf8f0e7d63c05828187a6aa39d70caf87d18a4834800dcbf29cf5f5d81d03c7d2471cd0b61cee97f6
   languageName: node
   linkType: hard
 
