@@ -1108,7 +1108,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@floating-ui/react-dom@npm:^2.0.8":
+"@floating-ui/react-dom@npm:^2.0.8, @floating-ui/react-dom@npm:^2.1.4":
   version: 2.1.4
   resolution: "@floating-ui/react-dom@npm:2.1.4"
   dependencies:
@@ -1117,6 +1117,20 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: be2cc094b0c5cd7f6a06c6c58944e4f070e231bdc8d9f84fc8246eedf91e1545a8a9e6d8560664054de126aae6520da57a30b7d81433cb2625641a08eea8f029
+  languageName: node
+  linkType: hard
+
+"@floating-ui/react@npm:^0.27.3":
+  version: 0.27.13
+  resolution: "@floating-ui/react@npm:0.27.13"
+  dependencies:
+    "@floating-ui/react-dom": ^2.1.4
+    "@floating-ui/utils": ^0.2.10
+    tabbable: ^6.0.0
+  peerDependencies:
+    react: ">=17.0.0"
+    react-dom: ">=17.0.0"
+  checksum: 7baeed48daabf14a0c73176da40464bfc4c670154ccf758aa5728e7604a2c0dedef4fb85ffc48441b5734a7d31eb31961f9f049c2ab3af3374cbd120ac262769
   languageName: node
   linkType: hard
 
@@ -1936,13 +1950,6 @@ __metadata:
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
-  languageName: node
-  linkType: hard
-
-"@popperjs/core@npm:^2.9.2":
-  version: 2.11.5
-  resolution: "@popperjs/core@npm:2.11.5"
-  checksum: fd7f9dca3fb716d7426332b6ee283f88d2724c0ab342fb678865a640bad403dfb9eeebd8204a406986162f7e2b33394f104320008b74d0e9066d7322f70ea35d
   languageName: node
   linkType: hard
 
@@ -2818,15 +2825,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-datepicker@npm:^4.4.1":
-  version: 4.19.6
-  resolution: "@types/react-datepicker@npm:4.19.6"
+"@types/react-datepicker@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@types/react-datepicker@npm:7.0.0"
   dependencies:
-    "@popperjs/core": ^2.9.2
-    "@types/react": "*"
-    date-fns: ^2.0.1
-    react-popper: ^2.2.5
-  checksum: ee9f21bd7012c03abbcc3e6cda72aec69f4a96955d80938a8c8b23b1867bb515588ea17121d99835a9bd444774dd467f8e29e3ae36591d45e26c8ec536ba103a
+    react-datepicker: "*"
+  checksum: b73d822abb0410bf9046e14844304f31e2d680c44a510dd757ef4be4861aa0a8943863ef7c427f361f42a630c982ba39fb1882b9532506a5c89d47fe099a2df1
   languageName: node
   linkType: hard
 
@@ -3573,7 +3577,7 @@ __metadata:
     "@types/node": 22.16.4
     "@types/react": 19.1.8
     "@types/react-beautiful-dnd": ^13.1.2
-    "@types/react-datepicker": ^4.4.1
+    "@types/react-datepicker": ^7.0.0
     "@types/react-dom": 19.1.6
     "@types/react-table": ^7.7.12
     "@typescript-eslint/eslint-plugin": ^8.0.0
@@ -4522,19 +4526,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.0.1":
-  version: 2.28.0
-  resolution: "date-fns@npm:2.28.0"
-  checksum: a0516b2e4f99b8bffc6cc5193349f185f195398385bdcaf07f17c2c4a24473c99d933eb0018be4142a86a6d46cb0b06be6440ad874f15e795acbedd6fd727a1f
-  languageName: node
-  linkType: hard
-
 "date-fns@npm:^2.30.0":
   version: 2.30.0
   resolution: "date-fns@npm:2.30.0"
   dependencies:
     "@babel/runtime": ^7.21.0
   checksum: f7be01523282e9bb06c0cd2693d34f245247a29098527d4420628966a2d9aad154bd0e90a6b1cf66d37adcb769cd108cf8a7bd49d76db0fb119af5cdd13644f4
+  languageName: node
+  linkType: hard
+
+"date-fns@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "date-fns@npm:4.1.0"
+  checksum: fb681b242cccabed45494468f64282a7d375ea970e0adbcc5dcc92dcb7aba49b2081c2c9739d41bf71ce89ed68dd73bebfe06ca35129490704775d091895710b
   languageName: node
   linkType: hard
 
@@ -7708,6 +7712,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-datepicker@npm:*":
+  version: 8.4.0
+  resolution: "react-datepicker@npm:8.4.0"
+  dependencies:
+    "@floating-ui/react": ^0.27.3
+    clsx: ^2.1.1
+    date-fns: ^4.1.0
+  peerDependencies:
+    react: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: d81742b69ccf07fc09ae9a14129958ddf444944d9e7f8719cb56721292e232dd05cb2fc727bbfee3deb6854475b364d4899a72668b607a7c4cf21e7182412ed9
+  languageName: node
+  linkType: hard
+
 "react-datepicker@npm:^4.8.0":
   version: 4.25.0
   resolution: "react-datepicker@npm:4.25.0"
@@ -7808,7 +7826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-popper@npm:^2.2.5, react-popper@npm:^2.3.0":
+"react-popper@npm:^2.3.0":
   version: 2.3.0
   resolution: "react-popper@npm:2.3.0"
   dependencies:
@@ -8826,6 +8844,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 53b1e247e68e05db7b3808b99b892bd36fb096e6fba213a06da7fab22045e97597db425c724f2bbd6c99a3c295e1e73f3e4de78592289f38431049e1277ca0ae
+  languageName: node
+  linkType: hard
+
+"tabbable@npm:^6.0.0":
+  version: 6.2.0
+  resolution: "tabbable@npm:6.2.0"
+  checksum: f8440277d223949272c74bb627a3371be21735ca9ad34c2570f7e1752bd646ccfc23a9d8b1ee65d6561243f4134f5fbbf1ad6b39ac3c4b586554accaff4a1300
   languageName: node
   linkType: hard
 
