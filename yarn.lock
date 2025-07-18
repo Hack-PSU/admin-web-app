@@ -3617,7 +3617,7 @@ __metadata:
     lint-staged: ">=10"
     lucide-react: ^0.525.0
     luxon: ^3.0.0
-    match-sorter: ^6.3.1
+    match-sorter: ^8.0.0
     moment: ^2.29.3
     next: 15.4.1
     nookies: ^2.5.2
@@ -6701,13 +6701,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"match-sorter@npm:^6.3.1":
-  version: 6.3.4
-  resolution: "match-sorter@npm:6.3.4"
+"match-sorter@npm:^8.0.0":
+  version: 8.0.3
+  resolution: "match-sorter@npm:8.0.3"
   dependencies:
     "@babel/runtime": ^7.23.8
     remove-accents: 0.5.0
-  checksum: 950c1600173a639e216947559a389b64258d52f33aea3a6ddb97500589888b83c976a028f731f40bc08d9d8af20de7916992fabb403f38330183a1df44c7634b
+  checksum: 57321f1fdd0805bce3a48c06fb944ef7bd86ba70e26ae63b5393cd0bb5cd1e1b2f4830a183ada264b34de1c9fd1f70fe98f2dc44f0b6c67ac2850420180e9508
   languageName: node
   linkType: hard
 
