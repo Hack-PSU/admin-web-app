@@ -7511,9 +7511,9 @@ __metadata:
   linkType: hard
 
 "posthog-node@npm:^5.5.1":
-  version: 5.5.1
-  resolution: "posthog-node@npm:5.5.1"
-  checksum: 99d4ed6c789ec25cc189974da166aca238f459dfb78dc7046a789d042cfc61f6b7468eb5332b407e6ab0daa4eb787e9778ebf677d0e0ef264741a6fa0109631a
+  version: 5.6.0
+  resolution: "posthog-node@npm:5.6.0"
+  checksum: 7494426f79950785111db43f4f6608d07953909ceec2de6aa544321a40db3a5e7a165b57b807ad6414ad44eb03a4e5487f0dfdf3ccc51e0c06dc481e097151f6
   languageName: node
   linkType: hard
 
