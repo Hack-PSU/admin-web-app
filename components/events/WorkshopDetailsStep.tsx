@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback } from "react";
 import EventStep from "./EventStep";
 import { Grid } from "@mui/material";
 import {
@@ -13,6 +13,7 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { array, object, optional, string } from "superstruct";
+import { useEventStore } from "common/store";
 
 const skillLevelOptions = [
   { value: "beginner", label: "Beginner" },
@@ -27,29 +28,33 @@ const schema = object({
   wsUrls: optional(array(string())),
 });
 
-type FormData = {
-  wsPresenterNames?: { value: string; label: string }[];
-  wsSkillLevel?: { value: string; label: string };
-  wsRelevantSkills?: { value: string; label: string }[];
-  wsUrls?: string[];
-};
-
 const WorkshopDetailsStep: FC = () => {
-  const [workshopDetails, setWorkshopDetails] = useState<FormData>({});
+  const { 
+    wsPresenterNames, 
+    wsSkillLevel, 
+    wsRelevantSkills, 
+    wsUrls, 
+    updateWorkshop 
+  } = useEventStore();
 
-  const methods = useForm<FormData>({
+  const methods = useForm({
     resolver: superstructResolver(schema),
-    defaultValues: workshopDetails,
+    defaultValues: {
+      wsPresenterNames,
+      wsSkillLevel,
+      wsRelevantSkills,
+      wsUrls,
+    },
   });
 
   const { nextStep, active, previousStep } = useStepper(2, "3. Workshop Details");
 
   const handleNext = useCallback(() => {
     methods.handleSubmit((data) => {
-      setWorkshopDetails(data);
+      updateWorkshop(data);
       nextStep();
     })();
-  }, [methods, nextStep]);
+  }, [methods, nextStep, updateWorkshop]);
 
   return (
     <FormProvider {...methods}>

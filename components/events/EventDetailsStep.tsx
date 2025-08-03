@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from "react";
+import React, { FC, useCallback, useMemo } from "react";
 import EventStep from "./EventStep";
 import {
   ControlledCreatableSelect,
@@ -15,44 +15,30 @@ import { EventType, fetch, getAllLocations, QueryKeys } from "api";
 import { any, date, object, optional, string } from "superstruct";
 import { useQuery } from "@tanstack/react-query";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
+import { useEventStore } from "common/store";
+import { NonEmptySelect, NonEmptyString } from "common/form";
 
 const schema = object({
-  name: string(),
-  location: object({
-    value: any(),
-    label: string(),
-  }),
-  description: optional(string()),
+  name: NonEmptyString,
+  location: NonEmptySelect,
+  description: optional(any()),
   date: object({
     start: date(),
     end: date(),
   }),
 });
 
-type FormData = {
-  name: string;
-  location: { value: any; label: string };
-  description?: string;
-  date: {
-    start: Date;
-    end: Date;
-  };
-};
-
 const EventDetailsStep: FC = () => {
-  const [eventDetails, setEventDetails] = useState<FormData>({
-    name: "",
-    location: null,
-    description: "",
-    date: {
-      start: new Date(),
-      end: new Date(),
-    },
-  });
+  const { type, name, location, description, date, updateDetails } = useEventStore();
 
-  const methods = useForm<FormData>({
+  const methods = useForm({
     resolver: superstructResolver(schema),
-    defaultValues: eventDetails,
+    defaultValues: {
+      name,
+      location,
+      description,
+      date,
+    },
   });
 
   const { nextStep, active, previousStep, gotoStep } = useStepper(
@@ -81,42 +67,52 @@ const EventDetailsStep: FC = () => {
   }, [locationOptions]);
 
   const handleNext = useCallback(() => {
-    methods.handleSubmit((data) => {
-      let locationData = data.location;
+    methods.handleSubmit(
+      (data) => {
+        let locationData = data.location;
 
-      // location is not found in currentLocations
-      if (
-        data.location &&
-        currentLocations &&
-        !currentLocations.has(data.location.value)
-      ) {
-        locationData = {
-          ...data.location,
-          isNew: true,
-        };
+        // location is not found in currentLocations
+        if (
+          data.location &&
+          currentLocations &&
+          !currentLocations.has(data.location.value)
+        ) {
+          locationData = {
+            ...data.location,
+            isNew: true,
+          };
+        }
+
+        updateDetails({
+          name: data.name,
+          location: locationData,
+          description: data.description,
+          date: data.date,
+        });
+        
+        // Skip workshop step if not a workshop
+        if (type && type.value !== EventType.WORKSHOP) {
+          gotoStep(3, 2);
+        } else {
+          nextStep();
+        }
+      },
+      (errors) => {
+        console.log("Form validation errors:", errors);
       }
-
-      const updatedData = {
-        name: data.name,
-        location: locationData,
-        description: data.description,
-        date: data.date,
-      };
-
-      setEventDetails(updatedData);
-      
-      // Skip workshop step if not a workshop
-      // For now, go to next step - we'll add logic later
-      nextStep();
-    })();
-  }, [currentLocations, methods, nextStep]);
+    )();
+  }, [currentLocations, methods, nextStep, updateDetails, type, gotoStep]);
 
   return (
     <FormProvider {...methods}>
       <EventStep
         title="Event Details"
         handleNext={handleNext}
-        handleNextTitle="Next"
+        handleNextTitle={
+          type && type.value === EventType.WORKSHOP
+            ? "Next"
+            : "Continue to Event Icon"
+        }
         active={active}
         handlePrevious={previousStep}
       >

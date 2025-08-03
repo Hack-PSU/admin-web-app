@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback } from "react";
 import EventStep from "./EventStep";
 import { Grid } from "@mui/material";
 import { ControlledSelect, LabelledSelect, useStepper } from "components/base";
@@ -6,6 +6,7 @@ import { EventType } from "api";
 import { FormProvider, useForm } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { enums, object, string } from "superstruct";
+import { useEventStore } from "common/store";
 
 const options = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -26,28 +27,30 @@ type FormData = {
 };
 
 const EventTypeStep: FC = () => {
-  const [eventType, setEventType] = useState<{ value: EventType; label: string } | null>(
-    { value: EventType.ACTIVITY, label: "Activity" }
-  );
+  const { type, updateType } = useEventStore();
 
   const methods = useForm<FormData>({
     resolver: superstructResolver(schema),
     defaultValues: {
-      type: eventType,
+      type,
     },
   });
 
   const { active, nextStep } = useStepper(0, "1. Event Type");
 
   const handleNext = useCallback(() => {
-    methods
-      .handleSubmit((data) => {
+    methods.handleSubmit(
+      (data) => {
         if (data.type) {
-          setEventType(data.type);
+          updateType(data.type);
           nextStep();
         }
-      })();
-  }, [methods, nextStep]);
+      },
+      (errors) => {
+        console.log("Form validation errors:", errors);
+      }
+    )();
+  }, [methods, nextStep, updateType]);
 
   return (
     <FormProvider {...methods}>

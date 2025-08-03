@@ -1,31 +1,41 @@
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback } from "react";
 import EventStep from "./EventStep";
 import { Grid, Typography, Box } from "@mui/material";
 import { useStepper } from "components/base";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
+import { useEventStore } from "common/store";
+import { EventType } from "api";
 
 type FormData = {
   icon?: File;
 };
 
 const EventIconStep: FC = () => {
-  const [iconFile, setIconFile] = useState<File | null>(null);
+  const { type, icon, updateIcon } = useEventStore();
 
   const methods = useForm<FormData>({
     defaultValues: {
-      icon: undefined,
+      icon,
     },
   });
 
-  const { nextStep, active, previousStep } = useStepper(3, "4. Event Icon");
+  const { nextStep, active, previousStep, gotoStep } = useStepper(3, "4. Event Icon");
+
+  const handleClickPrevious = useCallback(() => {
+    if (type && type.value !== EventType.WORKSHOP) {
+      gotoStep(1, 2);
+    } else {
+      previousStep();
+    }
+  }, [type, gotoStep, previousStep]);
 
   const handleNext = useCallback(() => {
     methods.handleSubmit((data) => {
-      setIconFile(data.icon || null);
+      updateIcon(data.icon);
       nextStep();
     })();
-  }, [methods, nextStep]);
+  }, [methods, nextStep, updateIcon]);
 
   return (
     <FormProvider {...methods}>
@@ -33,7 +43,7 @@ const EventIconStep: FC = () => {
         title="Event Icon"
         handleNext={handleNext}
         active={active}
-        handlePrevious={previousStep}
+        handlePrevious={handleClickPrevious}
         handleNextTitle="Continue to Review"
       >
         <Grid container item spacing={2}>
