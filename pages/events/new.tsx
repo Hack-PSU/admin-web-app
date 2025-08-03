@@ -1,16 +1,10 @@
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import { withDefaultLayout } from "common/HOCs";
 import { Grid, Typography } from "@mui/material";
-import EventFormStepper from "components/event/steps/EventFormStepper";
-import { useEventStore } from "common/store";
+import { StepperProvider } from "components/base";
+import EventFormStepper from "components/events/EventFormStepper";
 
 const EventSteps: FC = () => {
-  const { clear } = useEventStore();
-
-  useEffect(() => {
-    clear();
-  }, [clear]);
-
   return (
     <Grid container flexDirection="column" sx={{ paddingBottom: 2 }}>
       <Grid item>
@@ -19,7 +13,9 @@ const EventSteps: FC = () => {
         </Typography>
       </Grid>
       <Grid item>
-        <EventFormStepper />
+        <StepperProvider>
+          <EventFormStepper />
+        </StepperProvider>
       </Grid>
     </Grid>
   );

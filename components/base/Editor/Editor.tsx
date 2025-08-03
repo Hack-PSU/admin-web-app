@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useMemo, useId } from "react";
 import { Content, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { alpha, Grid, styled } from "@mui/material";
@@ -50,29 +50,43 @@ const EditorContainer = styled(Grid)(({ theme }) => ({
 }));
 
 const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
+  const editorId = useId();
+  
+  const extensions = useMemo(() => {
+    // Create fresh instances each time to avoid plugin conflicts
+    return [
+      StarterKit.configure({
+        heading: false,
+        code: false,
+        listItem: false,
+        blockquote: false,
+        bulletList: false,
+        codeBlock: false,
+        horizontalRule: false,
+        orderedList: false,
+        strike: false,
+      }),
+      Underline.extend({
+        name: `underline-${editorId}`,
+      }),
+      Link.configure({
+        openOnClick: false,
+      }).extend({
+        name: `link-${editorId}`,
+      }),
+      Placeholder.configure({
+        emptyEditorClass: "is-editor-empty",
+        placeholder,
+      }).extend({
+        name: `placeholder-${editorId}`,
+      }),
+    ];
+  }, [placeholder, editorId]);
+
   const editor = useEditor(
     {
-      extensions: [
-        StarterKit.configure({
-          heading: false,
-          code: false,
-          listItem: false,
-          blockquote: false,
-          bulletList: false,
-          codeBlock: false,
-          horizontalRule: false,
-          orderedList: false,
-          strike: false,
-        }),
-        Underline,
-        Link.configure({
-          openOnClick: false,
-        }),
-        Placeholder.configure({
-          emptyEditorClass: "is-editor-empty",
-          placeholder,
-        }),
-      ],
+      extensions,
+      immediatelyRender: false,
       onCreate: ({ editor }) => {
         if (disabled) {
           editor.setEditable(false);
@@ -81,17 +95,45 @@ const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
       onUpdate: ({ editor }) => {
         onChange(editor.getHTML());
       },
-      content: value,
+      content: value || "",
+      enableInputRules: true,
+      enablePasteRules: true,
+      injectCSS: false,
+      editorProps: {
+        attributes: {
+          class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+        },
+      },
     },
-    [placeholder, onChange, disabled]
+    [extensions, onChange, disabled]
   );
+
+  useEffect(() => {
+    if (editor && value !== undefined && value !== editor.getHTML()) {
+      editor.commands.setContent(value || "", false);
+    }
+  }, [editor, value]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(!disabled);
+    }
+  }, [editor, disabled]);
+
+  useEffect(() => {
+    return () => {
+      if (editor) {
+        editor.destroy();
+      }
+    };
+  }, [editor]);
 
   if (!editor) {
     return null;
   }
 
   return (
-    <EditorContainer container flexDirection={"column"}>
+    <EditorContainer key={editorId} container flexDirection={"column"}>
       {!disabled && <EditorStyles editor={editor} />}
       {!disabled && <EditorContextMenu editor={editor} />}
       <Grid item>

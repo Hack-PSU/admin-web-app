@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Editor } from "@tiptap/core";
 import { BubbleMenu } from "@tiptap/react";
 import { darken, Grid, lighten, styled, useTheme } from "@mui/material";
@@ -31,10 +31,11 @@ const MenuContainer = styled(Grid)(({ theme }) => ({
 const EditorContextMenu: FC<Props> = ({ editor }) => {
   const theme = useTheme();
 
-  return (
+  const bubbleMenu = useMemo(() => (
     <BubbleMenu
       editor={editor}
       shouldShow={({ editor }) => editor.isActive("link")}
+      tippyOptions={{ duration: 100 }}
     >
       <MenuContainer container>
         <Grid item>
@@ -58,7 +59,9 @@ const EditorContextMenu: FC<Props> = ({ editor }) => {
         </Grid>
       </MenuContainer>
     </BubbleMenu>
-  );
+  ), [editor, theme]);
+
+  return bubbleMenu;
 };
 
 export default EditorContextMenu;

@@ -40,7 +40,7 @@ const eventSliceDefaults: EventModel = {
     start: new Date(),
     end: new Date(),
   },
-  description: { blocks: [], entityMap: {} },
+  description: "",
   wsPresenterNames: undefined,
   wsSkillLevel: undefined,
   wsUrls: [],
