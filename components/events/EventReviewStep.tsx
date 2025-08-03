@@ -2,21 +2,26 @@ import React, { FC, useCallback } from "react";
 import EventStep from "./EventStep";
 import { Grid, Typography, Card, CardContent, Chip, Box } from "@mui/material";
 import { useStepper } from "components/base";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { 
   fetch, 
   createEventForm, 
   createLocation,
   EventType, 
-  LocationEntity 
+  LocationEntity,
+  QueryKeys 
 } from "api";
 import { useSnackbar } from "notistack";
 import { useEventStore } from "common/store";
+import { DateTime } from "luxon";
+
+type CreateEntity<T> = { entity: T };
 
 const EventReviewStep: FC = () => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const { active, previousStep } = useStepper(4, "5. Review");
   
   const {
@@ -32,68 +37,113 @@ const EventReviewStep: FC = () => {
     icon
   } = useEventStore();
 
-  const createEventMutation = useMutation({
-    mutationFn: async () => {
-      let locationId = location?.value;
+  const {
+    mutateAsync: mutateEvent,
+    isLoading,
+  } = useMutation(
+    ({ entity }: CreateEntity<FormData>) =>
+      fetch(() => createEventForm(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.event.all);
+        enqueueSnackbar("Successfully created event", {
+          variant: "success",
+        });
+        router.push("/events");
+      },
+      onError: (error: any) => {
+        enqueueSnackbar(error?.message || "Failed to create event", { 
+          variant: "error" 
+        });
+      },
+    }
+  );
 
-      // Create location if it's new
-      if (location?.isNew) {
-        const newLocation: Omit<LocationEntity, "id"> = {
+  const { mutateAsync: mutateLocation } = useMutation(
+    ({ entity }: CreateEntity<Omit<LocationEntity, "id">>) =>
+      fetch(() => createLocation(entity)),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.location.all);
+      },
+    }
+  );
+
+  const onSubmit = useCallback(async () => {
+    let locationId = location?.value ?? -1;
+    
+    if (location && location.isNew) {
+      const data = await mutateLocation({
+        entity: {
           name: location.label,
-        };
-        const createdLocation = await fetch(createLocation(newLocation));
-        locationId = createdLocation.id;
+        },
+      });
+      if (data?.id) {
+        locationId = data?.id;
       }
+    }
 
-      const formData = new FormData();
-      
-      formData.append("name", name);
-      formData.append("type", type ? type.value : EventType.ACTIVITY);
-      formData.append("description", description);
-      formData.append("locationId", String(locationId));
-      formData.append("startTime", date.start.getTime().toString());
-      formData.append("endTime", date.end.getTime().toString());
+    const formData = new FormData();
 
-      // Workshop specific fields
-      if (type?.value === EventType.WORKSHOP) {
-        if (wsPresenterNames) {
-          formData.append("wsPresenterNames", wsPresenterNames.map(p => p.label).join(", "));
-        }
-        if (wsSkillLevel) {
-          formData.append("wsSkillLevel", wsSkillLevel.label);
-        }
-        if (wsRelevantSkills) {
-          formData.append("wsRelevantSkills", wsRelevantSkills.map(s => s.label).join(", "));
-        }
-        if (wsUrls && wsUrls.length > 0) {
-          wsUrls.forEach(url => formData.append("wsUrls", url));
-        }
-      }
+    if (icon) {
+      formData.append("icon", icon);
+    }
+    formData.append("type", type ? type.value : EventType.ACTIVITY);
+    formData.append("description", description);
+    formData.append("locationId", String(locationId));
+    formData.append(
+      "startTime",
+      String(DateTime.fromJSDate(date.start).toMillis())
+    );
+    formData.append(
+      "endTime",
+      String(DateTime.fromJSDate(date.end).toMillis())
+    );
+    formData.append("name", name);
 
-      if (icon) {
-        formData.append("icon", icon);
-      }
+    if (wsUrls) {
+      formData.append("wsUrls", wsUrls.join("|"));
+    }
 
-      return fetch(createEventForm(formData));
-    },
-    onSuccess: () => {
-      enqueueSnackbar("Event created successfully!", { variant: "success" });
-      router.push("/events");
-    },
-    onError: (error: any) => {
-      enqueueSnackbar(error?.message || "Failed to create event", { variant: "error" });
-    },
-  });
+    if (wsPresenterNames) {
+      formData.append(
+        "wsPresenterNames",
+        wsPresenterNames.map((name) => name.value).join(", ")
+      );
+    }
 
-  const handleSubmit = useCallback(() => {
-    createEventMutation.mutate();
-  }, [createEventMutation]);
+    if (wsSkillLevel) {
+      formData.append("wsSkillLevel", wsSkillLevel.value);
+    }
+
+    if (wsRelevantSkills) {
+      formData.append(
+        "wsRelevantSkills",
+        wsRelevantSkills.map((skill) => skill.value).join(", ")
+      );
+    }
+
+    await mutateEvent({ entity: formData });
+  }, [
+    location,
+    mutateEvent,
+    icon,
+    type,
+    description,
+    date,
+    name,
+    wsUrls,
+    wsPresenterNames,
+    wsSkillLevel,
+    wsRelevantSkills,
+    mutateLocation,
+  ]);
 
   return (
     <EventStep
       title={`Review ${type?.label || "Event"}`}
-      handleNext={handleSubmit}
-      handleNextTitle={createEventMutation.isLoading ? "Creating..." : "Create Event"}
+      handleNext={onSubmit}
+      handleNextTitle={isLoading ? "Creating..." : "Create Event"}
       active={active}
       handlePrevious={previousStep}
     >
