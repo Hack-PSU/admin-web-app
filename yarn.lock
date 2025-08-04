@@ -2198,11 +2198,11 @@ __metadata:
   linkType: hard
 
 "@tanstack/match-sorter-utils@npm:^8.0.0-alpha.82, @tanstack/match-sorter-utils@npm:^8.1.1":
-  version: 8.1.1
-  resolution: "@tanstack/match-sorter-utils@npm:8.1.1"
+  version: 8.19.4
+  resolution: "@tanstack/match-sorter-utils@npm:8.19.4"
   dependencies:
-    remove-accents: 0.4.2
-  checksum: bf1458b7ca08cf79750ebd46fddef9c9b845ef55b5b69c0f7f69d48d6cbd73dbfd98763509f655298033b93cfc92b21d54f9f13a4d631cc68ca9191913967205
+    remove-accents: 0.5.0
+  checksum: 7ec302d75be1f65a3e91dd30b567e47e56c13577937276ef3a3ac7c8560a0b9f6dcaca44dd877189375ce9e7401d250895265adb0741ec867eda4e47d0f07dc0
   languageName: node
   linkType: hard
 
@@ -2249,21 +2249,21 @@ __metadata:
   linkType: hard
 
 "@tanstack/react-table@npm:^8.3.3":
-  version: 8.3.3
-  resolution: "@tanstack/react-table@npm:8.3.3"
+  version: 8.21.3
+  resolution: "@tanstack/react-table@npm:8.21.3"
   dependencies:
-    "@tanstack/table-core": 8.3.3
+    "@tanstack/table-core": 8.21.3
   peerDependencies:
-    react: ">=16"
-    react-dom: ">=16"
-  checksum: bc5295389b5bfef58d3d4372fc5f0d5872544ea610808977adfa58f41273e6bf33746e52cab973fe3da1fa2119a4a2b8b74080ddff54783f4735fdd2f1ff9c74
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 1452e7bd1dd0febbfc37e656c61c2c426dc243136333a8688bfadfccfec233e87c9bbe83011d742b0e86ae52c9b3d436bdc5618be4ac675ab921f52317317780
   languageName: node
   linkType: hard
 
-"@tanstack/table-core@npm:8.3.3":
-  version: 8.3.3
-  resolution: "@tanstack/table-core@npm:8.3.3"
-  checksum: b23908b195c706ab940ae53996a295e86366f2253bfbdbe95e814f5cdcce598a044b7df0d6279c1391f7036f0c4551c88b3f41381ed3c99fb8c25b35cbbf5877
+"@tanstack/table-core@npm:8.21.3":
+  version: 8.21.3
+  resolution: "@tanstack/table-core@npm:8.21.3"
+  checksum: ce260ab981f334ba999240cf68ae942a524a28980f6853275da90d1864a8b56fa59b952bfd2266570f36ae11f66476d1c96dacc640ba5fd9d6d4e2a78cf05187
   languageName: node
   linkType: hard
 
@@ -8207,13 +8207,6 @@ __metadata:
   version: 3.2.0
   resolution: "regexpp@npm:3.2.0"
   checksum: a78dc5c7158ad9ddcfe01aa9144f46e192ddbfa7b263895a70a5c6c73edd9ce85faf7c0430e59ac38839e1734e275b9c3de5c57ee3ab6edc0e0b1bdebefccef8
-  languageName: node
-  linkType: hard
-
-"remove-accents@npm:0.4.2":
-  version: 0.4.2
-  resolution: "remove-accents@npm:0.4.2"
-  checksum: 84a6988555dea24115e2d1954db99509588d43fe55a1590f0b5894802776f7b488b3151c37ceb9e4f4b646f26b80b7325dcea2fae58bc3865df146e1fa606711
   languageName: node
   linkType: hard
 
