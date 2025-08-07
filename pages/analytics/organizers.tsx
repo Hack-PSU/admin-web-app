@@ -61,13 +61,13 @@ const AnalyticsOrganizersPage: NextPage = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Grid item xs={10}>
+        <Grid item xs={12}>
           <Typography variant={"h4"} sx={{ fontWeight: 700 }}>
             Organizers
           </Typography>
         </Grid>
       </Grid>
-      <Grid item sx={{ width: "100%" }}>
+      <Grid item sx={{ width: "100%", overflowX: "auto" }}>
         <Table {...table}>
           <Table.GlobalActions>
             <Table.GlobalRefresh onRefresh={refetch} />

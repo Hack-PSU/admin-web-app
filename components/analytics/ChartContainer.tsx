@@ -22,7 +22,7 @@ const ChartContainer: FC<WithChildren<IChartContainer>> = ({
       sx={{
         boxShadow: 2,
         borderRadius: "15px",
-        padding: theme.spacing(3, 4),
+        padding: { xs: theme.spacing(2, 2), sm: theme.spacing(3, 4) },
         ...props.sx,
       }}
     >

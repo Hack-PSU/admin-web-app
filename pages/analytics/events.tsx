@@ -73,13 +73,13 @@ const AnalyticsEventsPage: NextPage = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Grid item xs={9.7}>
+        <Grid item xs={12}>
           <Typography variant={"h4"} sx={{ fontWeight: 700 }}>
             Events
           </Typography>
         </Grid>
       </Grid>
-      <Grid item sx={{ width: "100%" }}>
+      <Grid item sx={{ width: "100%", overflowX: "auto" }}>
         <Table {...table}>
           <Table.GlobalActions>
             <Table.GlobalRefresh onRefresh={refetch} />

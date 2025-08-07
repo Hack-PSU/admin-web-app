@@ -70,7 +70,7 @@ const AnalyticsSummaryPage: NextPage = () => {
   return (
     <Grid container gap={1.5} flexDirection="column">
       <Grid container item justifyContent="space-between" alignItems="center">
-        <Grid item xs={9.7}>
+        <Grid item xs={12}>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Summary
           </Typography>
@@ -98,7 +98,7 @@ const AnalyticsSummaryPage: NextPage = () => {
             </ParentSizeModern>
           </ChartContainer>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <ChartContainer title={"Genders"}>
             <ParentSizeModern>
               {({ width }) => (
@@ -123,7 +123,7 @@ const AnalyticsSummaryPage: NextPage = () => {
             </ParentSizeModern>
           </ChartContainer>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <ChartContainer title={"Race/Ethnicity"}>
             <ParentSizeModern>
               {({ width }) => (
@@ -153,7 +153,7 @@ const AnalyticsSummaryPage: NextPage = () => {
             </ParentSizeModern>
           </ChartContainer>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <ChartContainer title={"Academic Years"}>
             <ParentSizeModern>
               {({ width }) => (
@@ -178,7 +178,7 @@ const AnalyticsSummaryPage: NextPage = () => {
             </ParentSizeModern>
           </ChartContainer>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <ChartContainer title={"Coding Experience"}>
             <ParentSizeModern>
               {({ width }) => (
