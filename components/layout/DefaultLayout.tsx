@@ -7,7 +7,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Grid, useMediaQuery, useTheme, IconButton, AppBar, Toolbar } from "@mui/material";
+import { EvaIcon } from "components/base";
 import { Menu } from "components/Menu";
 import { WithChildren } from "common/types";
 
@@ -59,9 +60,35 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
           height: "100vh",
         }}
       >
+        {shouldHide && (
+          <AppBar
+            position="fixed"
+            sx={{
+              zIndex: theme.zIndex.drawer + 1,
+              backgroundColor: "background.light",
+              boxShadow: 1,
+            }}
+          >
+            <Toolbar>
+              <IconButton
+                edge="start"
+                onClick={() => toggleDrawer()}
+                sx={{
+                  color: "common.black",
+                }}
+              >
+                <EvaIcon name="menu-outline" />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+        )}
         <Grid
           item
-          sx={{ overflow: "auto", width: open ? "20%" : 0, height: "100vh" }}
+          sx={{ 
+            overflow: "auto", 
+            width: shouldHide ? (open ? "80%" : 0) : (open ? "20%" : 0), 
+            height: "100vh" 
+          }}
         >
           <Menu
             open={open}
@@ -72,11 +99,15 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
         <Grid
           item
           sx={{
-            width: open ? "80%" : "100%",
+            width: shouldHide 
+              ? (open ? "20%" : "100%") 
+              : (open ? "80%" : "100%"),
             flexGrow: 1,
             overflow: "auto",
             height: "100vh",
-            padding: theme.spacing(3, 4),
+            padding: shouldHide 
+              ? theme.spacing(10, 2, 3, 2)
+              : theme.spacing(3, 4),
           }}
         >
           {children}

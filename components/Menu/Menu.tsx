@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from "react";
-import { Drawer, Grid, List, styled, Typography } from "@mui/material";
+import { Drawer, Grid, List, styled, Typography, useTheme, useMediaQuery } from "@mui/material";
 import MenuItem, { CollapsibleMenuItem } from "./MenuItem";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
@@ -11,7 +11,10 @@ import { useHackathonStore } from "common/store";
 const DrawerHeader = styled(Grid)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-start",
-  padding: theme.spacing(3.5, 3, 1),
+  padding: theme.spacing(2, 2, 1),
+  [theme.breakpoints.up("lg")]: {
+    padding: theme.spacing(3.5, 3, 1),
+  },
 }));
 
 interface IMenuProps {
@@ -22,6 +25,8 @@ interface IMenuProps {
 }
 
 const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const { activeHackathon: hackathon, updateActiveHackathon } =
     useHackathonStore();
 
@@ -66,7 +71,7 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
 
   return (
     <Drawer
-      variant="persistent"
+      variant={isMobile ? "temporary" : "persistent"}
       open={open}
       onClose={handleClose}
       ModalProps={{
@@ -74,22 +79,30 @@ const Menu: FC<IMenuProps> = ({ open, shouldClose, handleClose }) => {
       }}
       sx={{
         backgroundColor: "background.light",
-        width: "20%",
+        width: isMobile ? "280px" : "20%",
       }}
       PaperProps={{
         sx: {
-          width: "20%",
+          width: isMobile ? "280px" : "20%",
           borderRight: "none",
           backgroundColor: "background.light",
         },
       }}
     >
       <DrawerHeader container>
-        <Grid item sx={{ mr: 1.5 }}>
-          <Image src={Logo} alt="hackpsu-logo" width={55} height={55} />
+        <Grid item sx={{ mr: { xs: 1, lg: 1.5 } }}>
+          <Image 
+            src={Logo} 
+            alt="hackpsu-logo" 
+            width={isMobile ? 45 : 55} 
+            height={isMobile ? 45 : 55} 
+          />
         </Grid>
         <Grid item>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          <Typography 
+            variant={isMobile ? "h6" : "h5"} 
+            sx={{ fontWeight: "bold" }}
+          >
             {formatHackathon(activeHackathon)}
           </Typography>
         </Grid>

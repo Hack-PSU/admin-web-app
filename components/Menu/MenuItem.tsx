@@ -6,6 +6,7 @@ import {
   ListItemButton,
   ListItemText,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import MenuItemIcon from "./MenuItemIcon";
 import Link from "next/link";
@@ -43,16 +44,18 @@ const BaseMenuItem: FC<IBaseMenuItemProps> = ({
   active,
   onClickLink,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   return (
     <ListItem disablePadding sx={{ display: "block", mt: 1 }}>
       <ListItemButton
         disableRipple
         disableGutters
         sx={{
-          minHeight: 48,
+          minHeight: isMobile ? 56 : 48,
           justifyContent: "center",
-          px: 2.3,
-          py: 2,
+          px: isMobile ? 2 : 2.3,
+          py: isMobile ? 2.5 : 2,
           width: "90%",
           mx: "auto",
           borderRadius: "15px",
@@ -72,7 +75,7 @@ const BaseMenuItem: FC<IBaseMenuItemProps> = ({
           primaryTypographyProps={{
             sx: {
               color: "common.black",
-              fontSize: "1.05rem",
+              fontSize: isMobile ? "1.1rem" : "1.05rem",
               fontFamily: "Inter",
               fontWeight: 700,
             },
@@ -111,6 +114,8 @@ export const CollapsibleMenuItem: FC<ICollapsibleMenuItemProps> = ({
   nestedItems,
 }) => {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const active = router.pathname === to || router.pathname.startsWith(to);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -118,8 +123,6 @@ export const CollapsibleMenuItem: FC<ICollapsibleMenuItemProps> = ({
   const toggleNestedList = () => {
     setIsOpen((open) => !open);
   };
-
-  const theme = useTheme();
 
   return (
     <>
@@ -140,8 +143,8 @@ export const CollapsibleMenuItem: FC<ICollapsibleMenuItemProps> = ({
                   disableGutters
                   disableRipple
                   sx={{
-                    px: 2.3,
-                    py: 1,
+                    px: isMobile ? 2 : 2.3,
+                    py: isMobile ? 1.5 : 1,
                     width: "70%",
                     mx: "auto",
                     borderLeft: `2px solid ${
@@ -149,6 +152,7 @@ export const CollapsibleMenuItem: FC<ICollapsibleMenuItemProps> = ({
                         ? theme.palette.sunset.dark
                         : theme.palette.border.light
                     }`,
+                    minHeight: isMobile ? 44 : "auto",
                     ":hover": {
                       backgroundColor: "transparent",
                     },
@@ -160,6 +164,7 @@ export const CollapsibleMenuItem: FC<ICollapsibleMenuItemProps> = ({
                       sx: {
                         color: "common.black",
                         fontWeight: 500,
+                        fontSize: isMobile ? "1rem" : "0.875rem",
                       },
                     }}
                   />
