@@ -22,7 +22,11 @@ const ChartContainer: FC<WithChildren<IChartContainer>> = ({
       sx={{
         boxShadow: 2,
         borderRadius: "15px",
+        // reduce padding on extra-small screens to maximise available space
         padding: { xs: theme.spacing(2, 2), sm: theme.spacing(3, 4) },
+        // allow horizontal scrolling on small screens when charts are wider than
+        // the viewport; ensures charts remain usable without breaking layout
+        overflowX: "auto",
         ...props.sx,
       }}
     >

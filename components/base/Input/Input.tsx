@@ -15,7 +15,9 @@ export type ControlledInputProps = WithControllerProps<
 >;
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: theme.spacing(0.8, 1.8),
+  // increase padding and minimum height to improve touch targets on mobile
+  padding: theme.spacing(1.25, 2),
+  minHeight: 44,
   border: `2px solid ${theme.palette.border.light}`,
   borderRadius: "15px",
   color: theme.palette.common.black,

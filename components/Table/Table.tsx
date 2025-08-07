@@ -142,16 +142,29 @@ const Content: FC<WithChildren<{ overflowVisible?: boolean }>> = ({
   overflowVisible,
   children,
 }) => {
+  /*
+   * Apply horizontal scrolling on smaller screens by specifying overflowX on the
+   * underlying TableContainer. Using a callback form of the sx prop ensures
+   * that the theme is available for breakpoint definitions. When
+   * `overflowVisible` is true, the caller can override the overflow property.
+   */
   return (
     <TableContainer
-      sx={{
+      sx={(theme) => ({
         width: "100%",
         borderBottomLeftRadius: "10px",
         borderBottomRightRadius: "10px",
+        // enable horizontal scrolling for mobile and small tablets
+        overflowX: "auto",
+        [theme.breakpoints.up("lg")]: {
+          // on larger screens keep overflow behaviour default unless explicitly
+          // overridden by overflowVisible prop
+          overflowX: overflowVisible ? "visible" : "auto",
+        },
         ...(overflowVisible ? { overflow: "visible" } : {}),
-      }}
+      })}
     >
-      <MuiTable sx={{ width: "100%" }}>{children}</MuiTable>
+      <MuiTable sx={{ width: "100%", minWidth: "100%" }}>{children}</MuiTable>
     </TableContainer>
   );
 };

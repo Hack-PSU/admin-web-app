@@ -28,6 +28,8 @@ const Button = forwardRef<any, IButtonProps>(
           borderRadius: "15px",
           padding: theme.spacing(1, 5),
           fontSize: theme.typography.pxToRem(16),
+          // ensure a minimum touch target height of 44px on all platforms
+          minHeight: 44,
           ":hover": {
             backgroundColor: darken(theme.palette.button.light, 0.05),
           },

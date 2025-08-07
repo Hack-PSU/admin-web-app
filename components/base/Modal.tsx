@@ -48,10 +48,19 @@ type ModalFC = ModalComponent & ModalSubComponents;
 const Container = styled(Grid)(({ theme }) => ({
   position: "absolute",
   backgroundColor: "white",
+  // default width for modals on desktop devices
   width: "50%",
+  // on small screens allow the modal to expand to occupy most of the viewport
+  [theme.breakpoints.down("sm")]: {
+    width: "90%",
+    maxWidth: "90%",
+  },
   boxShadow: theme.shadows[1],
   padding: theme.spacing(3, 3.5),
   borderRadius: "15px",
+  // allow scrolling inside the modal when content overflows on smaller devices
+  maxHeight: "90vh",
+  overflowY: "auto",
 }));
 
 type LocalModalProviderHooks = Pick<IModalProps, "open" | "onClose">;

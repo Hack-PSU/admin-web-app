@@ -84,10 +84,13 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
         )}
         <Grid
           item
-          sx={{ 
-            overflow: "auto", 
-            width: shouldHide ? (open ? "80%" : 0) : (open ? "20%" : 0), 
-            height: "100vh" 
+          sx={{
+            overflow: "auto",
+            // When using a temporary drawer on mobile, the menu should not occupy
+            // any width within the layout. On larger screens the drawer takes
+            // up space as a persistent sidebar.
+            width: shouldHide ? 0 : open ? "20%" : 0,
+            height: "100vh",
           }}
         >
           <Menu
@@ -99,13 +102,13 @@ const DefaultLayout: FC<WithChildren> = ({ children }) => {
         <Grid
           item
           sx={{
-            width: shouldHide 
-              ? (open ? "20%" : "100%") 
-              : (open ? "80%" : "100%"),
+            // On mobile the main content always takes the full width. On
+            // desktop shrink when the persistent menu is open.
+            width: shouldHide ? "100%" : open ? "80%" : "100%",
             flexGrow: 1,
             overflow: "auto",
             height: "100vh",
-            padding: shouldHide 
+            padding: shouldHide
               ? theme.spacing(10, 2, 3, 2)
               : theme.spacing(3, 4),
           }}
