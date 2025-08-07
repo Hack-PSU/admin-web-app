@@ -3,7 +3,6 @@ import BaseDatePicker, {
   ReactDatePickerCustomHeaderProps,
   ReactDatePickerProps,
 } from "react-datepicker";
-import moment from "moment";
 import { Box, Grid, InputAdornment, Typography, useTheme } from "@mui/material";
 import {
   EvaIcon,
@@ -81,7 +80,7 @@ const DatePickerHeader: FC<ReactDatePickerCustomHeaderProps> = ({
       </Grid>
       <Grid item flexGrow={1}>
         <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-          {moment(date).format("MMMM")}
+          {DateTime.fromJSDate(date).toFormat("MMMM")}
         </Typography>
       </Grid>
       <Grid item onClick={increaseMonth} sx={{ cursor: "pointer" }}>
