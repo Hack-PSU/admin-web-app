@@ -23,9 +23,11 @@ import {
   QueryKeys,
   SponsorEntity,
   updateSponsorBatch,
+  deleteSponsor,
 } from "api";
 import { useSnackbar } from "notistack";
 import EditSponsorModal from "components/modal/EditSponsorModal";
+import { AxiosError } from "axios";
 
 type MutateSponsors = {
   sponsors: PatchBatchSponsor[];
@@ -56,7 +58,10 @@ const AddNewSponsorButton: FC = () => {
   );
 };
 
-const EditActionCell: FC<{ onClick(): void }> = ({ onClick }) => {
+const EditActionCell: FC<{ 
+  onEdit(): void; 
+  onDelete(): void;
+}> = ({ onEdit, onDelete }) => {
   const { showModal } = useModalContext();
 
   return (
@@ -70,9 +75,13 @@ const EditActionCell: FC<{ onClick(): void }> = ({ onClick }) => {
         {
           icon: "edit-outline",
           onClick: () => {
-            onClick();
+            onEdit();
             showModal("editSponsor");
           },
+        },
+        {
+          icon: "trash-outline",
+          onClick: onDelete,
         },
       ]}
     />
@@ -125,6 +134,22 @@ const SponsorshipPage: NextPage = () => {
     }
   );
 
+  const { mutateAsync: mutateDeleteSponsor } = useMutation(
+    ({ id }: { id: number }) => fetch(() => deleteSponsor({}, { id })),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(QueryKeys.sponsorship.all);
+        enqueueSnackbar("Successfully deleted sponsor", {
+          variant: "success",
+        });
+      },
+      onError: (error: AxiosError) => {
+        console.error("Delete Sponsor Error:", error.response?.data);
+        enqueueSnackbar("Failed to delete sponsor", { variant: "error" });
+      },
+    }
+  );
+
   const [data, setData] = useImmer<SponsorEntity[]>(allSponsors ?? []);
 
   const defs = useColumnDef<SponsorEntity>({
@@ -155,11 +180,12 @@ const SponsorshipPage: NextPage = () => {
         header: "",
         cell: ({ row }) => (
           <EditActionCell
-            onClick={() => {
+            onEdit={() => {
               if (originalData.current) {
                 setSelectedSponsor(originalData.current[row.original.id]);
               }
             }}
+            onDelete={() => onDeleteSponsor(row.original.id, row.original.name)}
           />
         ),
       },
@@ -230,6 +256,19 @@ const SponsorshipPage: NextPage = () => {
       });
     }
   }, [data, mutateAsync]);
+
+  const onDeleteSponsor = useCallback(async (id: number, name: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete sponsor "${name}"? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await mutateDeleteSponsor({ id });
+    } catch (error) {
+      console.error("Delete Sponsor Error:", error);
+    }
+  }, [mutateDeleteSponsor]);
 
   useEffect(() => {
     if (allSponsors) {
