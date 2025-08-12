@@ -68,7 +68,7 @@ export const updateSponsorBatch: CreateMutationReturn<
  * @link https://api.hackpsu.org/v2/doc/#api-Sponsorship-Delete_Sponsor
  */
 export const deleteSponsor: CreateMutationReturn<{}, {}, { id: number }> =
-  createMutation("/sponsors/:id");
+  createMutation("/sponsors/:id", "DELETE");
 
 export const SponsorshipQueryKeys = {
   all: [{ entity: "sponsorship" }] as const,
