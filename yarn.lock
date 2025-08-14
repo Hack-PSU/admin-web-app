@@ -1985,6 +1985,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@posthog/core@npm:1.0.0"
+  checksum: 59dcf12c84ee7846d33cdbf703ac67f324811b89dbe16eb5cdb4a4aba8671366e21a7b7e8f67388ed9f491dcabcda41d3af6649349ae28b6d7f4ea89018ec512
+  languageName: node
+  linkType: hard
+
 "@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/aspromise@npm:1.1.2"
@@ -7411,9 +7418,11 @@ __metadata:
   linkType: hard
 
 "posthog-node@npm:^5.5.1":
-  version: 5.5.1
-  resolution: "posthog-node@npm:5.5.1"
-  checksum: 99d4ed6c789ec25cc189974da166aca238f459dfb78dc7046a789d042cfc61f6b7468eb5332b407e6ab0daa4eb787e9778ebf677d0e0ef264741a6fa0109631a
+  version: 5.7.0
+  resolution: "posthog-node@npm:5.7.0"
+  dependencies:
+    "@posthog/core": 1.0.0
+  checksum: ce6e5005b7bd14c2f6a953ac7c3b142510a7122003e1ae9cc47405de0d9ca15d4ab159b379ad838c7942e5d084d268486f8234845b5a11e80f4834f5f08f347e
   languageName: node
   linkType: hard
 
