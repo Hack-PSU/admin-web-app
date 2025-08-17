@@ -187,6 +187,28 @@ const AnalyticsSummaryPage: NextPage = () => {
     }));
   }, [currentHackathonUsers]);
 
+  const travelReimbursementDistribution = useMemo(() => {
+    if (!currentHackathonRegistrations || currentHackathonRegistrations.length === 0) return [];
+
+    const travelReimbursementCounts = {
+      "Requesting Reimbursement": 0,
+      "Not Requesting Reimbursement": 0,
+    };
+
+    currentHackathonRegistrations.forEach((registration) => {
+      if (registration.travelReimbursement === true) {
+        travelReimbursementCounts["Requesting Reimbursement"]++;
+      } else {
+        travelReimbursementCounts["Not Requesting Reimbursement"]++;
+      }
+    });
+
+    return Object.entries(travelReimbursementCounts).map(([status, count]) => ({
+      status,
+      count,
+    }));
+  }, [currentHackathonRegistrations]);
+
   return (
     <Grid container gap={1.5} flexDirection="column">
       <Grid container item justifyContent="space-between" alignItems="center">
@@ -364,6 +386,43 @@ const AnalyticsSummaryPage: NextPage = () => {
                 />
               )}
             </ParentSizeModern>
+          </ChartContainer>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <ChartContainer title={"Travel Reimbursement Requests"}>
+            <ParentSizeModern>
+              {({ width }) => (
+                <Pie
+                  width={width}
+                  data={travelReimbursementDistribution}
+                  getKey={(item) => item.status}
+                  getLabel={(item) => item.status}
+                  getCount={(item) => item.count}
+                  getTooltipData={(item) => {
+                    if (travelReimbursementDistribution) {
+                      const total = travelReimbursementDistribution.reduce(
+                        (acc, curr) => acc + curr.count,
+                        0
+                      );
+                      return `${((item.count / total) * 100).toPrecision(2)}%`;
+                    }
+                    return "";
+                  }}
+                />
+              )}
+            </ParentSizeModern>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                display: 'block', 
+                mt: 1, 
+                fontStyle: 'italic', 
+                color: 'text.secondary',
+                fontSize: '0.75rem'
+              }}
+            >
+              Fall 2025: feature implemented after ~90 registrations
+            </Typography>
           </ChartContainer>
         </Grid>
       </Grid>
