@@ -15,6 +15,7 @@ export const TEAM_NAMES = {
   SERVICE_ACCOUNT: "Service Account",
   ADVISORS: "Advisors",
   UNASSIGNED: "Unassigned",
+  EXEC: "Exec",
 } as const;
 
 export const TEAM_ORDER = [
@@ -27,6 +28,7 @@ export const TEAM_ORDER = [
   TEAM_NAMES.MARKETING,
   TEAM_NAMES.SPONSORSHIP,
   TEAM_NAMES.TECHNOLOGY,
+  TEAM_NAMES.EXEC,
   TEAM_NAMES.CO_EXEC,
   TEAM_NAMES.EXTERNAL,
   TEAM_NAMES.SERVICE_ACCOUNT,
@@ -44,6 +46,7 @@ export const TEAM_OPTIONS: IOption<string>[] = [
   { value: TEAM_NAMES.SPONSORSHIP, label: TEAM_NAMES.SPONSORSHIP },
   { value: TEAM_NAMES.TECHNOLOGY, label: TEAM_NAMES.TECHNOLOGY },
   { value: TEAM_NAMES.CO_EXEC, label: TEAM_NAMES.CO_EXEC },
+  { value: TEAM_NAMES.EXEC, label: TEAM_NAMES.EXEC },
   { value: TEAM_NAMES.EXTERNAL, label: TEAM_NAMES.EXTERNAL },
   { value: TEAM_NAMES.SERVICE_ACCOUNT, label: TEAM_NAMES.SERVICE_ACCOUNT },
   { value: TEAM_NAMES.ADVISORS, label: TEAM_NAMES.ADVISORS },
