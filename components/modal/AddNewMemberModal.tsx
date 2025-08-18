@@ -24,6 +24,7 @@ import { object } from "superstruct";
 import { Email, NonEmptySelect, NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 import { IOption } from "components/base/Select/types";
+import { TEAM_OPTIONS } from "common/constants";
 
 const PermissionOptions: IOption<number>[] = [
   {
@@ -48,11 +49,13 @@ const PermissionOptions: IOption<number>[] = [
   },
 ];
 
+
 const schema = object({
   firstName: NonEmptyString,
   lastName: NonEmptyString,
   email: Email,
   privilege: NonEmptySelect,
+  team: NonEmptySelect,
 });
 
 const AddNewMemberModal: FC = () => {
@@ -67,6 +70,7 @@ const AddNewMemberModal: FC = () => {
       lastName: "",
       email: "",
       privilege: { value: 2, label: "Team Member" },
+      team: { value: "", label: "" },
     },
     resolver: superstructResolver(schema),
   });
@@ -95,6 +99,8 @@ const AddNewMemberModal: FC = () => {
             firstName: data.firstName,
             lastName: data.lastName,
             privilege: data.privilege.value,
+            team: data.team.value,
+            isActive: true,
           },
         });
         reset();
@@ -113,6 +119,8 @@ const AddNewMemberModal: FC = () => {
           firstName: data.firstName,
           lastName: data.lastName,
           privilege: data.privilege.value,
+          team: data.team.value,
+          isActive: true,
         },
       });
       reset();
@@ -164,6 +172,17 @@ const AddNewMemberModal: FC = () => {
                 label={"Privilege"}
                 showError
                 options={PermissionOptions}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <ControlledSelect
+                name={"team"}
+                placeholder={"Select a team"}
+                as={LabelledSelect}
+                id={"team"}
+                label={"Team"}
+                showError
+                options={TEAM_OPTIONS}
               />
             </Grid>
           </Grid>

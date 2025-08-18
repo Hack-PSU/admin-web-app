@@ -1,0 +1,52 @@
+import { IOption } from "components/base/Select/types";
+
+export const TEAM_NAMES = {
+  COMMUNICATIONS: "Communications",
+  DESIGN: "Design", 
+  EDUCATION: "Education",
+  ENTERTAINMENT: "Entertainment",
+  FINANCE: "Finance",
+  LOGISTICS: "Logistics",
+  MARKETING: "Marketing",
+  SPONSORSHIP: "Sponsorship",
+  TECHNOLOGY: "Technology",
+  CO_EXEC: "Co-exec",
+  EXTERNAL: "External",
+  SERVICE_ACCOUNT: "Service Account",
+  ADVISORS: "Advisors",
+  UNASSIGNED: "Unassigned",
+} as const;
+
+export const TEAM_ORDER = [
+  TEAM_NAMES.COMMUNICATIONS,
+  TEAM_NAMES.DESIGN,
+  TEAM_NAMES.EDUCATION,
+  TEAM_NAMES.ENTERTAINMENT,
+  TEAM_NAMES.FINANCE,
+  TEAM_NAMES.LOGISTICS,
+  TEAM_NAMES.MARKETING,
+  TEAM_NAMES.SPONSORSHIP,
+  TEAM_NAMES.TECHNOLOGY,
+  TEAM_NAMES.CO_EXEC,
+  TEAM_NAMES.EXTERNAL,
+  TEAM_NAMES.SERVICE_ACCOUNT,
+  TEAM_NAMES.ADVISORS,
+];
+
+export const TEAM_OPTIONS: IOption<string>[] = [
+  { value: TEAM_NAMES.COMMUNICATIONS, label: TEAM_NAMES.COMMUNICATIONS },
+  { value: TEAM_NAMES.DESIGN, label: TEAM_NAMES.DESIGN },
+  { value: TEAM_NAMES.EDUCATION, label: TEAM_NAMES.EDUCATION },
+  { value: TEAM_NAMES.ENTERTAINMENT, label: TEAM_NAMES.ENTERTAINMENT },
+  { value: TEAM_NAMES.FINANCE, label: TEAM_NAMES.FINANCE },
+  { value: TEAM_NAMES.LOGISTICS, label: TEAM_NAMES.LOGISTICS },
+  { value: TEAM_NAMES.MARKETING, label: TEAM_NAMES.MARKETING },
+  { value: TEAM_NAMES.SPONSORSHIP, label: TEAM_NAMES.SPONSORSHIP },
+  { value: TEAM_NAMES.TECHNOLOGY, label: TEAM_NAMES.TECHNOLOGY },
+  { value: TEAM_NAMES.CO_EXEC, label: TEAM_NAMES.CO_EXEC },
+  { value: TEAM_NAMES.EXTERNAL, label: TEAM_NAMES.EXTERNAL },
+  { value: TEAM_NAMES.SERVICE_ACCOUNT, label: TEAM_NAMES.SERVICE_ACCOUNT },
+  { value: TEAM_NAMES.ADVISORS, label: TEAM_NAMES.ADVISORS },
+];
+
+export type TeamName = typeof TEAM_NAMES[keyof typeof TEAM_NAMES];
