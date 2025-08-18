@@ -1,7 +1,6 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { NextPage } from "next";
 import { withSettingsLayout } from "components/settings";
-import { DefaultCell, Table, useColumnDef, useTable } from "components/Table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CreateEntity,
@@ -20,11 +19,25 @@ import {
   useFirebase,
   useModalContext,
 } from "components/context";
-import { Grid, useTheme, TableRow, TableCell, Typography } from "@mui/material";
+import { 
+  Grid, 
+  useTheme, 
+  TableContainer,
+  Table as MuiTable,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Checkbox,
+  Box,
+  Button
+} from "@mui/material";
 import AddNewMemberModal from "components/modal/AddNewMemberModal";
 import { IOption } from "components/base/Select/types";
 import { TEAM_ORDER, TEAM_NAMES } from "common/constants";
 import { AxiosError } from "axios";
+import { EvaIcon, Input } from "components/base";
+import { InputAdornment } from "@mui/material";
 
 type OrganizerEntity = {
   id: string;
@@ -38,11 +51,6 @@ type OrganizerEntity = {
 type UpdateOrganizerEntity = {
   id: string;
   privilege: number;
-};
-
-type GroupedOrganizerEntity = OrganizerEntity & {
-  isTeamHeader?: boolean;
-  teamName?: string;
 };
 
 const PERMISSION_OPTIONS: IOption<number>[] = [
@@ -92,10 +100,12 @@ const AddNewMemberButton: FC = () => {
 };
 
 const SettingsMembers: NextPage = () => {
+  const theme = useTheme();
   const { user } = useFirebase();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+  const [searchFilter, setSearchFilter] = useState("");
 
   const { data: allOrganizers, refetch } = useQuery(
     QueryKeys.organizer.findAll(),
@@ -128,44 +138,42 @@ const SettingsMembers: NextPage = () => {
     return [];
   }, [allOrganizers, user]);
 
-  // Create flattened data with team headers
-  const tableData = useMemo(() => {
-    if (!data) return [];
+  // Group and sort data by teams, then by name within teams
+  const groupedData = useMemo(() => {
+    if (!data) return {};
     
-    const grouped = _.groupBy(data, 'team');
-    const flatData: GroupedOrganizerEntity[] = [];
+    let filteredData = data;
+    
+    // Apply search filter
+    if (searchFilter) {
+      filteredData = data.filter(member => 
+        member.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+        member.email.toLowerCase().includes(searchFilter.toLowerCase())
+      );
+    }
+    
+    const grouped = _.groupBy(filteredData, 'team');
+    const sortedGroups: Record<string, OrganizerEntity[]> = {};
     
     // Add teams in the specified order
-    const teamOrder = [...TEAM_ORDER];
-    
-    // Add any remaining teams (including "Unassigned") that aren't in the order
-    Object.keys(grouped).forEach(team => {
-      if (!teamOrder.includes(team)) {
-        teamOrder.push(team);
-      }
-    });
+    const teamOrder = [...TEAM_ORDER, TEAM_NAMES.UNASSIGNED];
     
     teamOrder.forEach(team => {
       if (grouped[team] && grouped[team].length > 0) {
-        // Add team header
-        flatData.push({
-          id: `team-header-${team}`,
-          name: '',
-          email: '',
-          permission: { value: 0, label: '' },
-          team: team,
-          isActive: true,
-          isTeamHeader: true,
-          teamName: team,
-        });
-        
-        // Add team members
-        flatData.push(...grouped[team]);
+        // Sort members within each team by name
+        sortedGroups[team] = _.sortBy(grouped[team], 'name');
       }
     });
     
-    return flatData;
-  }, [data]);
+    // Add any remaining teams not in the order
+    Object.keys(grouped).forEach(team => {
+      if (!teamOrder.includes(team) && grouped[team].length > 0) {
+        sortedGroups[team] = _.sortBy(grouped[team], 'name');
+      }
+    });
+    
+    return sortedGroups;
+  }, [data, searchFilter]);
 
   const defaultValues = useMemo(() => {
     if (data) {
@@ -292,113 +300,224 @@ const SettingsMembers: NextPage = () => {
     setSelectedRows({});
   }, [selectedRows, deleteMutateAsync, enqueueSnackbar]);
 
-  const defs = useColumnDef<GroupedOrganizerEntity>({
-    columns: [
-      {
-        id: "name",
-        header: "Name",
-        accessorKey: "name",
-        type: "text",
-        cell: ({ row }) => {
-          if (row.original.isTeamHeader) {
-            return (
-              <TableCell 
-                colSpan={3} 
-                sx={{ 
-                  backgroundColor: '#f5f5f5',
-                  fontWeight: 600,
-                  fontSize: '1.1rem',
-                  py: 1.5,
-                  borderBottom: '2px solid #e0e0e0'
-                }}
-              >
-                {row.original.teamName} ({data.filter(d => d.team === row.original.team).length} members)
-              </TableCell>
-            );
-          }
-          return <DefaultCell column={row.getVisibleCells()[0].column}>{row.original.name}</DefaultCell>;
-        },
-      },
-      {
-        id: "email",
-        header: "Email",
-        accessorKey: "email",
-        type: "text",
-        cell: ({ row }) => {
-          if (row.original.isTeamHeader) return null;
-          return <DefaultCell column={row.getVisibleCells()[1].column}>{row.original.email}</DefaultCell>;
-        },
-      },
-      {
-        id: "permission",
-        header: "",
-        type: "custom",
-        accessorKey: "permission",
-        enableSorting: false,
-        cell: ({ row }) => {
-          if (row.original.isTeamHeader) return null;
-          return (
-            <DefaultCell column={row.getVisibleCells()[2].column}>
-              <ControlledSelect
-                name={`${row.original.id}.permission`}
-                key={row.original.id}
-                options={PERMISSION_OPTIONS}
-              />
-            </DefaultCell>
-          );
-        },
-      },
-    ],
-  });
-
-  const table = useTable({
-    ...defs,
-    getRowId: (row) => row.id,
-    data: tableData,
-    onRowSelectionChange: setSelectedRows,
-    enableRowSelection: (row) => !row.original.isTeamHeader,
-    state: {
-      rowSelection: selectedRows,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 1000, // Show all members without pagination
-      },
-    },
-  });
-
   const onRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Calculate selection states
+  const allMemberIds = useMemo(() => {
+    return Object.values(groupedData).flat().map(member => member.id);
+  }, [groupedData]);
+
+  const selectedCount = Object.keys(selectedRows).filter(key => selectedRows[key]).length;
+  const isAllSelected = allMemberIds.length > 0 && allMemberIds.every(id => selectedRows[id]);
+  const isIndeterminate = selectedCount > 0 && !isAllSelected;
+
+  const handleSelectAll = useCallback(() => {
+    if (isAllSelected) {
+      setSelectedRows({});
+    } else {
+      const newSelection: Record<string, boolean> = {};
+      allMemberIds.forEach(id => {
+        newSelection[id] = true;
+      });
+      setSelectedRows(newSelection);
+    }
+  }, [isAllSelected, allMemberIds]);
+
+  const handleRowSelect = useCallback((id: string, checked: boolean) => {
+    setSelectedRows(prev => ({
+      ...prev,
+      [id]: checked
+    }));
+  }, []);
 
   return (
     <ModalProvider>
       <AddNewMemberModal />
       <Grid container flexDirection={"column"} gap={1.5}>
-        <Grid container item justifyContent={"flex-end"}>
-          <Grid item>
-            <AddNewMemberButton />
+        
+        {/* Header Actions */}
+        <Grid container item justifyContent={"space-between"}>
+          <Grid item xs={5}>
+            <Input
+              startAdornment={
+                <InputAdornment position={"start"}>
+                  <Box mt={0.5}>
+                    <EvaIcon name={"search-outline"} />
+                  </Box>
+                </InputAdornment>
+              }
+              value={searchFilter}
+              onChange={(event) => setSearchFilter(event.target.value)}
+              sx={{
+                width: "100%",
+                py: theme.spacing(0.8),
+                backgroundColor: "common.white",
+              }}
+              placeholder="Search by name or email"
+            />
+          </Grid>
+          <Grid container item xs={7} justifyContent={"flex-end"} columnSpacing={1} alignItems={"center"}>
+            <Grid item xs={3}>
+              <Button
+                startIcon={
+                  <Box mt={0.5}>
+                    <EvaIcon name={"refresh-outline"} />
+                  </Box>
+                }
+                sx={{
+                  lineHeight: "1.5rem",
+                  padding: theme.spacing(0.5, 2),
+                  borderRadius: "10px",
+                  alignItems: "center",
+                  width: "100%",
+                  backgroundColor: "common.white",
+                  boxShadow: 1,
+                  height: "100%",
+                }}
+                onClick={onRefresh}
+              >
+                Refresh
+              </Button>
+            </Grid>
+            <Grid item>
+              <AddNewMemberButton />
+            </Grid>
           </Grid>
         </Grid>
-        <Grid item sx={{ width: "100%" }}>
-          <Table {...table}>
-            <Table.GlobalActions>
-              <Table.GlobalRefresh onRefresh={onRefresh} />
-              <Table.GlobalPageSize />
-            </Table.GlobalActions>
-            <Table.Container>
-              <Table.Actions
-                center={<Table.PaginationAction />}
-                right={<Table.DeleteAction onDelete={onDelete} />}
-              />
-              <Table.Content overflowVisible>
-                <Table.Header />
-                <FormProvider {...methods}>
-                  <Table.Body />
-                </FormProvider>
-              </Table.Content>
-            </Table.Container>
-          </Table>
+
+        {/* Table */}
+        <Grid
+          container
+          sx={{
+            border: `1px solid ${theme.palette.border.light}`,
+            borderRadius: "10px",
+            boxShadow: 1,
+          }}
+        >
+          {/* Table Actions */}
+          <Grid
+            container
+            sx={{
+              padding: theme.spacing(2),
+              borderBottom: `2px solid ${theme.palette.border.light}`,
+            }}
+          >
+            <Grid container item xs={3}>
+              {/* Left actions placeholder */}
+            </Grid>
+            <Grid container item justifyContent="center" xs={6}>
+              {/* Center actions placeholder */}
+            </Grid>
+            <Grid container item xs={3} justifyContent="flex-end">
+              {selectedCount > 0 && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={onDelete}
+                  sx={{
+                    borderColor: 'error.main',
+                    color: 'error.main',
+                    '&:hover': {
+                      backgroundColor: 'error.main',
+                      color: 'white',
+                    }
+                  }}
+                >
+                  Delete ({selectedCount})
+                </Button>
+              )}
+            </Grid>
+          </Grid>
+
+          {/* Table Content */}
+          <TableContainer
+            sx={{
+              width: "100%",
+              borderBottomLeftRadius: "10px",
+              borderBottomRightRadius: "10px",
+            }}
+          >
+            <MuiTable sx={{ width: "100%" }}>
+              <TableHead>
+                <TableRow sx={{
+                  backgroundColor: theme.palette.action.hover,
+                  borderBottom: `2px solid ${theme.palette.border.light}`,
+                }}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={isAllSelected}
+                      indeterminate={isIndeterminate}
+                      onChange={handleSelectAll}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Permission</TableCell>
+                </TableRow>
+              </TableHead>
+              <FormProvider {...methods}>
+                <TableBody>
+                  {Object.entries(groupedData).map(([teamName, members]) => (
+                    <React.Fragment key={teamName}>
+                      {/* Team Header Row */}
+                      <TableRow>
+                        <TableCell 
+                          colSpan={4} 
+                          sx={{ 
+                            backgroundColor: '#f8f9fa',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            py: 1.5,
+                            borderBottom: `1px solid ${theme.palette.border.light}`,
+                            color: theme.palette.text.primary
+                          }}
+                        >
+                          {teamName} ({members.length} member{members.length !== 1 ? 's' : ''})
+                        </TableCell>
+                      </TableRow>
+                      
+                      {/* Team Members */}
+                      {members.map((member) => (
+                        <TableRow 
+                          key={member.id}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.hover,
+                            }
+                          }}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={!!selectedRows[member.id]}
+                              onChange={(e) => handleRowSelect(member.id, e.target.checked)}
+                            />
+                          </TableCell>
+                          <TableCell>{member.name}</TableCell>
+                          <TableCell>{member.email}</TableCell>
+                          <TableCell>
+                            <ControlledSelect
+                              name={`${member.id}.permission`}
+                              options={PERMISSION_OPTIONS}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                  
+                  {Object.keys(groupedData).length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>
+                        {searchFilter ? 'No members found matching your search.' : 'No team members found.'}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </FormProvider>
+            </MuiTable>
+          </TableContainer>
         </Grid>
       </Grid>
     </ModalProvider>
