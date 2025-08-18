@@ -16,7 +16,6 @@ import {
   OrganizerEntity,
   QueryEntity,
   QueryKeys,
-  updateOrganizer,
 } from "api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
@@ -76,7 +75,7 @@ const AddNewMemberModal: FC = () => {
   });
 
   const { mutateAsync: mutateCreateOrganizer, isLoading } = useMutation(
-    ({ entity }: QueryEntity<Omit<OrganizerEntity, "id">>) =>
+    ({ entity }: QueryEntity<Omit<OrganizerEntity, "id"|"isActive">>) =>
       fetch(() => createOrganizer(entity)),
     {
       onSuccess: async () => {
@@ -100,7 +99,6 @@ const AddNewMemberModal: FC = () => {
             lastName: data.lastName,
             privilege: data.privilege.value,
             team: data.team.value,
-            isActive: true,
           },
         });
         reset();
@@ -120,7 +118,6 @@ const AddNewMemberModal: FC = () => {
           lastName: data.lastName,
           privilege: data.privilege.value,
           team: data.team.value,
-          isActive: true,
         },
       });
       reset();

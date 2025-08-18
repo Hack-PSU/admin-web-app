@@ -32,7 +32,7 @@ export const getOrganizer: CreateQueryReturn<OrganizerEntity, { id: string }> =
  * @link https://api.hackpsu.org/v2/doc/#api-Admin-Add_Organizer
  */
 export const createOrganizer: CreateMutationReturn<
-  Omit<OrganizerEntity, "id">
+  Omit<OrganizerEntity, "id" | "isActive">
 > = createMutation("/organizers", "POST");
 
 /**

@@ -20,18 +20,10 @@ import {
   useFirebase,
   useModalContext,
 } from "components/context";
-import { 
-  Grid, 
-  useTheme, 
-  Typography, 
-  Box, 
-  Paper,
-  Chip,
-  Stack 
-} from "@mui/material";
+import { Grid, useTheme } from "@mui/material";
 import AddNewMemberModal from "components/modal/AddNewMemberModal";
 import { IOption } from "components/base/Select/types";
-import { TEAM_ORDER, TEAM_NAMES, TeamName } from "common/constants";
+import { TEAM_ORDER, TEAM_NAMES } from "common/constants";
 import { AxiosError } from "axios";
 
 type OrganizerEntity = {
@@ -99,10 +91,10 @@ const TeamSection: FC<{
   members: OrganizerEntity[];
   selectedRows: Record<string, boolean>;
   onRowSelectionChange: (updater: any) => void;
+  onRefresh: () => void;
+  onDelete: () => void;
   methods: any;
-}> = ({ teamName, members, selectedRows, onRowSelectionChange, methods }) => {
-  const theme = useTheme();
-
+}> = ({ teamName, members, selectedRows, onRowSelectionChange, onRefresh, onDelete, methods }) => {
   const defs = useColumnDef<OrganizerEntity>({
     columns: [
       {
@@ -113,13 +105,13 @@ const TeamSection: FC<{
       },
       {
         id: "email",
-        header: "Email",
+        header: "Email", 
         accessorKey: "email",
         type: "text",
       },
       {
         id: "permission",
-        header: "Permission",
+        header: "",
         type: "custom",
         accessorKey: "permission",
         enableSorting: false,
@@ -144,54 +136,30 @@ const TeamSection: FC<{
     state: {
       rowSelection: selectedRows,
     },
+    initialState: {
+      pagination: {
+        pageSize: 1000, // Show all members without pagination
+      },
+    },
   });
 
-  const memberCount = members.length;
+  if (members.length === 0) {
+    return null; // Don't render empty teams
+  }
 
   return (
-    <Paper 
-      elevation={1} 
-      sx={{ 
-        mb: 3, 
-        overflow: "hidden",
-        border: `1px solid ${theme.palette.divider}`,
-      }}
-    >
-      {/* Team Header */}
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          p: 2,
-          backgroundColor: theme.palette.action.hover,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: 600,
-            color: theme.palette.text.primary,
-          }}
-        >
-          {teamName}
-        </Typography>
-        <Chip 
-          label={`${memberCount} member${memberCount !== 1 ? 's' : ''}`}
-          size="small"
-          variant="outlined"
-          sx={{
-            backgroundColor: theme.palette.background.paper,
-            fontWeight: 500
-          }}
-        />
-      </Box>
-      
-      {/* Team Members Table */}
-      {memberCount > 0 ? (
+    <Grid container gap={1.5} sx={{ mb: 2 }}>
+      <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
+          <Table.GlobalActions>
+            <Table.GlobalRefresh onRefresh={onRefresh} />
+            <Table.GlobalPageSize />
+          </Table.GlobalActions>
           <Table.Container>
+            <Table.Actions
+              center={<Table.PaginationAction />}
+              right={<Table.DeleteAction onDelete={onDelete} />}
+            />
             <Table.Content overflowVisible>
               <Table.Header />
               <FormProvider {...methods}>
@@ -200,20 +168,8 @@ const TeamSection: FC<{
             </Table.Content>
           </Table.Container>
         </Table>
-      ) : (
-        <Box 
-          sx={{ 
-            p: 3, 
-            textAlign: 'center',
-            color: theme.palette.text.secondary 
-          }}
-        >
-          <Typography variant="body2">
-            No members assigned to this team
-          </Typography>
-        </Box>
-      )}
-    </Paper>
+      </Grid>
+    </Grid>
   );
 };
 
@@ -408,107 +364,34 @@ const SettingsMembers: NextPage = () => {
     refetch();
   }, [refetch]);
 
-  const totalMembers = data.length;
-  const totalTeams = Object.keys(groupedData).length;
-
   return (
     <ModalProvider>
       <AddNewMemberModal />
-      <Grid container flexDirection={"column"} gap={2}>
-        {/* Header Section */}
-        <Grid container item justifyContent={"space-between"} alignItems={"center"}>
+      <Grid container flexDirection={"column"} gap={1.5}>
+        <Grid container item justifyContent={"flex-end"}>
           <Grid item>
-            <Stack spacing={1}>
-              <Typography variant="h5" fontWeight={600}>
-                Team Members
-              </Typography>
-              <Stack direction="row" spacing={2}>
-                <Chip 
-                  label={`${totalMembers} Total Members`} 
-                  size="small" 
-                  variant="outlined"
-                />
-                <Chip 
-                  label={`${totalTeams} Teams`} 
-                  size="small" 
-                  variant="outlined"
-                />
-              </Stack>
-            </Stack>
-          </Grid>
-          <Grid item>
-            <Stack direction="row" spacing={2}>
-              <GradientButton
-                variant="outlined"
-                sx={{ padding: (theme) => theme.spacing(1, 2) }}
-                onClick={onRefresh}
-              >
-                Refresh
-              </GradientButton>
-              <AddNewMemberButton />
-            </Stack>
+            <AddNewMemberButton />
           </Grid>
         </Grid>
-
-        {/* Team Sections */}
-        <Grid item>
-          {Object.entries(groupedData).map(([teamName, members]) => (
-            <TeamSection
-              key={teamName}
-              teamName={teamName}
-              members={members}
-              selectedRows={selectedRows}
-              onRowSelectionChange={setSelectedRows}
-              methods={methods}
-            />
-          ))}
-          
-          {totalMembers === 0 && (
-            <Paper 
-              elevation={1} 
-              sx={{ 
-                p: 4, 
-                textAlign: 'center',
-                bgcolor: 'background.default' 
-              }}
-            >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                No team members found
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Add your first team member to get started
-              </Typography>
-            </Paper>
-          )}
-        </Grid>
-
-        {/* Global Actions */}
-        {Object.keys(selectedRows).filter(key => selectedRows[key]).length > 0 && (
-          <Grid item>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2" color="text.secondary">
-                  {Object.keys(selectedRows).filter(key => selectedRows[key]).length} members selected
-                </Typography>
-                <GradientButton
-                  variant="outlined"
-                  color="error"
-                  onClick={onDelete}
-                  sx={{ 
-                    borderColor: 'error.main',
-                    color: 'error.main',
-                    '&:hover': {
-                      backgroundColor: 'error.main',
-                      color: 'white',
-                    }
-                  }}
-                >
-                  Delete Selected
-                </GradientButton>
-              </Stack>
-            </Paper>
+        
+        {Object.entries(groupedData).map(([teamName, members]) => (
+          <Grid item key={teamName}>
+            <Grid container gap={1.5}>
+              <Grid item sx={{ width: "100%" }}>
+                <h3 style={{ margin: "0 0 8px 0", color: "#333" }}>{teamName}</h3>
+                <TeamSection
+                  teamName={teamName}
+                  members={members}
+                  selectedRows={selectedRows}
+                  onRowSelectionChange={setSelectedRows}
+                  onRefresh={onRefresh}
+                  onDelete={onDelete}
+                  methods={methods}
+                />
+              </Grid>
+            </Grid>
           </Grid>
-        )}
+        ))}
       </Grid>
     </ModalProvider>
   );
