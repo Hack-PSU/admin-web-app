@@ -20,7 +20,7 @@ import {
   useFirebase,
   useModalContext,
 } from "components/context";
-import { Grid, useTheme } from "@mui/material";
+import { Grid, useTheme, TableRow, TableCell, Typography } from "@mui/material";
 import AddNewMemberModal from "components/modal/AddNewMemberModal";
 import { IOption } from "components/base/Select/types";
 import { TEAM_ORDER, TEAM_NAMES } from "common/constants";
@@ -38,6 +38,11 @@ type OrganizerEntity = {
 type UpdateOrganizerEntity = {
   id: string;
   privilege: number;
+};
+
+type GroupedOrganizerEntity = OrganizerEntity & {
+  isTeamHeader?: boolean;
+  teamName?: string;
 };
 
 const PERMISSION_OPTIONS: IOption<number>[] = [
@@ -86,93 +91,6 @@ const AddNewMemberButton: FC = () => {
   );
 };
 
-const TeamSection: FC<{
-  teamName: string;
-  members: OrganizerEntity[];
-  selectedRows: Record<string, boolean>;
-  onRowSelectionChange: (updater: any) => void;
-  onRefresh: () => void;
-  onDelete: () => void;
-  methods: any;
-}> = ({ teamName, members, selectedRows, onRowSelectionChange, onRefresh, onDelete, methods }) => {
-  const defs = useColumnDef<OrganizerEntity>({
-    columns: [
-      {
-        id: "name",
-        header: "Name",
-        accessorKey: "name",
-        type: "text",
-      },
-      {
-        id: "email",
-        header: "Email", 
-        accessorKey: "email",
-        type: "text",
-      },
-      {
-        id: "permission",
-        header: "",
-        type: "custom",
-        accessorKey: "permission",
-        enableSorting: false,
-        cell: ({ row, column }) => (
-          <DefaultCell column={column}>
-            <ControlledSelect
-              name={`${row.original.id}.permission`}
-              key={row.original.id}
-              options={PERMISSION_OPTIONS}
-            />
-          </DefaultCell>
-        ),
-      },
-    ],
-  });
-
-  const table = useTable({
-    ...defs,
-    getRowId: (row) => row.id,
-    data: members,
-    onRowSelectionChange,
-    state: {
-      rowSelection: selectedRows,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 1000, // Show all members without pagination
-      },
-    },
-  });
-
-  if (members.length === 0) {
-    return null; // Don't render empty teams
-  }
-
-  return (
-    <Grid container gap={1.5} sx={{ mb: 2 }}>
-      <Grid item sx={{ width: "100%" }}>
-        <Table {...table}>
-          <Table.GlobalActions>
-            <Table.GlobalRefresh onRefresh={onRefresh} />
-            <Table.GlobalPageSize />
-          </Table.GlobalActions>
-          <Table.Container>
-            <Table.Actions
-              center={<Table.PaginationAction />}
-              right={<Table.DeleteAction onDelete={onDelete} />}
-            />
-            <Table.Content overflowVisible>
-              <Table.Header />
-              <FormProvider {...methods}>
-                <Table.Body />
-              </FormProvider>
-            </Table.Content>
-          </Table.Container>
-        </Table>
-      </Grid>
-    </Grid>
-  );
-};
-
 const SettingsMembers: NextPage = () => {
   const { user } = useFirebase();
   const queryClient = useQueryClient();
@@ -210,29 +128,43 @@ const SettingsMembers: NextPage = () => {
     return [];
   }, [allOrganizers, user]);
 
-  const groupedData = useMemo(() => {
-    if (!data) return {};
+  // Create flattened data with team headers
+  const tableData = useMemo(() => {
+    if (!data) return [];
     
     const grouped = _.groupBy(data, 'team');
-    
-    // Sort teams according to TEAM_ORDER, putting unassigned teams at the end
-    const sortedGroups: Record<string, OrganizerEntity[]> = {};
+    const flatData: GroupedOrganizerEntity[] = [];
     
     // Add teams in the specified order
-    TEAM_ORDER.forEach(team => {
-      if (grouped[team]) {
-        sortedGroups[team] = grouped[team];
-      }
-    });
+    const teamOrder = [...TEAM_ORDER];
     
-    // Add any remaining teams (including "Unassigned")
+    // Add any remaining teams (including "Unassigned") that aren't in the order
     Object.keys(grouped).forEach(team => {
-      if (!TEAM_ORDER.includes(team)) {
-        sortedGroups[team] = grouped[team];
+      if (!teamOrder.includes(team)) {
+        teamOrder.push(team);
       }
     });
     
-    return sortedGroups;
+    teamOrder.forEach(team => {
+      if (grouped[team] && grouped[team].length > 0) {
+        // Add team header
+        flatData.push({
+          id: `team-header-${team}`,
+          name: '',
+          email: '',
+          permission: { value: 0, label: '' },
+          team: team,
+          isActive: true,
+          isTeamHeader: true,
+          teamName: team,
+        });
+        
+        // Add team members
+        flatData.push(...grouped[team]);
+      }
+    });
+    
+    return flatData;
   }, [data]);
 
   const defaultValues = useMemo(() => {
@@ -360,6 +292,81 @@ const SettingsMembers: NextPage = () => {
     setSelectedRows({});
   }, [selectedRows, deleteMutateAsync, enqueueSnackbar]);
 
+  const defs = useColumnDef<GroupedOrganizerEntity>({
+    columns: [
+      {
+        id: "name",
+        header: "Name",
+        accessorKey: "name",
+        type: "text",
+        cell: ({ row }) => {
+          if (row.original.isTeamHeader) {
+            return (
+              <TableCell 
+                colSpan={3} 
+                sx={{ 
+                  backgroundColor: '#f5f5f5',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  py: 1.5,
+                  borderBottom: '2px solid #e0e0e0'
+                }}
+              >
+                {row.original.teamName} ({data.filter(d => d.team === row.original.team).length} members)
+              </TableCell>
+            );
+          }
+          return <DefaultCell column={row.getVisibleCells()[0].column}>{row.original.name}</DefaultCell>;
+        },
+      },
+      {
+        id: "email",
+        header: "Email",
+        accessorKey: "email",
+        type: "text",
+        cell: ({ row }) => {
+          if (row.original.isTeamHeader) return null;
+          return <DefaultCell column={row.getVisibleCells()[1].column}>{row.original.email}</DefaultCell>;
+        },
+      },
+      {
+        id: "permission",
+        header: "",
+        type: "custom",
+        accessorKey: "permission",
+        enableSorting: false,
+        cell: ({ row }) => {
+          if (row.original.isTeamHeader) return null;
+          return (
+            <DefaultCell column={row.getVisibleCells()[2].column}>
+              <ControlledSelect
+                name={`${row.original.id}.permission`}
+                key={row.original.id}
+                options={PERMISSION_OPTIONS}
+              />
+            </DefaultCell>
+          );
+        },
+      },
+    ],
+  });
+
+  const table = useTable({
+    ...defs,
+    getRowId: (row) => row.id,
+    data: tableData,
+    onRowSelectionChange: setSelectedRows,
+    enableRowSelection: (row) => !row.original.isTeamHeader,
+    state: {
+      rowSelection: selectedRows,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 1000, // Show all members without pagination
+      },
+    },
+  });
+
   const onRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
@@ -373,25 +380,26 @@ const SettingsMembers: NextPage = () => {
             <AddNewMemberButton />
           </Grid>
         </Grid>
-        
-        {Object.entries(groupedData).map(([teamName, members]) => (
-          <Grid item key={teamName}>
-            <Grid container gap={1.5}>
-              <Grid item sx={{ width: "100%" }}>
-                <h3 style={{ margin: "0 0 8px 0", color: "#333" }}>{teamName}</h3>
-                <TeamSection
-                  teamName={teamName}
-                  members={members}
-                  selectedRows={selectedRows}
-                  onRowSelectionChange={setSelectedRows}
-                  onRefresh={onRefresh}
-                  onDelete={onDelete}
-                  methods={methods}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        ))}
+        <Grid item sx={{ width: "100%" }}>
+          <Table {...table}>
+            <Table.GlobalActions>
+              <Table.GlobalRefresh onRefresh={onRefresh} />
+              <Table.GlobalPageSize />
+            </Table.GlobalActions>
+            <Table.Container>
+              <Table.Actions
+                center={<Table.PaginationAction />}
+                right={<Table.DeleteAction onDelete={onDelete} />}
+              />
+              <Table.Content overflowVisible>
+                <Table.Header />
+                <FormProvider {...methods}>
+                  <Table.Body />
+                </FormProvider>
+              </Table.Content>
+            </Table.Container>
+          </Table>
+        </Grid>
       </Grid>
     </ModalProvider>
   );
