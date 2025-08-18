@@ -27,10 +27,13 @@ const LoginContainer = styled(Grid)(({ theme }) => ({
 
 const Login: NextPage = () => {
   const router = useRouter();
-  const { isAuthenticated } = useFirebase();
+  const { isAuthenticated, isLoading } = useFirebase();
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
+    // Wait for authentication state to be initialized
+    if (isLoading) return;
+
     if (isAuthenticated) {
       const { return_to } = router.query;
       if (return_to) {
@@ -44,7 +47,7 @@ const Login: NextPage = () => {
     const timer = setTimeout(() => {
       const returnTo = encodeURIComponent("https://admin.hackpsu.org/");
       window.location.href = `https://auth.hackpsu.org/login?returnTo=${returnTo}`;
-    }, 5000);
+    }, 3000);
 
     const countdownTimer = setInterval(() => {
       setCountdown((prev) => prev - 1);
@@ -54,7 +57,24 @@ const Login: NextPage = () => {
       clearTimeout(timer);
       clearInterval(countdownTimer);
     };
-  }, [router, isAuthenticated]);
+  }, [router, isAuthenticated, isLoading]);
+
+  if (isLoading) {
+    return (
+      <Container container>
+        <LoginContainer container item gap={3}>
+          <Grid item>
+            <Image src={Logo} width={120} height={120} alt="hackpsu-logo" />
+          </Grid>
+          <Grid item>
+            <Typography variant="h5" align="center" gutterBottom>
+              Loading...
+            </Typography>
+          </Grid>
+        </LoginContainer>
+      </Container>
+    );
+  }
 
   return (
     <Container container>

@@ -55,6 +55,7 @@ export interface IFirebaseProviderHooks {
   token: string;
   permission: AuthPermission;
   isAuthenticated: boolean;
+  isLoading: boolean;
   error: AuthError;
 
   validatePermissions(privilege: number, userToken?: string): boolean;
@@ -275,6 +276,7 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
       token,
       permission,
       isAuthenticated,
+      isLoading: !hasInitialized,
       error,
       validatePermissions,
       resolveAuthState,
@@ -286,6 +288,7 @@ const FirebaseProvider: FC<WithChildren<IFirebaseProviderProps>> = ({
       token,
       permission,
       isAuthenticated,
+      hasInitialized,
       error,
       validatePermissions,
       resolveAuthState,

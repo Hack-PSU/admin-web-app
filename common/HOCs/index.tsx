@@ -16,7 +16,11 @@ export function withProtectedRoute(
   permission: AuthPermission
 ) {
   const Page: NextPage = () => {
-    const { validatePermissions } = useFirebase();
+    const { validatePermissions, isLoading } = useFirebase();
+
+    if (isLoading) {
+      return <div>Loading...</div>;
+    }
 
     if (validatePermissions(permission)) {
       return <Component />;
