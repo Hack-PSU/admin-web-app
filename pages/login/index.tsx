@@ -1,11 +1,8 @@
 import { NextPage } from "next";
-import { darken, Grid, styled, useTheme } from "@mui/material";
-import { useForm, FormProvider } from "react-hook-form";
-import { LoginForm } from "components/login";
+import { Grid, styled, Typography } from "@mui/material";
 import { useFirebase } from "components/context";
-import { GradientButton } from "components/base";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Logo from "assets/images/logo.svg";
 
@@ -29,16 +26,9 @@ const LoginContainer = styled(Grid)(({ theme }) => ({
 }));
 
 const Login: NextPage = () => {
-  const theme = useTheme();
-  const methods = useForm();
   const router = useRouter();
-  const { loginWithEmailAndPassword, isAuthenticated } = useFirebase();
-
-  const handleSubmit = () => {
-    methods.handleSubmit((data) => {
-      return loginWithEmailAndPassword(data.email, data.password);
-    })();
-  };
+  const { isAuthenticated } = useFirebase();
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -48,42 +38,51 @@ const Login: NextPage = () => {
       } else {
         void router.push("/hackers");
       }
+      return;
     }
+
+    const timer = setTimeout(() => {
+      const returnTo = encodeURIComponent("https://admin.hackpsu.org/");
+      window.location.href = `https://auth.hackpsu.org/login?returnTo=${returnTo}`;
+    }, 5000);
+
+    const countdownTimer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(countdownTimer);
+    };
   }, [router, isAuthenticated]);
 
   return (
-    <FormProvider {...methods}>
-      <Container container>
-        <LoginContainer container item gap={1.5}>
-          <Grid item>
-            <Image src={Logo} width={120} height={120} alt="hackpsu-logo" />
-          </Grid>
-          <LoginForm />
-          <Grid item sx={{ width: "80%" }}>
-            <GradientButton
-              onClick={handleSubmit}
-              sx={{
-                mt: 1.5,
-                lineHeight: "1.5rem",
-                padding: theme.spacing(1.5, 2),
-                width: "100%",
-                backgroundColor: "error.main",
-                ":hover": {
-                  backgroundColor: darken(theme.palette.error.main, 0.1),
-                },
-              }}
-              textProps={{
-                sx: {
-                  color: "common.white",
-                },
-              }}
+    <Container container>
+      <LoginContainer container item gap={3}>
+        <Grid item>
+          <Image src={Logo} width={120} height={120} alt="hackpsu-logo" />
+        </Grid>
+        <Grid item>
+          <Typography variant="h5" align="center" gutterBottom>
+            You will be redirected soon...
+          </Typography>
+          <Typography variant="body1" align="center" color="text.secondary">
+            Redirecting to auth.hackpsu.org in {countdown} seconds
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="body2" align="center" color="text.secondary">
+            If you are not redirected automatically, please{" "}
+            <a 
+              href="https://auth.hackpsu.org" 
+              style={{ color: "#d32f2f", textDecoration: "none" }}
             >
-              Submit
-            </GradientButton>
-          </Grid>
-        </LoginContainer>
-      </Container>
-    </FormProvider>
+              click here to login manually
+            </a>
+          </Typography>
+        </Grid>
+      </LoginContainer>
+    </Container>
   );
 };
 
