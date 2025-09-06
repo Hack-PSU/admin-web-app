@@ -131,6 +131,10 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   }, [selectedRows, mutateDeleteUser, enqueueSnackbar]);
 
   return (
+    <Grid container gap={1.5}>
+      <PageHeader
+        header={"Hackers"}
+      />
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
           <Table.GlobalActions>
