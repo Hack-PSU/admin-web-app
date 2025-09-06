@@ -131,28 +131,6 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
   }, [selectedRows, mutateDeleteUser, enqueueSnackbar]);
 
   return (
-    <Grid container gap={1.5}>
-      <PageHeader
-        header={"Hackers"}
-        right={
-          <GradientButton
-            variant="text"
-            sx={{
-              width: "100%",
-              padding: theme.spacing(1, 3.5),
-            }}
-            textProps={{
-              sx: {
-                lineHeight: "1.8rem",
-                color: "common.white",
-              },
-            }}
-            onClick={() => router.push("/hackers/new")}
-          >
-            Add a Hacker
-          </GradientButton>
-        }
-      />
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
           <Table.GlobalActions>
