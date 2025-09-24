@@ -2321,15 +2321,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-bubble-menu@npm:^2.0.0-beta.220, @tiptap/extension-bubble-menu@npm:^2.26.1":
-  version: 2.26.1
-  resolution: "@tiptap/extension-bubble-menu@npm:2.26.1"
+"@tiptap/extension-bubble-menu@npm:^2.0.0-beta.220, @tiptap/extension-bubble-menu@npm:^2.26.2":
+  version: 2.26.2
+  resolution: "@tiptap/extension-bubble-menu@npm:2.26.2"
   dependencies:
     tippy.js: ^6.3.7
   peerDependencies:
     "@tiptap/core": ^2.7.0
     "@tiptap/pm": ^2.7.0
-  checksum: 34db40d3bebfdf43873fcabd35ef4d0548d35478d13f4bb841d1eb7a3e9d5e7dbb08c12f1b20d474b8b79852059d73d2088db86db3e1377fe3f19968262ea08f
+  checksum: 3431a6a6ecb80b95d195d387ffd1eaac8c0a53935a776c77a4f12a5b31f564c44c0bb825d4c7bff69cd2ae0dd9d98557d50d3abd681b4a787643d6c6f7fc5410
   languageName: node
   linkType: hard
 
@@ -2380,15 +2380,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-floating-menu@npm:^2.26.1":
-  version: 2.26.1
-  resolution: "@tiptap/extension-floating-menu@npm:2.26.1"
+"@tiptap/extension-floating-menu@npm:^2.26.2":
+  version: 2.26.2
+  resolution: "@tiptap/extension-floating-menu@npm:2.26.2"
   dependencies:
     tippy.js: ^6.3.7
   peerDependencies:
     "@tiptap/core": ^2.7.0
     "@tiptap/pm": ^2.7.0
-  checksum: 85bdde6f807621d40106121ffbb97773f75a89ed4afd79f9370fc19eafbca37a6b68652f7e66ac66a8bf4e1b85e5d5346f751dbae73af5aa5c23650977531963
+  checksum: 05fc9a3e63628855d45e0ea3f87c5c503087cc301562bdf3b929ad0ff00acfd71a78b2b5c7306f8577408bb241cacf3ab16445e41fca50ffc59a2a9669d188bb
   languageName: node
   linkType: hard
 
@@ -2450,14 +2450,14 @@ __metadata:
   linkType: hard
 
 "@tiptap/extension-link@npm:^2.0.0-beta.220":
-  version: 2.26.1
-  resolution: "@tiptap/extension-link@npm:2.26.1"
+  version: 2.26.2
+  resolution: "@tiptap/extension-link@npm:2.26.2"
   dependencies:
     linkifyjs: ^4.2.0
   peerDependencies:
     "@tiptap/core": ^2.7.0
     "@tiptap/pm": ^2.7.0
-  checksum: 4399423d99a1edfa9e8d99d22984b219ffe23ff0abee7ab4bfe8f48487fcca93cb5db6cde7099adabb44e3a962fdd3e35aa05f41d489dd1a036cd6340c35a999
+  checksum: 0b6401a7be874c3bfb99210daa49fa997b161d01ec2dd539c7ad0fc04dec4ac89027c1a11a2f1e1b6d7eee99f6c6f6eaa30b8211b5a407ba9907ce80e2bd5c0c
   languageName: node
   linkType: hard
 
@@ -2489,12 +2489,12 @@ __metadata:
   linkType: hard
 
 "@tiptap/extension-placeholder@npm:^2.0.0-beta.220":
-  version: 2.26.1
-  resolution: "@tiptap/extension-placeholder@npm:2.26.1"
+  version: 2.26.2
+  resolution: "@tiptap/extension-placeholder@npm:2.26.2"
   peerDependencies:
     "@tiptap/core": ^2.7.0
     "@tiptap/pm": ^2.7.0
-  checksum: 157c3495ce7777b13093eb65c9bf6b4645101ff93e369f34135279ad25e31a04ac4bbc868b8705ac73410a62ce44f9af5f0396b2ffca94ccd1c6448512d84d47
+  checksum: c29ff1e5bf7a18d789e0c8745f4a584ab2ea0b2e630d43bfef424a3965a0d3ba54ab2b225d8d22c15c47966401f9e5228136883567b4cd163db743a22eeb27d1
   languageName: node
   linkType: hard
 
@@ -2526,17 +2526,17 @@ __metadata:
   linkType: hard
 
 "@tiptap/extension-underline@npm:^2.0.0-beta.220":
-  version: 2.26.1
-  resolution: "@tiptap/extension-underline@npm:2.26.1"
+  version: 2.26.2
+  resolution: "@tiptap/extension-underline@npm:2.26.2"
   peerDependencies:
     "@tiptap/core": ^2.7.0
-  checksum: 263c61527ec1b496a0a0d3c269cc6df2119ad4f6f4a4b237d72abaddc4ddfcbc28381d982642a92df80690240d9ec6248fba256dfed17aa285e6e18c89c7874f
+  checksum: b29237500e9dfd872fbe84b17fd48417d3adb263248d944004e6312b101f18134f8678d2eba0dc6bf77fa2e55baaa98760c433b3ae68fef4a23f5e279c92bf87
   languageName: node
   linkType: hard
 
 "@tiptap/pm@npm:^2.0.0-beta.220, @tiptap/pm@npm:^2.26.1":
-  version: 2.26.1
-  resolution: "@tiptap/pm@npm:2.26.1"
+  version: 2.26.2
+  resolution: "@tiptap/pm@npm:2.26.2"
   dependencies:
     prosemirror-changeset: ^2.3.0
     prosemirror-collab: ^1.3.1
@@ -2556,16 +2556,16 @@ __metadata:
     prosemirror-trailing-node: ^3.0.0
     prosemirror-transform: ^1.10.2
     prosemirror-view: ^1.37.0
-  checksum: 2d4f128f258ee2fc648fcce48b17d6c75d28a155945364d9c116885c597259f6575a9d730c4b4715c86bd5aa9c17493ba3cef5c03ca8d5563197c7fc02469b2d
+  checksum: bd67886c4a5148f0ddec8a93059eebb38a3fa031365631fc9bb4f51b7e132425908cb71943160abadb53836e063784b2ceef1b797971c1bab934b70a656d6646
   languageName: node
   linkType: hard
 
 "@tiptap/react@npm:^2.0.0-beta.220":
-  version: 2.26.1
-  resolution: "@tiptap/react@npm:2.26.1"
+  version: 2.26.2
+  resolution: "@tiptap/react@npm:2.26.2"
   dependencies:
-    "@tiptap/extension-bubble-menu": ^2.26.1
-    "@tiptap/extension-floating-menu": ^2.26.1
+    "@tiptap/extension-bubble-menu": ^2.26.2
+    "@tiptap/extension-floating-menu": ^2.26.2
     "@types/use-sync-external-store": ^0.0.6
     fast-deep-equal: ^3
     use-sync-external-store: ^1
@@ -2574,7 +2574,7 @@ __metadata:
     "@tiptap/pm": ^2.7.0
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 803ca98d124f1377341f1c7b64176fda4ff46e1bc9a113988b8593770fa9145c0bd1c42ab0280b10df934200abdd8f7ba9d20707ca30139a33a6e323011366b9
+  checksum: 965fcdddb1c69c3b42824a999a7fd12a30389e078895a1874ee77e86f320ecb25e6ee5d8640989f69cd6aba7b02c1169b3ddaeedf96246de9e212595cee79316
   languageName: node
   linkType: hard
 
