@@ -1992,6 +1992,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.2.1":
+  version: 1.2.1
+  resolution: "@posthog/core@npm:1.2.1"
+  checksum: d5b6e9fa88150164f65e0978ebf8ac13df9ca8ea10331f3b8eb18a005334e3c17bd625ead99400292b38e43db788f7be7ac40be3c2e1ec73a264505336cddf82
+  languageName: node
+  linkType: hard
+
 "@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/aspromise@npm:1.1.2"
@@ -7382,9 +7389,10 @@ __metadata:
   linkType: hard
 
 "posthog-js@npm:^1.257.0":
-  version: 1.259.0
-  resolution: "posthog-js@npm:1.259.0"
+  version: 1.268.4
+  resolution: "posthog-js@npm:1.268.4"
   dependencies:
+    "@posthog/core": 1.2.1
     core-js: ^3.38.1
     fflate: ^0.4.8
     preact: ^10.19.3
@@ -7397,7 +7405,7 @@ __metadata:
       optional: true
     rrweb-snapshot:
       optional: true
-  checksum: cab848558e1a03b97e8a5e7197b31d09515610b076a0811e2efc7f0d5bbf4e39d0dcddd5f776e1c0953bed7ee1ca5d1c38bde212bebd03cab6760e2ad3945aa3
+  checksum: e80be1e2c96b0f4231adab0acd55dafebae935f464620ef48621c9bb3add03776621f1afd849c7b6621c86a3bdde30bce1a02efe9864b3aaf4a13883385ea063
   languageName: node
   linkType: hard
 
