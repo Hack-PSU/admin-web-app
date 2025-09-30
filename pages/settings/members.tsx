@@ -110,15 +110,14 @@ const DownloadMemberCSVButton: FC<{
     const members: OrganizerEntity[] = Object.values(membersByTeam ?? {}).flat();
 
     // CSV header (include Team)
-    const header = ["Name", "Email", "Permission", "Team"];
+    const header = ["Name", "Email", "Team"];
 
     // Build rows, escape double quotes by doubling them
     const rows = members.map((m) => {
       const name = String(m.name ?? "").replace(/"/g, '""');
       const email = String(m.email ?? "").replace(/"/g, '""');
-      const permission = String(m.permission?.label ?? m.permission?.value ?? "").replace(/"/g, '""');
       const team = String(m.team ?? "").replace(/"/g, '""');
-      return `"${name}","${email}","${permission}","${team}"`;
+      return `"${name}","${email}","${team}"`;
     });
 
     const csvContent = `\uFEFF${header.map(h => `"${h}"`).join(",")}\n${rows.join("\n")}`;
