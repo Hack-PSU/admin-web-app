@@ -99,6 +99,60 @@ const AddNewMemberButton: FC = () => {
   );
 };
 
+const DownloadMemberCSVButton: FC<{
+  membersByTeam?: Record<string, OrganizerEntity[]>;
+}> = ({ membersByTeam }) => {
+  
+  const theme = useTheme();
+
+  const handleDownload = useCallback(() => {
+    // Flatten members from grouped data
+    const members: OrganizerEntity[] = Object.values(membersByTeam ?? {}).flat();
+
+    // CSV header (include Team)
+    const header = ["Name", "Email", "Permission", "Team"];
+
+    // Build rows, escape double quotes by doubling them
+    const rows = members.map((m) => {
+      const name = String(m.name ?? "").replace(/"/g, '""');
+      const email = String(m.email ?? "").replace(/"/g, '""');
+      const permission = String(m.permission?.label ?? m.permission?.value ?? "").replace(/"/g, '""');
+      const team = String(m.team ?? "").replace(/"/g, '""');
+      return `"${name}","${email}","${permission}","${team}"`;
+    });
+
+    const csvContent = `\uFEFF${header.map(h => `"${h}"`).join(",")}\n${rows.join("\n")}`;
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "members.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, [membersByTeam]);
+
+  return (
+    <GradientButton
+      sx={{
+        padding: theme.spacing(1, 3.5),
+        width: "100%",
+      }}
+      textProps={{
+        sx: {
+          lineHeight: "1.8rem",
+          color: "common.white",
+        },
+      }}
+      onClick={handleDownload}
+    >
+      Export CSV
+    </GradientButton>
+  );
+};
+
 const SettingsMembers: NextPage = () => {
   const theme = useTheme();
   const { user } = useFirebase();
@@ -167,7 +221,8 @@ const SettingsMembers: NextPage = () => {
     
     // Add any remaining teams not in the order
     Object.keys(grouped).forEach(team => {
-      if (!teamOrder.includes(team) && grouped[team].length > 0) {
+      // team has a more specific union type elsewhere; cast to any here to avoid a type error
+      if (!(teamOrder as any).includes(team) && grouped[team].length > 0) {
         sortedGroups[team] = _.sortBy(grouped[team], 'name');
       }
     });
@@ -380,6 +435,9 @@ const SettingsMembers: NextPage = () => {
               >
                 Refresh
               </Button>
+            </Grid>
+            <Grid item>
+              <DownloadMemberCSVButton membersByTeam={groupedData} />
             </Grid>
             <Grid item>
               <AddNewMemberButton />
