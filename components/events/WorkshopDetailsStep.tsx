@@ -12,8 +12,9 @@ import {
 } from "components/base";
 import { FormProvider, useForm } from "react-hook-form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
-import { array, object, optional, string } from "superstruct";
+import { object, optional, string } from "superstruct";
 import { useEventStore } from "common/store";
+import { NonEmptySelect, NonEmptySelectArray } from "common/form";
 
 const skillLevelOptions = [
   { value: "beginner", label: "Beginner" },
@@ -22,10 +23,10 @@ const skillLevelOptions = [
 ];
 
 const schema = object({
-  wsPresenterNames: optional(array(object({ value: string(), label: string() }))),
-  wsSkillLevel: optional(object({ value: string(), label: string() })),
-  wsRelevantSkills: optional(array(object({ value: string(), label: string() }))),
-  wsUrls: optional(array(string())),
+  wsPresenterNames: optional(NonEmptySelectArray),
+  wsSkillLevel: optional(NonEmptySelect),
+  wsRelevantSkills: optional(NonEmptySelectArray),
+  wsUrls: optional(string()),
 });
 
 const WorkshopDetailsStep: FC = () => {
@@ -43,17 +44,29 @@ const WorkshopDetailsStep: FC = () => {
       wsPresenterNames,
       wsSkillLevel,
       wsRelevantSkills,
-      wsUrls,
+      wsUrls: wsUrls ? wsUrls.join(', ') : '',
     },
   });
 
   const { nextStep, active, previousStep } = useStepper(2, "3. Workshop Details");
 
   const handleNext = useCallback(() => {
-    methods.handleSubmit((data) => {
-      updateWorkshop(data);
-      nextStep();
-    })();
+    methods.handleSubmit(
+      (data) => {
+        // Transform comma-separated URLs string to array
+        const transformedData = {
+          ...data,
+          wsUrls: data.wsUrls 
+            ? data.wsUrls.split(',').map((url: string) => url.trim()).filter((url: string) => url.length > 0)
+            : undefined
+        };
+        updateWorkshop(transformedData);
+        nextStep();
+      },
+      (errors) => {
+        console.log("Form validation errors:", errors);
+      }
+    )();
   }, [methods, nextStep, updateWorkshop]);
 
   return (
