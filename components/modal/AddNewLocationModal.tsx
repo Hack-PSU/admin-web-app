@@ -35,16 +35,13 @@ const AddNewLocationModal: FC = () => {
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync, isLoading } = useMutation(
-    QueryKeys.location.createOne(),
-    ({ entity }: CreateEntity<Omit<LocationEntity, "id">>) =>
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: ({ entity }: CreateEntity<Omit<LocationEntity, "id">>) =>
       fetch(() => createLocation(entity)),
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(QueryKeys.location.all);
-      },
-    }
-  );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: QueryKeys.location.all });
+    },
+  });
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
@@ -88,7 +85,7 @@ const AddNewLocationModal: FC = () => {
             <Grid item xs={6}>
               <Box mt={2}>
                 <MenuButton
-                  loading={isLoading}
+                  loading={isPending}
                   menuItems={[
                     {
                       label: "Submit and Create",
