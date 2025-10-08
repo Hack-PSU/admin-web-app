@@ -51,34 +51,30 @@ const EditorContainer = styled(Grid)(({ theme }) => ({
 
 const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
   const editorId = useId();
-  
-  const extensions = useMemo(() => {
-    return [
-      StarterKit.configure({
-        heading: false,
-        code: false,
-        listItem: false,
-        blockquote: false,
-        bulletList: false,
-        codeBlock: false,
-        horizontalRule: false,
-        orderedList: false,
-        strike: false,
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Placeholder.configure({
-        emptyEditorClass: "is-editor-empty",
-        placeholder,
-      }),
-    ];
-  }, [placeholder]);
 
   const editor = useEditor(
     {
-      extensions,
+      extensions: [
+        StarterKit.configure({
+          heading: false,
+          code: false,
+          listItem: false,
+          blockquote: false,
+          bulletList: false,
+          codeBlock: false,
+          horizontalRule: false,
+          orderedList: false,
+          strike: false,
+        }),
+        Underline,
+        Link.configure({
+          openOnClick: false,
+        }),
+        Placeholder.configure({
+          emptyEditorClass: "is-editor-empty",
+          placeholder,
+        }),
+      ],
       immediatelyRender: false,
       onCreate: ({ editor }) => {
         if (disabled) {
@@ -98,7 +94,7 @@ const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
         },
       },
     },
-    [extensions, onChange, disabled]
+    []
   );
 
   useEffect(() => {
