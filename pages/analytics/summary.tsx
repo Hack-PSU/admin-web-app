@@ -389,6 +389,48 @@ const AnalyticsSummaryPage: NextPage = () => {
           </ChartContainer>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
+          <ChartContainer title={"Participant Schools"}>
+            <ParentSizeModern>
+              {({ width }) => {
+                // Compute school counts from currentHackathonUsers
+                const schoolCounts: { [school: string]: number } = {};
+                if (currentHackathonUsers && currentHackathonUsers.length > 0) {
+                  currentHackathonUsers.forEach((u) => {
+                    // UserEntity uses `university` for the school/university name
+                    const school = u.university?.toString().trim() ?? "Unknown";
+                    const key = school === "" ? "Unknown" : school;
+                    schoolCounts[key] = (schoolCounts[key] || 0) + 1;
+                  });
+                }
+
+                const schoolData = Object.entries(schoolCounts).map(
+                  ([school, count]) => ({ school, count })
+                );
+
+                return (
+                  <Pie
+                    width={width}
+                    data={schoolData}
+                    getKey={(item) => item.school}
+                    getLabel={(item) => item.school}
+                    getCount={(item) => item.count}
+                    getTooltipData={(item) => {
+                      if (schoolData) {
+                        const total = schoolData.reduce(
+                          (acc, curr) => acc + curr.count,
+                          0
+                        );
+                        return `${((item.count / total) * 100).toPrecision(2)}%`;
+                      }
+                      return "";
+                    }}
+                  />
+                );
+              }}
+            </ParentSizeModern>
+          </ChartContainer>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
           <ChartContainer title={"Travel Reimbursement Requests"}>
             <ParentSizeModern>
               {({ width }) => (
