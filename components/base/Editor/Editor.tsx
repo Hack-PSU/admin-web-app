@@ -53,7 +53,6 @@ const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
   const editorId = useId();
   
   const extensions = useMemo(() => {
-    // Create fresh instances each time to avoid plugin conflicts
     return [
       StarterKit.configure({
         heading: false,
@@ -66,22 +65,16 @@ const Editor: FC<Props> = ({ onChange, value, placeholder, disabled }) => {
         orderedList: false,
         strike: false,
       }),
-      Underline.extend({
-        name: `underline-${editorId}`,
-      }),
+      Underline,
       Link.configure({
         openOnClick: false,
-      }).extend({
-        name: `link-${editorId}`,
       }),
       Placeholder.configure({
         emptyEditorClass: "is-editor-empty",
         placeholder,
-      }).extend({
-        name: `placeholder-${editorId}`,
       }),
     ];
-  }, [placeholder, editorId]);
+  }, [placeholder]);
 
   const editor = useEditor(
     {
