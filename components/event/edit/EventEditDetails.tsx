@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import EventEdit from "./EventEdit";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, TextField } from "@mui/material";
 import {
   ControlledCreatableSelect,
   ControlledInput,
@@ -11,11 +11,11 @@ import {
   LabelledSelect,
 } from "components/base";
 import { useDateTimeRange } from "common/hooks";
-import { ControlledEditor } from "components/base/Editor";
 import { LabelledDatePicker } from "components/base/Pickers";
 import { EventType } from "api";
 import { LabelledTimeInput } from "components/base/Pickers/TimeInput";
 import { IOption } from "components/base/Select/types";
+import { Controller, useFormContext } from "react-hook-form";
 
 const eventTypeOptions = [
   { value: EventType.ACTIVITY, label: "Activity" },
@@ -34,6 +34,8 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
     endDateTime: endDate,
     register,
   } = useDateTimeRange("date", { isMultiple: true });
+
+  const { control } = useFormContext();
 
   return (
     <EventEdit title={"Basic Details"}>
@@ -73,9 +75,41 @@ const EventEditDetails: FC<Props> = ({ locationOptions }) => {
         <Grid item xs={12}>
           <InputLabel id={"event-description"} label={"Description"} />
           <Box mt={0.6}>
-            <ControlledEditor
-              name={"description"}
-              placeholder={"Enter a description"}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  placeholder="Enter a description"
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "15px",
+                      backgroundColor: "common.white",
+                      border: "2px solid",
+                      borderColor: "border.light",
+                      "& fieldset": {
+                        border: "none",
+                      },
+                      "&:hover": {
+                        borderColor: "border.dark",
+                      },
+                      "&.Mui-focused": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      padding: "12px 16px",
+                      fontSize: "15px",
+                      lineHeight: "24px",
+                    },
+                  }}
+                />
+              )}
             />
           </Box>
         </Grid>
