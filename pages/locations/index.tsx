@@ -71,7 +71,6 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           return data.map((d) => ({
             id: d.id,
             name: d.name,
-            quantity: d.quantity,
           }));
         }
       },
@@ -81,10 +80,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const { mutateAsync: mutateUpdateLocation, isLoading } = useMutation(
     QueryKeys.location.updateBatch(),
     ({
-      entity: { id, name, quantity },
+      entity: { id, name },
     }: QueryEntity<
       Pick<LocationEntity, "id"> & Partial<Omit<LocationEntity, "id">>
-    >) => updateLocation({ name, quantity }, { id }),
+    >) => updateLocation({ name }, { id }),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.location.all);
@@ -110,7 +109,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
       return locationsData.reduce((obj, curr) => {
         obj[String(curr.id)] = curr;
         return obj;
-      }, {} as { [p: string]: { id: number; name: string; quantity: number } });
+      }, {} as { [p: string]: { id: number; name: string } });
     }
     return {};
   }, [locationsData]);
@@ -132,20 +131,20 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
 
     handleSubmit(async (data) => {
       const editedFields = Object.keys(dirtyFields).filter(
-        (field) => dirtyFields[field].name || dirtyFields[field].quantity
+        (field) => dirtyFields[field]?.name
       );
 
       await Promise.all(
         editedFields.map((id) =>
           mutateUpdateLocation({
-            entity: { id: data[id].id, name: data[id].name, quantity: data[id].quantity },
+            entity: { id: data[id].id, name: data[id].name },
           })
         )
       );
     })();
   }, [formState, handleSubmit, mutateUpdateLocation]);
 
-  const defs = useColumnDef<{ id: number; name: string; quantity: number }>({
+  const defs = useColumnDef<{ id: number; name: string }>({
     columns: [
       {
         id: "name",
@@ -155,15 +154,6 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         accessorKey: "name",
         header: "Name",
         size: 300,
-      },
-      {
-        id: "quantity",
-        type: "input",
-        inputName: "quantity",
-        placeholder: "0",
-        accessorKey: "quantity",
-        header: "Quantity",
-        size: 150,
       },
       {
         id: "actions",
@@ -181,7 +171,6 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
                 icon: "refresh-outline",
                 onClick: () => {
                   resetField(`${row.original.id}.name`);
-                  resetField(`${row.original.id}.quantity`);
                 },
               },
               {

@@ -16,13 +16,12 @@ import {
   LocationEntity,
   QueryKeys,
 } from "api";
-import { number, object } from "superstruct";
+import { object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 const schema = object({
   name: NonEmptyString,
-  quantity: number(),
 });
 
 const AddNewLocationModal: FC = () => {
@@ -30,7 +29,6 @@ const AddNewLocationModal: FC = () => {
   const methods = useForm({
     defaultValues: {
       name: "",
-      quantity: 0,
     },
     resolver: superstructResolver(schema),
   });
@@ -50,14 +48,14 @@ const AddNewLocationModal: FC = () => {
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name, quantity: data.quantity } });
+      await mutateAsync({ entity: { name: data.name } });
       methods.reset();
     })();
   };
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name, quantity: data.quantity } });
+      await mutateAsync({ entity: { name: data.name } });
       handleHide();
     })();
   };
@@ -67,7 +65,7 @@ const AddNewLocationModal: FC = () => {
       <FormProvider {...methods}>
         <Modal.Header>New Location</Modal.Header>
         <Modal.Body alignItems="center">
-          <Grid container item spacing={2}>
+          <Grid container item>
             <Grid item xs={12}>
               <ControlledInput
                 name={"name"}
@@ -75,17 +73,6 @@ const AddNewLocationModal: FC = () => {
                 as={LabelledInput}
                 label={"Name"}
                 id={"name"}
-                showError
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <ControlledInput
-                name={"quantity"}
-                placeholder={"Enter quantity"}
-                as={LabelledInput}
-                label={"Quantity"}
-                id={"quantity"}
-                type="number"
                 showError
               />
             </Grid>
