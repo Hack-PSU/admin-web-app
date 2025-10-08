@@ -13,15 +13,16 @@ import {
   CreateEntity,
   createLocation,
   fetch,
-  ILocationUpdateEntity,
+  LocationEntity,
   QueryKeys,
 } from "api";
-import { object } from "superstruct";
+import { number, object } from "superstruct";
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 const schema = object({
   name: NonEmptyString,
+  quantity: number(),
 });
 
 const AddNewLocationModal: FC = () => {
@@ -29,6 +30,7 @@ const AddNewLocationModal: FC = () => {
   const methods = useForm({
     defaultValues: {
       name: "",
+      quantity: 0,
     },
     resolver: superstructResolver(schema),
   });
@@ -37,7 +39,7 @@ const AddNewLocationModal: FC = () => {
 
   const { mutateAsync, isLoading } = useMutation(
     QueryKeys.location.createOne(),
-    ({ entity }: CreateEntity<ILocationUpdateEntity>) =>
+    ({ entity }: CreateEntity<Omit<LocationEntity, "id">>) =>
       fetch(() => createLocation(entity)),
     {
       onSuccess: async () => {
@@ -48,14 +50,14 @@ const AddNewLocationModal: FC = () => {
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+      await mutateAsync({ entity: { name: data.name, quantity: data.quantity } });
       methods.reset();
     })();
   };
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+      await mutateAsync({ entity: { name: data.name, quantity: data.quantity } });
       handleHide();
     })();
   };
@@ -65,7 +67,7 @@ const AddNewLocationModal: FC = () => {
       <FormProvider {...methods}>
         <Modal.Header>New Location</Modal.Header>
         <Modal.Body alignItems="center">
-          <Grid container item>
+          <Grid container item spacing={2}>
             <Grid item xs={12}>
               <ControlledInput
                 name={"name"}
@@ -73,6 +75,17 @@ const AddNewLocationModal: FC = () => {
                 as={LabelledInput}
                 label={"Name"}
                 id={"name"}
+                showError
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <ControlledInput
+                name={"quantity"}
+                placeholder={"Enter quantity"}
+                as={LabelledInput}
+                label={"Quantity"}
+                id={"quantity"}
+                type="number"
                 showError
               />
             </Grid>
