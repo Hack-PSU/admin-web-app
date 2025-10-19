@@ -13,6 +13,7 @@ import { SponsorshipQueryKeys } from "./sponsorship";
 import { FlagQueryKeys } from "./flag";
 import { AnalyticsQueryKeys } from "./analytics";
 import { RegistrationKeys } from "./registration";
+import { OrganizerApplicationKeys } from "./organizer_applications";
 
 export const QueryKeys = {
   event: EventKeys,
@@ -30,6 +31,7 @@ export const QueryKeys = {
   flag: FlagQueryKeys,
   analytics: AnalyticsQueryKeys,
   registration: RegistrationKeys,
+  organizerApplication: OrganizerApplicationKeys,
 };
 
 export * from "./checkout_item";
@@ -44,5 +46,6 @@ export * from "./sponsorship";
 export * from "./flag";
 export * from "./analytics";
 export * from "./registration";
+export * from "./organizer_applications";
 export * from "./types";
 export * from "./utils";
