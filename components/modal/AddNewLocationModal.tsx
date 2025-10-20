@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useModal } from "components/context/ModalProvider";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, capitalize } from "@mui/material";
 import {
   ControlledInput,
   LabelledInput,
@@ -17,11 +17,22 @@ import {
   QueryKeys,
 } from "api";
 import { object } from "superstruct";
+
+
+
+import { optional, string } from "superstruct";
+
+
+
 import { NonEmptyString } from "common/form";
 import { superstructResolver } from "@hookform/resolvers/superstruct";
 
 const schema = object({
   name: NonEmptyString,
+
+  capacity: optional(string())
+
+
 });
 
 const AddNewLocationModal: FC = () => {
@@ -29,6 +40,7 @@ const AddNewLocationModal: FC = () => {
   const methods = useForm({
     defaultValues: {
       name: "",
+      capacity: ""
     },
     resolver: superstructResolver(schema),
   });
@@ -45,15 +57,24 @@ const AddNewLocationModal: FC = () => {
 
   const handleSubmitAndCreate = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+
+      const capacity = data.capacity && data.capacity.trim() !== '' ? parseInt(data.capacity, 10) : -1;
+
+      await mutateAsync({ entity: { name: data.name, capacity } });
       methods.reset();
+
     })();
   };
 
   const handleSubmit = () => {
     methods.handleSubmit(async (data) => {
-      await mutateAsync({ entity: { name: data.name } });
+
+
+      const capacity = data.capacity && data.capacity.trim() !== '' ? parseInt(data.capacity, 10) : -1;
+
+      await mutateAsync({ entity: { name: data.name, capacity } });
       handleHide();
+
     })();
   };
 
@@ -73,7 +94,22 @@ const AddNewLocationModal: FC = () => {
                 showError
               />
             </Grid>
+
+          <Grid item xs={12}>
+            <ControlledInput
+              name={"capacity"}
+              placeholder={"Enter capacity"}
+              as={LabelledInput}
+              label={"Capacity (leave blank if room is not for hackers)"}
+              id={"capacity"}
+              showError
+              type="number"
+            />
           </Grid>
+
+
+          </Grid>
+
           <Grid
             container
             item
