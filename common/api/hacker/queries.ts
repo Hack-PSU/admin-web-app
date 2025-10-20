@@ -4,7 +4,7 @@ import {
   createQuery,
   CreateQueryReturn,
 } from "api/utils";
-import { UserEntity } from "./entity";
+import { UserEntity, MLHDataEntity } from "./entity";
 import { QueryAction, QueryScope } from "api/types";
 
 /**
@@ -15,6 +15,9 @@ import { QueryAction, QueryScope } from "api/types";
  */
 export const getAllUsers: CreateQueryReturn<UserEntity[]> =
   createQuery("/users");
+
+export const getMlhData: CreateQueryReturn<MLHDataEntity[]> =
+  createQuery("/users/export/data");
 
 /**
  * Create a User

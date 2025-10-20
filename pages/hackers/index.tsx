@@ -13,10 +13,12 @@ import { useRouter } from "next/router";
 import {
   fetch,
   getAllUsers,
+  getMlhData,
   deleteQuery,
   QueryKeys,
   resolveError,
   UserEntity,
+  MLHDataEntity,
 } from "api";
 import PageHeader from "components/Menu/PageHeader";
 import { AuthPermission } from "components/context/FirebaseProvider";
@@ -130,6 +132,85 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
     setSelectedRows({});
   }, [selectedRows, mutateDeleteUser, enqueueSnackbar]);
 
+  const handleDownload = useCallback(async () => {
+    try {
+      const mlhData = await fetch(getMlhData);
+      
+      if (!mlhData || mlhData.length === 0) {
+        enqueueSnackbar("No MLH data available to export", {
+          variant: "warning",
+        });
+        return;
+      }
+      
+      // Define CSV header in the specified order
+      const header = [
+        "first_name",
+        "last_name", 
+        "email",
+        "phone",
+        "age",
+        "country",
+        "university",
+        "academic_year",
+        "mlh_coc",
+        "mlh_dcp",
+        "share_address_mlh",
+        "share_address_sponsors",
+        "share_email_mlh",
+        "driving",
+        "travel_reimbursement",
+        "first_hackathon"
+      ];
+
+      // Build CSV rows from MLH data
+      const rows = mlhData.map((data: MLHDataEntity) => {
+        // Extract values and escape quotes by doubling them
+        const values = [
+          String(data.first_name ?? "").replace(/"/g, '""'),
+          String(data.last_name ?? "").replace(/"/g, '""'),
+          String(data.email ?? "").replace(/"/g, '""'),
+          String(data.phone ?? "").replace(/"/g, '""'),
+          String(data.age ?? "").replace(/"/g, '""'),
+          String(data.country ?? "").replace(/"/g, '""'),
+          String(data.university ?? "").replace(/"/g, '""'),
+          String(data.academic_year ?? "").replace(/"/g, '""'),
+          String(data.mlh_coc ?? "").replace(/"/g, '""'),
+          String(data.mlh_dcp ?? "").replace(/"/g, '""'),
+          String(data.share_address_mlh ?? "").replace(/"/g, '""'),
+          String(data.share_address_sponsors ?? "").replace(/"/g, '""'),
+          String(data.share_email_mlh ?? "").replace(/"/g, '""'),
+          String(data.driving ?? "").replace(/"/g, '""'),
+          String(data.travel_reimbursement ?? "").replace(/"/g, '""'),
+          String(data.first_hackathon ?? "").replace(/"/g, '""')
+        ];
+        
+        return `"${values.join('","')}"`;
+      });
+
+      // Create CSV content with BOM for Excel compatibility
+      const csvContent = `\uFEFF${header.map(h => `"${h}"`).join(",")}\n${rows.join("\n")}`;
+
+      // Create and download the CSV file
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mlh_hackers_data.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      enqueueSnackbar("MLH data exported successfully", {
+        variant: "success",
+      });
+    } catch (error) {
+      enqueueSnackbar("Failed to download MLH data", {
+        variant: "error",
+      });
+    }
+  }, [enqueueSnackbar]);
   return (
     <Grid container gap={1.5}>
       <PageHeader
@@ -138,6 +219,20 @@ const Hackers: NextPage<IHackersPageProps> = ({ hackers }) => {
       <Grid item sx={{ width: "100%" }}>
         <Table {...table}>
           <Table.GlobalActions>
+            <GradientButton
+                  sx={{
+                    padding: theme.spacing(1, 3.5),
+                  }}
+                  textProps={{
+                    sx: {
+                      lineHeight: "1.8rem",
+                      color: "common.white",
+                    },
+                  }}
+                  onClick={handleDownload}
+                >
+                  Export CSV
+            </GradientButton>
             <Table.GlobalRefresh onRefresh={onRefresh} />
             <Table.GlobalPageSize />
           </Table.GlobalActions>
