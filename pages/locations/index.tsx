@@ -25,7 +25,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ModalProvider, useModalContext } from "components/context";
 import AddNewLocationModal from "components/modal/AddNewLocationModal";
 import ConfirmModal from "components/modal/ConfirmModal";
-import _ from "lodash";
+import _, { rest } from "lodash";
 import { useSnackbar } from "notistack";
 
 interface ILocationsPageProps {
@@ -71,6 +71,9 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
           return data.map((d) => ({
             id: d.id,
             name: d.name,
+
+            capacity: d.capacity
+
           }));
         }
       },
@@ -80,10 +83,10 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
   const { mutateAsync: mutateUpdateLocation, isLoading } = useMutation(
     QueryKeys.location.updateBatch(),
     ({
-      entity: { id, name },
+      entity: { id, ...rest },
     }: QueryEntity<
       Pick<LocationEntity, "id"> & Partial<Omit<LocationEntity, "id">>
-    >) => updateLocation({ name }, { id }),
+    >) => updateLocation(rest, { id }),
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries(QueryKeys.location.all);
@@ -109,7 +112,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
       return locationsData.reduce((obj, curr) => {
         obj[String(curr.id)] = curr;
         return obj;
-      }, {} as { [p: string]: { id: number; name: string } });
+      }, {} as { [p: string]: { id: number; name: string, capacity: number } });
     }
     return {};
   }, [locationsData]);
@@ -130,21 +133,28 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
     const { dirtyFields } = formState;
 
     handleSubmit(async (data) => {
-      const editedFields = Object.keys(dirtyFields).filter(
-        (field) => dirtyFields[field]?.name
-      );
+      // const editedFields = Object.keys(dirtyFields).filter(
+      //   (field) => dirtyFields[field]?.name
+      // );
+      const editedFields = Object.keys(dirtyFields);
 
       await Promise.all(
-        editedFields.map((id) =>
-          mutateUpdateLocation({
-            entity: { id: data[id].id, name: data[id].name },
-          })
-        )
+        editedFields.map((id) => {
+          const updatedData = {
+            id: data[id].id,
+            ...dirtyFields[id]?.name && { name: data[id].name },
+            ...dirtyFields[id]?.capacity && { capacity: Number(data[id].capacity) },
+          };
+          // mutateUpdateLocation({
+          //   entity: { id: data[id].id, name: data[id].name },
+          // })
+          return mutateUpdateLocation({ entity: updatedData });
+        })
       );
     })();
   }, [formState, handleSubmit, mutateUpdateLocation]);
 
-  const defs = useColumnDef<{ id: number; name: string }>({
+  const defs = useColumnDef<{ id: number; name: string; capacity: number }>({
     columns: [
       {
         id: "name",
@@ -154,6 +164,15 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
         accessorKey: "name",
         header: "Name",
         size: 300,
+      },
+      {
+        id: "capacity",
+        type: "input",
+        inputName: "capacity",
+        placeholder: "Enter capacity",
+        accessorKey: "capacity",
+        header: "Capacity",
+        size: 150,
       },
       {
         id: "actions",
@@ -171,6 +190,7 @@ const LocationsPage: NextPage<ILocationsPageProps> = ({ locations }) => {
                 icon: "refresh-outline",
                 onClick: () => {
                   resetField(`${row.original.id}.name`);
+                  resetField(`${row.original.id}.capacity`); 
                 },
               },
               {
