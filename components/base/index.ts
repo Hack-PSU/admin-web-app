@@ -11,3 +11,4 @@ export * from "./SwitchTab";
 export { default as Root } from "./Root";
 export * from "./Stepper";
 export { default as Loading } from "./Loading";
+export * from "./MultiCategoryFilter";

@@ -8,7 +8,12 @@ import {
 import { Table, useColumnDef, useTable } from "components/Table";
 import { Box, Chip, Grid, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GradientButton } from "components/base";
+import {
+  GradientButton,
+  MultiCategoryFilter,
+  FilterCategory,
+  FilterState,
+} from "components/base";
 import {
   fetch,
   getAllApplications,
@@ -19,6 +24,7 @@ import {
   OrganizerApplicationEntity,
   ApplicationStatus,
   OrganizerTeam,
+  YearStanding,
 } from "api";
 import PageHeader from "components/Menu/PageHeader";
 import { AuthPermission } from "components/context/FirebaseProvider";
@@ -62,6 +68,39 @@ const getStatusColor = (
   }
 };
 
+const filterCategories: FilterCategory[] = [
+  {
+    id: "team",
+    label: "Team",
+    options: Object.values(OrganizerTeam).map((team) => ({
+      value: team,
+      label: team,
+    })),
+  },
+  {
+    id: "status",
+    label: "Status",
+    options: Object.values(ApplicationStatus).map((status) => ({
+      value: status,
+      label: status.charAt(0).toUpperCase() + status.slice(1),
+    })),
+  },
+  {
+    id: "yearStanding",
+    label: "Year Standing",
+    options: Object.values(YearStanding).map((year) => ({
+      value: year,
+      label: year,
+    })),
+  },
+];
+
+const initialFilterState: FilterState = {
+  team: [],
+  status: [],
+  yearStanding: [],
+};
+
 const OrganizerApplicationsContent: React.FC<{
   applications: OrganizerApplicationEntity[];
 }> = ({ applications }) => {
@@ -75,6 +114,8 @@ const OrganizerApplicationsContent: React.FC<{
     id: number;
     team: OrganizerTeam;
   } | null>(null);
+  const [filterState, setFilterState] =
+    useState<FilterState>(initialFilterState);
   const { showModal } = useModalContext();
 
   // Get full application data
@@ -86,34 +127,58 @@ const OrganizerApplicationsContent: React.FC<{
     }
   );
 
-  // Transform data for table display
+  // Transform and filter data for table display
   const applicationsData = useMemo(() => {
-    if (fullApplicationsData) {
-      return fullApplicationsData.map((d) => ({
-        id: d.id,
-        name: d.name,
-        email: d.email,
-        yearStanding: d.yearStanding,
-        major: d.major,
-        firstChoiceTeam: d.firstChoiceTeam,
-        secondChoiceTeam: d.secondChoiceTeam,
-        firstChoiceStatus: d.firstChoiceStatus,
-        secondChoiceStatus: d.secondChoiceStatus,
-        assignedTeam: d.assignedTeam,
-        createdAt: new Date(d.createdAt).toLocaleDateString(),
-      }));
+    if (!fullApplicationsData) return [];
+
+    let filtered = fullApplicationsData;
+
+    // Apply team filter (matches first or second choice team)
+    if (filterState.team.length > 0) {
+      filtered = filtered.filter(
+        (d) =>
+          filterState.team.includes(d.firstChoiceTeam) ||
+          filterState.team.includes(d.secondChoiceTeam)
+      );
     }
-    return [];
-  }, [fullApplicationsData]);
+
+    // Apply status filter (matches first or second choice status)
+    if (filterState.status.length > 0) {
+      filtered = filtered.filter(
+        (d) =>
+          filterState.status.includes(d.firstChoiceStatus) ||
+          filterState.status.includes(d.secondChoiceStatus)
+      );
+    }
+
+    // Apply year standing filter
+    if (filterState.yearStanding.length > 0) {
+      filtered = filtered.filter((d) =>
+        filterState.yearStanding.includes(d.yearStanding)
+      );
+    }
+
+    return filtered.map((d) => ({
+      id: d.id,
+      name: d.name,
+      email: d.email,
+      yearStanding: d.yearStanding,
+      major: d.major,
+      firstChoiceTeam: d.firstChoiceTeam,
+      secondChoiceTeam: d.secondChoiceTeam,
+      firstChoiceStatus: d.firstChoiceStatus,
+      secondChoiceStatus: d.secondChoiceStatus,
+      assignedTeam: d.assignedTeam,
+      createdAt: new Date(d.createdAt).toLocaleDateString(),
+    }));
+  }, [fullApplicationsData, filterState]);
 
   const { mutateAsync: mutateAcceptApplication } = useMutation(
     ({ id, team }: { id: number; team: OrganizerTeam }) =>
       fetch(() => acceptApplication({ team }, { id })),
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          QueryKeys.organizerApplication.all
-        );
+        await queryClient.invalidateQueries(QueryKeys.organizerApplication.all);
         enqueueSnackbar("Application accepted successfully", {
           variant: "success",
         });
@@ -132,9 +197,7 @@ const OrganizerApplicationsContent: React.FC<{
       fetch(() => rejectApplication({ team }, { id })),
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          QueryKeys.organizerApplication.all
-        );
+        await queryClient.invalidateQueries(QueryKeys.organizerApplication.all);
         enqueueSnackbar("Application rejected successfully", {
           variant: "success",
         });
@@ -194,141 +257,146 @@ const OrganizerApplicationsContent: React.FC<{
     setConfirmAction(null);
   }, []);
 
-  const columns = useMemo(() => [
-    {
-      id: "name",
-      type: "text" as const,
-      header: "Name",
-      accessorKey: "name" as const,
-      size: 200,
-    },
-    {
-      id: "email",
-      type: "text" as const,
-      header: "Email",
-      accessorKey: "email" as const,
-      size: 250,
-    },
-    {
-      id: "yearStanding",
-      type: "text" as const,
-      header: "Year Standing",
-      accessorKey: "yearStanding" as const,
-      size: 150,
-    },
-    {
-      id: "major",
-      type: "text" as const,
-      header: "Major",
-      accessorKey: "major" as const,
-      size: 200,
-    },
-    {
-      id: "firstChoiceTeam",
-      type: "text" as const,
-      header: "1st Choice Team",
-      accessorKey: "firstChoiceTeam" as const,
-      size: 180,
-    },
-    {
-      id: "firstChoiceStatus",
-      type: "text" as const,
-      header: "1st Choice Status",
-      accessorKey: "firstChoiceStatus" as const,
-      size: 150,
-    },
-    {
-      id: "secondChoiceTeam",
-      type: "text" as const,
-      header: "2nd Choice Team",
-      accessorKey: "secondChoiceTeam" as const,
-      size: 180,
-    },
-    {
-      id: "secondChoiceStatus",
-      type: "text" as const,
-      header: "2nd Choice Status",
-      accessorKey: "secondChoiceStatus" as const,
-      size: 150,
-    },
-    {
-      id: "assignedTeam",
-      type: "text" as const,
-      header: "Assigned Team",
-      accessorKey: "assignedTeam" as const,
-      size: 150,
-    },
-    {
-      id: "createdAt",
-      type: "text" as const,
-      header: "Applied On",
-      accessorKey: "createdAt" as const,
-      size: 130,
-    },
-    {
-      id: "actions",
-      type: "custom" as const,
-      header: "Actions",
-      size: 140,
-      cell: ({ row }: any) => {
-        const application = fullApplicationsData?.find((a) => a.id === row.original.id);
-        if (!application) return null;
-
-        const items = [
-          {
-            icon: "eye-outline" as const,
-            onClick: () => handleViewApplication(application),
-          },
-        ];
-
-        // Add accept/reject actions based on status
-        if (
-          application.firstChoiceStatus === ApplicationStatus.PENDING &&
-          !application.assignedTeam
-        ) {
-          items.push({
-            icon: "checkmark-circle-outline" as const,
-            onClick: () =>
-              handleAccept(
-                application.id,
-                application.firstChoiceTeam as OrganizerTeam
-              ),
-          });
-          items.push({
-            icon: "close-circle-outline" as const,
-            onClick: () =>
-              handleReject(
-                application.id,
-                application.firstChoiceTeam as OrganizerTeam
-              ),
-          });
-        } else if (
-          application.firstChoiceStatus === ApplicationStatus.REJECTED &&
-          application.secondChoiceStatus === ApplicationStatus.PENDING &&
-          !application.assignedTeam
-        ) {
-          items.push({
-            icon: "checkmark-circle-outline" as const,
-            onClick: () =>
-              handleAccept(
-                application.id,
-                application.secondChoiceTeam as OrganizerTeam
-              ),
-          });
-          items.push({
-            icon: "close-circle-outline" as const,
-            onClick: () =>
-              handleReject(
-                application.id,
-                application.secondChoiceTeam as OrganizerTeam
-              ),
-          });
-        }
-
-        return <DefaultActionCell items={items} />;
+  const columns = useMemo(
+    () => [
+      {
+        id: "name",
+        type: "text" as const,
+        header: "Name",
+        accessorKey: "name" as const,
+        size: 200,
       },
-    },
-  ], [fullApplicationsData, handleViewApplication, handleAccept, handleReject]);
+      {
+        id: "email",
+        type: "text" as const,
+        header: "Email",
+        accessorKey: "email" as const,
+        size: 250,
+      },
+      {
+        id: "yearStanding",
+        type: "text" as const,
+        header: "Year Standing",
+        accessorKey: "yearStanding" as const,
+        size: 150,
+      },
+      {
+        id: "major",
+        type: "text" as const,
+        header: "Major",
+        accessorKey: "major" as const,
+        size: 200,
+      },
+      {
+        id: "firstChoiceTeam",
+        type: "text" as const,
+        header: "1st Choice Team",
+        accessorKey: "firstChoiceTeam" as const,
+        size: 180,
+      },
+      {
+        id: "firstChoiceStatus",
+        type: "text" as const,
+        header: "1st Choice Status",
+        accessorKey: "firstChoiceStatus" as const,
+        size: 150,
+      },
+      {
+        id: "secondChoiceTeam",
+        type: "text" as const,
+        header: "2nd Choice Team",
+        accessorKey: "secondChoiceTeam" as const,
+        size: 180,
+      },
+      {
+        id: "secondChoiceStatus",
+        type: "text" as const,
+        header: "2nd Choice Status",
+        accessorKey: "secondChoiceStatus" as const,
+        size: 150,
+      },
+      {
+        id: "assignedTeam",
+        type: "text" as const,
+        header: "Assigned Team",
+        accessorKey: "assignedTeam" as const,
+        size: 150,
+      },
+      {
+        id: "createdAt",
+        type: "text" as const,
+        header: "Applied On",
+        accessorKey: "createdAt" as const,
+        size: 130,
+      },
+      {
+        id: "actions",
+        type: "custom" as const,
+        header: "Actions",
+        size: 140,
+        cell: ({ row }: any) => {
+          const application = fullApplicationsData?.find(
+            (a) => a.id === row.original.id
+          );
+          if (!application) return null;
+
+          const items = [
+            {
+              icon: "eye-outline" as const,
+              onClick: () => handleViewApplication(application),
+            },
+          ];
+
+          // Add accept/reject actions based on status
+          if (
+            application.firstChoiceStatus === ApplicationStatus.PENDING &&
+            !application.assignedTeam
+          ) {
+            items.push({
+              icon: "checkmark-circle-outline" as const,
+              onClick: () =>
+                handleAccept(
+                  application.id,
+                  application.firstChoiceTeam as OrganizerTeam
+                ),
+            });
+            items.push({
+              icon: "close-circle-outline" as const,
+              onClick: () =>
+                handleReject(
+                  application.id,
+                  application.firstChoiceTeam as OrganizerTeam
+                ),
+            });
+          } else if (
+            application.firstChoiceStatus === ApplicationStatus.REJECTED &&
+            application.secondChoiceStatus === ApplicationStatus.PENDING &&
+            !application.assignedTeam
+          ) {
+            items.push({
+              icon: "checkmark-circle-outline" as const,
+              onClick: () =>
+                handleAccept(
+                  application.id,
+                  application.secondChoiceTeam as OrganizerTeam
+                ),
+            });
+            items.push({
+              icon: "close-circle-outline" as const,
+              onClick: () =>
+                handleReject(
+                  application.id,
+                  application.secondChoiceTeam as OrganizerTeam
+                ),
+            });
+          }
+
+          return <DefaultActionCell items={items} />;
+        },
+      },
+    ],
+    [fullApplicationsData, handleViewApplication, handleAccept, handleReject]
+  );
 
   const defs = useColumnDef<ApplicationTableRow>({
     columns,
@@ -392,7 +460,13 @@ const OrganizerApplicationsContent: React.FC<{
           <Grid item>
             <Box display="flex" alignItems="center" gap={2}>
               <Typography variant="subtitle1">
-                Total Applications: {applicationsData?.length || 0}
+                {(Object.values(filterState) as string[][]).some(
+                  (v) => v.length > 0
+                )
+                  ? `Showing ${applicationsData?.length || 0} of ${
+                      fullApplicationsData?.length || 0
+                    } Applications`
+                  : `Total Applications: ${applicationsData?.length || 0}`}
               </Typography>
               <Chip
                 label={`${pendingCount} Pending`}
@@ -405,6 +479,11 @@ const OrganizerApplicationsContent: React.FC<{
         <Grid item sx={{ width: "100%" }}>
           <Table {...table}>
             <Table.GlobalActions>
+              <MultiCategoryFilter
+                categories={filterCategories}
+                filterState={filterState}
+                onFilterChange={setFilterState}
+              />
               <Table.GlobalRefresh onRefresh={onRefresh} />
               <Table.GlobalPageSize />
             </Table.GlobalActions>

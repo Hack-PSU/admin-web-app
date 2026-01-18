@@ -16,8 +16,6 @@ const EventImageReview: FC = () => {
     <>
       <Grid item xs={12}>
         {getImageURL() ? (
-          // required to enforce full width and height
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={getImageURL()}
             alt={`event-image-${name}`}
