@@ -101,6 +101,28 @@ const initialFilterState: FilterState = {
   yearStanding: [],
 };
 
+// Helper to get the effective status of an application
+const getEffectiveStatus = (
+  app: OrganizerApplicationEntity
+): ApplicationStatus => {
+  // If accepted on either choice, they're in
+  if (
+    app.firstChoiceStatus === ApplicationStatus.ACCEPTED ||
+    app.secondChoiceStatus === ApplicationStatus.ACCEPTED
+  ) {
+    return ApplicationStatus.ACCEPTED;
+  }
+  // If rejected on both, they're fully rejected
+  if (
+    app.firstChoiceStatus === ApplicationStatus.REJECTED &&
+    app.secondChoiceStatus === ApplicationStatus.REJECTED
+  ) {
+    return ApplicationStatus.REJECTED;
+  }
+  // Otherwise still pending (first pending, or first rejected but second pending)
+  return ApplicationStatus.PENDING;
+};
+
 const OrganizerApplicationsContent: React.FC<{
   applications: OrganizerApplicationEntity[];
 }> = ({ applications }) => {
@@ -142,12 +164,10 @@ const OrganizerApplicationsContent: React.FC<{
       );
     }
 
-    // Apply status filter (matches first or second choice status)
+    // Apply status filter based on effective status
     if (filterState.status.length > 0) {
-      filtered = filtered.filter(
-        (d) =>
-          filterState.status.includes(d.firstChoiceStatus) ||
-          filterState.status.includes(d.secondChoiceStatus)
+      filtered = filtered.filter((d) =>
+        filterState.status.includes(getEffectiveStatus(d))
       );
     }
 
