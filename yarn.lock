@@ -2246,7 +2246,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/match-sorter-utils@npm:^8.1.1, @tanstack/match-sorter-utils@npm:^8.7.0":
+"@tanstack/match-sorter-utils@npm:^8.1.1":
   version: 8.19.4
   resolution: "@tanstack/match-sorter-utils@npm:8.19.4"
   dependencies:
@@ -2255,44 +2255,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:4.41.0":
-  version: 4.41.0
-  resolution: "@tanstack/query-core@npm:4.41.0"
-  checksum: 285d1d138ee752139a37871c05d56f75ac2a5583b9eb91de5656a0e0568cbc8066ac512a2744b3be592fa2b5ce362bcf1a3060968299c59e4d2ec8f6d34e2c3c
+"@tanstack/query-core@npm:5.101.2":
+  version: 5.101.2
+  resolution: "@tanstack/query-core@npm:5.101.2"
+  checksum: 1a8427af5c6fd85adef0f3b649c96147bbf88bf2725a2b0c72daaa30679eb33791fe9e1979963bcd2b3318283b2bca22e6c6ad0c705e64f2542cdf7f25919c7b
   languageName: node
   linkType: hard
 
-"@tanstack/react-query-devtools@npm:^4.2.1":
-  version: 4.42.0
-  resolution: "@tanstack/react-query-devtools@npm:4.42.0"
-  dependencies:
-    "@tanstack/match-sorter-utils": ^8.7.0
-    superjson: ^1.10.0
-    use-sync-external-store: ^1.2.0
-  peerDependencies:
-    "@tanstack/react-query": ^4.42.0
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 512d89ebab7986f329805700fd780c861ec7b3d5fcffb1f7f5ec5b8487dbeff1ad4ccbf5c2cb82edc3097f89e10773e238a5425e475c716b49dceacbfc5ac9bb
+"@tanstack/query-devtools@npm:5.101.2":
+  version: 5.101.2
+  resolution: "@tanstack/query-devtools@npm:5.101.2"
+  checksum: ce23a59d67cd13ba7019faf8d761158df2044b4e6e6876f645149c48ff011bb984cfddfe76e675c8012ad6ac7e8fbffd776ee39c8fb001973305da9783487b89
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^4.2.1":
-  version: 4.42.0
-  resolution: "@tanstack/react-query@npm:4.42.0"
+"@tanstack/react-query-devtools@npm:^5.0.0":
+  version: 5.101.2
+  resolution: "@tanstack/react-query-devtools@npm:5.101.2"
   dependencies:
-    "@tanstack/query-core": 4.41.0
-    use-sync-external-store: ^1.2.0
+    "@tanstack/query-devtools": 5.101.2
   peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-native: "*"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: d5492a1b8681c1270244d75ec613becbec47612b28308e678d339d1a3858f4c10d23a4761bf7dae476792daf8dc4fd50e27ea705c76998fda71b5acb5045d059
+    "@tanstack/react-query": ^5.101.2
+    react: ^18 || ^19
+  checksum: b20c161db89066f70e2a1922ed80bc382ac7086e30b909f8451a25b8320695fe5f33ff091cabb3fac73d7b85ab96f7b8229fb55c5bbd7a55b34cdaec676f794a
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.0.0":
+  version: 5.101.2
+  resolution: "@tanstack/react-query@npm:5.101.2"
+  dependencies:
+    "@tanstack/query-core": 5.101.2
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 241c5d9f7d76c968d1e8b4b4d7e4b15ac509ab6b559be3bb662ff7a5b33f3532cb96fed81c631b40fd782f230536d71f9b81abb38b893541b07d44539e66e68d
   languageName: node
   linkType: hard
 
@@ -3662,8 +3658,8 @@ __metadata:
     "@mui/material": ^5.8.1
     "@mui/styled-engine-sc": ^5.8.0
     "@tanstack/match-sorter-utils": ^8.1.1
-    "@tanstack/react-query": ^4.2.1
-    "@tanstack/react-query-devtools": ^4.2.1
+    "@tanstack/react-query": ^5.0.0
+    "@tanstack/react-query-devtools": ^5.0.0
     "@tanstack/react-table": ^8.3.3
     "@tiptap/extension-bubble-menu": ^2.0.0-beta.220
     "@tiptap/extension-link": ^2.0.0-beta.220
@@ -4332,15 +4328,6 @@ __metadata:
   version: 0.4.2
   resolution: "cookie@npm:0.4.2"
   checksum: a00833c998bedf8e787b4c342defe5fa419abd96b32f4464f718b91022586b8f1bafbddd499288e75c037642493c83083da426c6a9080d309e3bd90fd11baa9b
-  languageName: node
-  linkType: hard
-
-"copy-anything@npm:^3.0.2":
-  version: 3.0.5
-  resolution: "copy-anything@npm:3.0.5"
-  dependencies:
-    is-what: ^4.1.8
-  checksum: d39f6601c16b7cbd81cdb1c1f40f2bf0f2ca0297601cf7bfbb4ef1d85374a6a89c559502329f5bada36604464df17623e111fe19a9bb0c3f6b1c92fe2cbe972f
   languageName: node
   linkType: hard
 
@@ -6506,13 +6493,6 @@ __metadata:
     call-bound: ^1.0.3
     get-intrinsic: ^1.2.6
   checksum: 5c6c8415a06065d78bdd5e3a771483aa1cd928df19138aa73c4c51333226f203f22117b4325df55cc8b3085a6716870a320c2d757efee92d7a7091a039082041
-  languageName: node
-  linkType: hard
-
-"is-what@npm:^4.1.8":
-  version: 4.1.16
-  resolution: "is-what@npm:4.1.16"
-  checksum: baf99e4b9f06003ceb3b2eea4a1e17179524ee3a6310dc44903eb675cfe3c0a17819ab057bb1ae6ba7ca4939ae4bdfcc6a0c4210a8457aff1756abd3607b713c
   languageName: node
   linkType: hard
 
@@ -8955,15 +8935,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superjson@npm:^1.10.0":
-  version: 1.13.3
-  resolution: "superjson@npm:1.13.3"
-  dependencies:
-    copy-anything: ^3.0.2
-  checksum: f5aeb010f24163cb871a4bc402d9164112201c059afc247a75b03131c274aea6eec9cf08be9e4a9465fe4961689009a011584528531d52f7cc91c077e07e5c75
-  languageName: node
-  linkType: hard
-
 "superstruct@npm:^0.16.0":
   version: 0.16.7
   resolution: "superstruct@npm:0.16.7"
@@ -9374,15 +9345,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 5e639c9273200adb6985b512c96a3a02c458bc8ca1a72e91da9cdc6426144fc6538dca434b0f99b28fb1baabc82e1c383ba7900b25ccdcb43758fb058dc66c34
-  languageName: node
-  linkType: hard
-
-"use-sync-external-store@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "use-sync-external-store@npm:1.2.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
   languageName: node
   linkType: hard
 
