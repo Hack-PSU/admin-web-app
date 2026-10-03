@@ -87,7 +87,7 @@
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "eslint": "8.57.1",
-    "eslint-config-next": "^15.0.0",
+    "eslint-config-next": "^16.0.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": ">=6",
     "lint-staged": ">=10",
