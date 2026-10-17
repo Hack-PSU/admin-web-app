@@ -3726,7 +3726,7 @@ __metadata:
     react-spring: ^9.5.0
     react-table: ^7.8.0
     styled-components: ^5.3.5
-    superstruct: ^0.16.0
+    superstruct: ^2.0.0
     typescript: 4.9.5
     use-immer: ^0.11.0
     yup: ^0.32.11
@@ -8964,10 +8964,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superstruct@npm:^0.16.0":
-  version: 0.16.7
-  resolution: "superstruct@npm:0.16.7"
-  checksum: c8c855ff6945da8a41048c6d236de7b1af5d4d9c31742b3ee54d65647c31597488620281f65e095d5efc9e2fbdaad529b8c8f2506c12569d428467c835a21477
+"superstruct@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "superstruct@npm:2.0.2"
+  checksum: a5f75b72cb8b14b86f4f7f750dae8c5ab0e4e1d92414b55e7625bae07bbcafad81c92486e7e32ccacd6ae1f553caff2b92a50ff42ad5093fd35b9cb7f4e5ec86
   languageName: node
   linkType: hard
 
