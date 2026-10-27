@@ -73,7 +73,7 @@
     "superstruct": "^0.16.0",
     "use-immer": "^0.11.0",
     "yup": "^0.32.11",
-    "zustand": "^4.1.0"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/d3-scale-chromatic": "^3.0.0",
